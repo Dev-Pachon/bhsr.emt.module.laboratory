@@ -133,7 +133,7 @@
     "cross-env": "7.0.3",
     "css-loader": "6.7.1",
     "css-minimizer-webpack-plugin": "4.0.0",
-    "cypress": "10.7.0",
+    "cypress": "13.3.2",
     "cypress-audit": "1.1.0",
     "eslint": "8.23.0",
     "eslint-config-prettier": "8.5.0",
