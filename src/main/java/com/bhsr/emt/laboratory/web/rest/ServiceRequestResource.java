@@ -102,7 +102,7 @@ public class ServiceRequestResource {
                 }
 
                 return serviceRequestRepository
-                    .save(serviceRequest.setIsPersisted())
+                    .save(serviceRequest)
                     .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
                     .map(result ->
                         ResponseEntity

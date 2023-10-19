@@ -101,7 +101,7 @@ public class PatientResource {
                 }
 
                 return patientRepository
-                    .save(patient.setIsPersisted())
+                    .save(patient)
                     .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
                     .map(result ->
                         ResponseEntity

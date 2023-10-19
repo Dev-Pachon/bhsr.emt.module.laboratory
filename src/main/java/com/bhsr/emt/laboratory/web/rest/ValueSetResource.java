@@ -101,7 +101,7 @@ public class ValueSetResource {
                 }
 
                 return valueSetRepository
-                    .save(valueSet.setIsPersisted())
+                    .save(valueSet)
                     .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
                     .map(result ->
                         ResponseEntity

@@ -103,7 +103,7 @@ public class DiagnosticReportFormatResource {
                 }
 
                 return diagnosticReportFormatRepository
-                    .save(diagnosticReportFormat.setIsPersisted())
+                    .save(diagnosticReportFormat)
                     .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
                     .map(result ->
                         ResponseEntity
