@@ -1,0 +1,24 @@
+{
+  "laboratoryApp": {
+    "laboratoryIdentifierType": {
+      "home": {
+        "title": "Identifier Types",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Identifier Type",
+        "createOrEditLabel": "Create or edit a Identifier Type",
+        "notFound": "No Identifier Types found"
+      },
+      "created": "A new Identifier Type is created with identifier {{ param }}",
+      "updated": "A Identifier Type is updated with identifier {{ param }}",
+      "deleted": "A Identifier Type is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Identifier Type {{ id }}?"
+      },
+      "detail": {
+        "title": "Identifier Type"
+      },
+      "id": "Id",
+      "name": "Name"
+    }
+  }
+}

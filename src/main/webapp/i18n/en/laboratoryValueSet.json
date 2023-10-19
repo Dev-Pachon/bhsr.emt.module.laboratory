@@ -1,0 +1,24 @@
+{
+  "laboratoryApp": {
+    "laboratoryValueSet": {
+      "home": {
+        "title": "Value Sets",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Value Set",
+        "createOrEditLabel": "Create or edit a Value Set",
+        "notFound": "No Value Sets found"
+      },
+      "created": "A new Value Set is created with identifier {{ param }}",
+      "updated": "A Value Set is updated with identifier {{ param }}",
+      "deleted": "A Value Set is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Value Set {{ id }}?"
+      },
+      "detail": {
+        "title": "Value Set"
+      },
+      "id": "Id",
+      "name": "Name"
+    }
+  }
+}

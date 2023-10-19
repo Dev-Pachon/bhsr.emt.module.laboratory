@@ -1,0 +1,32 @@
+{
+  "laboratoryApp": {
+    "laboratoryDiagnosticReport": {
+      "home": {
+        "title": "Diagnostic Reports",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Diagnostic Report",
+        "createOrEditLabel": "Create or edit a Diagnostic Report",
+        "notFound": "No Diagnostic Reports found"
+      },
+      "created": "A new Diagnostic Report is created with identifier {{ param }}",
+      "updated": "A Diagnostic Report is updated with identifier {{ param }}",
+      "deleted": "A Diagnostic Report is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Diagnostic Report {{ id }}?"
+      },
+      "detail": {
+        "title": "Diagnostic Report"
+      },
+      "id": "Id",
+      "status": "Status",
+      "createdAt": "Created At",
+      "createdBy": "Created By",
+      "updatedAt": "Updated At",
+      "updatedBy": "Updated By",
+      "deletedAt": "Deleted At",
+      "subject": "Subject",
+      "format": "Format",
+      "basedOn": "Based On"
+    }
+  }
+}

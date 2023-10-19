@@ -1,0 +1,73 @@
+{
+  "applications": ["laboratory"],
+  "changelogDate": "20231019220735",
+  "clientRootFolder": "laboratory",
+  "databaseType": "mongodb",
+  "dto": "no",
+  "embedded": false,
+  "entityTableName": "diagnostic_report",
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "unique"]
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "DiagnosticReportStatus",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "REGISTERED,PARTIAL,PRELIMINARY,MODIFIED,FINAL,AMENDED,CORRECTED,APPENDED,CANCELLED,ENTERED_IN_ERROR,UNKNOWN"
+    },
+    {
+      "fieldName": "createdAt",
+      "fieldType": "LocalDate",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "createdBy",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "updatedAt",
+      "fieldType": "LocalDate",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "updatedBy",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "deletedAt",
+      "fieldType": "LocalDate"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "microserviceName": "laboratory",
+  "name": "DiagnosticReport",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "patient",
+      "ownerSide": true,
+      "relationshipName": "subject",
+      "relationshipType": "one-to-one"
+    },
+    {
+      "otherEntityName": "diagnosticReportFormat",
+      "ownerSide": true,
+      "relationshipName": "format",
+      "relationshipType": "one-to-one"
+    },
+    {
+      "otherEntityName": "serviceRequest",
+      "ownerSide": true,
+      "relationshipName": "basedOn",
+      "relationshipType": "one-to-one"
+    }
+  ],
+  "service": "no"
+}

@@ -1,0 +1,28 @@
+{
+  "laboratoryApp": {
+    "laboratoryDiagnosticReportFormat": {
+      "home": {
+        "title": "Diagnostic Report Formats",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Diagnostic Report Format",
+        "createOrEditLabel": "Create or edit a Diagnostic Report Format",
+        "notFound": "No Diagnostic Report Formats found"
+      },
+      "created": "A new Diagnostic Report Format is created with identifier {{ param }}",
+      "updated": "A Diagnostic Report Format is updated with identifier {{ param }}",
+      "deleted": "A Diagnostic Report Format is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Diagnostic Report Format {{ id }}?"
+      },
+      "detail": {
+        "title": "Diagnostic Report Format"
+      },
+      "id": "Id",
+      "createdAt": "Created At",
+      "createdBy": "Created By",
+      "updatedAt": "Updated At",
+      "updatedBy": "Updated By",
+      "deletedAt": "Deleted At"
+    }
+  }
+}
