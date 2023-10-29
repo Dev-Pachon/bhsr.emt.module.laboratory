@@ -68,7 +68,6 @@ class DiagnosticReportFormatResourceIT {
             .updatedAt(DEFAULT_UPDATED_AT)
             .updatedBy(DEFAULT_UPDATED_BY)
             .deletedAt(DEFAULT_DELETED_AT);
-        return diagnosticReportFormat;
     }
 
     /**
