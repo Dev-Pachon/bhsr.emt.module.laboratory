@@ -16,7 +16,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
  * A DiagnosticReportFormat.
  */
 @Document(collection = "diagnostic_report_format")
-@SuppressWarnings("common-java:DuplicatedBlocks")
 @Data
 @Builder
 @AllArgsConstructor

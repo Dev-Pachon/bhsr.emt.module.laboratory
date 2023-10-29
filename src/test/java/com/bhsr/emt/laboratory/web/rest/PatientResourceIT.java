@@ -57,7 +57,10 @@ class PatientResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Patient createEntity() {
-        Patient patient = new Patient().active(DEFAULT_ACTIVE).gender(DEFAULT_GENDER).birthDate(DEFAULT_BIRTH_DATE);
+        Patient patient = new Patient();
+        patient.setActive(DEFAULT_ACTIVE);
+        patient.setGender(DEFAULT_GENDER);
+        patient.setBirthDate(DEFAULT_BIRTH_DATE);
         return patient;
     }
 
@@ -68,7 +71,10 @@ class PatientResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Patient createUpdatedEntity() {
-        Patient patient = new Patient().active(UPDATED_ACTIVE).gender(UPDATED_GENDER).birthDate(UPDATED_BIRTH_DATE);
+        Patient patient = new Patient();
+        patient.setActive(DEFAULT_ACTIVE);
+        patient.setGender(DEFAULT_GENDER);
+        patient.setBirthDate(DEFAULT_BIRTH_DATE);
         return patient;
     }
 
@@ -295,7 +301,9 @@ class PatientResourceIT {
 
         // Update the patient
         Patient updatedPatient = patientRepository.findById(patient.getId()).block();
-        updatedPatient.active(UPDATED_ACTIVE).gender(UPDATED_GENDER).birthDate(UPDATED_BIRTH_DATE);
+        updatedPatient.setActive(DEFAULT_ACTIVE);
+        updatedPatient.setGender(DEFAULT_GENDER);
+        updatedPatient.setBirthDate(DEFAULT_BIRTH_DATE);
 
         webTestClient
             .put()
@@ -387,7 +395,9 @@ class PatientResourceIT {
         Patient partialUpdatedPatient = new Patient();
         partialUpdatedPatient.setId(patient.getId());
 
-        partialUpdatedPatient.active(UPDATED_ACTIVE).gender(UPDATED_GENDER).birthDate(UPDATED_BIRTH_DATE);
+        partialUpdatedPatient.setActive(DEFAULT_ACTIVE);
+        partialUpdatedPatient.setGender(DEFAULT_GENDER);
+        partialUpdatedPatient.setBirthDate(DEFAULT_BIRTH_DATE);
 
         webTestClient
             .patch()
@@ -419,7 +429,9 @@ class PatientResourceIT {
         Patient partialUpdatedPatient = new Patient();
         partialUpdatedPatient.setId(patient.getId());
 
-        partialUpdatedPatient.active(UPDATED_ACTIVE).gender(UPDATED_GENDER).birthDate(UPDATED_BIRTH_DATE);
+        partialUpdatedPatient.setActive(DEFAULT_ACTIVE);
+        partialUpdatedPatient.setGender(DEFAULT_GENDER);
+        partialUpdatedPatient.setBirthDate(DEFAULT_BIRTH_DATE);
 
         webTestClient
             .patch()
