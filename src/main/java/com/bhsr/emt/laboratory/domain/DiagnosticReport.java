@@ -20,7 +20,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@SuppressWarnings("common-java:DuplicatedBlocks")
 public class DiagnosticReport implements Serializable {
 
     private static final long serialVersionUID = 1L;

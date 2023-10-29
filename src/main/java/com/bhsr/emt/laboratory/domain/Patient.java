@@ -40,4 +40,16 @@ public class Patient implements Serializable {
     @NotNull(message = "must not be null")
     @Field("birth_date")
     private LocalDate birthDate;
+
+    @NotNull(message = "must not be null")
+    @Field("address")
+    private Address address;
+
+    @NotNull(message = "must not be null")
+    @Field("contact")
+    private Contact contact;
+
+    @NotNull(message = "must not be null")
+    @Field("humanName")
+    private HumanName humanName;
 }

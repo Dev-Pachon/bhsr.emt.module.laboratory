@@ -2,6 +2,7 @@ package com.bhsr.emt.laboratory.domain;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 import javax.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,4 +47,7 @@ public class DiagnosticReportFormat implements Serializable {
 
     @Field("deleted_at")
     private LocalDate deletedAt;
+
+    @Field("FieldFormat")
+    private List<FieldFormat> fieldFormats;
 }

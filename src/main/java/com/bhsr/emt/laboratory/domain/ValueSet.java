@@ -1,6 +1,7 @@
 package com.bhsr.emt.laboratory.domain;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,4 +31,8 @@ public class ValueSet implements Serializable {
     @NotNull(message = "must not be null")
     @Field("name")
     private String name;
+
+    @NotNull(message = "must not be null")
+    @Field("constant")
+    private List<Constant> constant;
 }
