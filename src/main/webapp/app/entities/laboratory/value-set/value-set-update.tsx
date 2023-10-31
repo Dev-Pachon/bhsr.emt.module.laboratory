@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Button, Row, Col, FormText } from 'reactstrap';
-import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
+import { Translate, translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
@@ -10,6 +9,12 @@ import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { IValueSet } from 'app/shared/model/laboratory/value-set.model';
 import { getEntity, updateEntity, createEntity, reset } from './value-set.reducer';
+import { Button, Card, Col, DatePicker, Form, Input, InputNumber, Row, Select, Space, Switch } from 'antd';
+import { useForm, useWatch } from 'antd/es/form/Form';
+import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+
+import { DataType } from 'app/shared/model/enumerations/data-type.model';
+import { IConstant } from 'app/shared/model/laboratory/constant.model';
 
 export const ValueSetUpdate = () => {
   const dispatch = useAppDispatch();
@@ -23,6 +28,9 @@ export const ValueSetUpdate = () => {
   const loading = useAppSelector(state => state.laboratory.valueSet.loading);
   const updating = useAppSelector(state => state.laboratory.valueSet.updating);
   const updateSuccess = useAppSelector(state => state.laboratory.valueSet.updateSuccess);
+
+  const [form] = useForm<IValueSet>();
+  const dataType = useWatch('dataType', form);
 
   const handleClose = () => {
     navigate('/laboratory/value-set');
@@ -43,16 +51,17 @@ export const ValueSetUpdate = () => {
   }, [updateSuccess]);
 
   const saveEntity = values => {
-    const entity = {
-      ...valueSetEntity,
-      ...values,
-    };
-
-    if (isNew) {
-      dispatch(createEntity(entity));
-    } else {
-      dispatch(updateEntity(entity));
-    }
+    console.log(values);
+    // const entity = {
+    //   ...valueSetEntity,
+    //   ...values,
+    // };
+    //
+    // if (isNew) {
+    //   dispatch(createEntity(entity));
+    // } else {
+    //   dispatch(updateEntity(entity));
+    // }
   };
 
   const defaultValues = () =>
@@ -62,42 +71,121 @@ export const ValueSetUpdate = () => {
           ...valueSetEntity,
         };
 
+  const filterOption = (input: string, option?: { label: string; value: string }) =>
+    (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
+
+  const addValueField = () => {
+    switch (dataType) {
+      case DataType.BOOLEAN:
+        return <Switch />;
+      case DataType.DATE:
+        return <DatePicker />;
+      case DataType.STRING:
+        return <Input placeholder={translate('laboratoryApp.laboratoryValueSet.create.values.value')} />;
+      case DataType.NUMBER:
+        return <InputNumber />;
+      default:
+        return <Input placeholder={translate('laboratoryApp.laboratoryValueSet.create.values.value')} />;
+    }
+  };
+
   return (
     <div>
       <Row className="justify-content-center">
-        <Col md="8">
+        <Col span="8">
           <h2 id="laboratoryApp.laboratoryValueSet.home.createOrEditLabel" data-cy="ValueSetCreateUpdateHeading">
             <Translate contentKey="laboratoryApp.laboratoryValueSet.home.createOrEditLabel">Create or edit a ValueSet</Translate>
           </h2>
         </Col>
       </Row>
       <Row className="justify-content-center">
-        <Col md="8">
+        <Col span="8">
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
+            <Form form={form} initialValues={defaultValues()} onFinish={saveEntity}>
               {!isNew ? (
-                <ValidatedField
-                  name="id"
-                  required
-                  readOnly
-                  id="value-set-id"
-                  label={translate('laboratoryApp.laboratoryValueSet.id')}
-                  validate={{ required: true }}
-                />
+                <Form.Item<IValueSet> name="id" label={translate('laboratoryApp.laboratoryValueSet.id')} rules={[{ required: true }]}>
+                  <Input readOnly />
+                </Form.Item>
               ) : null}
-              <ValidatedField
-                label={translate('laboratoryApp.laboratoryValueSet.name')}
-                id="value-set-name"
+              <Form.Item<IValueSet>
                 name="name"
-                data-cy="name"
-                type="text"
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                }}
-              />
-              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/laboratory/value-set" replace color="info">
+                label={translate('laboratoryApp.laboratoryValueSet.create.name')}
+                rules={[{ required: true, message: 'Please fill this field.' }]}
+              >
+                <Input placeholder={translate('laboratoryApp.laboratoryValueSet.create.name')} />
+              </Form.Item>
+              <Form.Item<IValueSet>
+                name="description"
+                label={translate('laboratoryApp.laboratoryValueSet.create.description')}
+                rules={[{ required: true }]}
+              >
+                <Input placeholder={translate('laboratoryApp.laboratoryValueSet.create.description')} />
+              </Form.Item>
+              <Form.Item<IValueSet>
+                name="dataType"
+                label={translate('laboratoryApp.laboratoryValueSet.create.dataType')}
+                rules={[{ required: true }]}
+              >
+                <Select
+                  showSearch
+                  placeholder="Select a data type "
+                  optionFilterProp="children"
+                  filterOption={filterOption}
+                  options={Object.keys(DataType).map((key: string) => {
+                    return { value: key, label: translate(`laboratoryApp.fieldFormatType.${key}`) };
+                  })}
+                />
+              </Form.Item>
+              <Form.List name="values">
+                {(constants, { add, remove }) => (
+                  <div style={{ display: 'flex', rowGap: 16, flexDirection: 'column' }}>
+                    {constants.map(constant => (
+                      <Card
+                        size="small"
+                        title={`Constant ${constant.name + 1}`}
+                        key={constant.key}
+                        extra={
+                          <DeleteOutlined
+                            onClick={() => {
+                              remove(constant.name);
+                            }}
+                            rev={undefined}
+                          />
+                        }
+                      >
+                        <Form.Item
+                          name={[constant.name, 'name']}
+                          label={translate('laboratoryApp.laboratoryValueSet.create.values.name')}
+                          rules={[{ required: true, message: 'Please fill this field!' }]}
+                        >
+                          <Input placeholder={translate('laboratoryApp.laboratoryValueSet.create.values.name')} />
+                        </Form.Item>
+                        <Form.Item
+                          name={[constant.name, 'description']}
+                          label={translate('laboratoryApp.laboratoryValueSet.create.values.description')}
+                          rules={[{ required: true, message: 'Please fill this field!' }]}
+                        >
+                          <Input placeholder={translate('laboratoryApp.laboratoryValueSet.create.values.description')} />
+                        </Form.Item>
+                        <Form.Item
+                          name={[constant.name, 'value']}
+                          label={translate('laboratoryApp.laboratoryValueSet.create.values.value')}
+                          rules={[{ required: true, message: 'Please fill this field!' }]}
+                          valuePropName={dataType === DataType.BOOLEAN && 'checked'}
+                        >
+                          {addValueField()}
+                        </Form.Item>
+                      </Card>
+                    ))}
+                    <Button type="dashed" onClick={add} block icon={<PlusOutlined rev={undefined} />} className={'mb-4'}>
+                      Add field
+                    </Button>
+                  </div>
+                )}
+              </Form.List>
+              <Button type="link" id="cancel-save" data-cy="entityCreateCancelButton" href="/laboratory/value-set" color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">
@@ -105,12 +193,12 @@ export const ValueSetUpdate = () => {
                 </span>
               </Button>
               &nbsp;
-              <Button color="primary" id="save-entity" data-cy="entityCreateSaveButton" type="submit" disabled={updating}>
+              <Button type="primary" id="save-entity" data-cy="entityCreateSaveButton" htmlType="submit" disabled={updating}>
                 <FontAwesomeIcon icon="save" />
                 &nbsp;
                 <Translate contentKey="entity.action.save">Save</Translate>
               </Button>
-            </ValidatedForm>
+            </Form>
           )}
         </Col>
       </Row>

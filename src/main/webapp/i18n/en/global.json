@@ -10,9 +10,9 @@
         "laboratoryPatient": "Patient",
         "laboratoryIdentifierType": "Identifier Type",
         "laboratoryDiagnosticReport": "Diagnostic Report",
-        "laboratoryDiagnosticReportFormat": "Diagnostic Report Format",
-        "laboratoryServiceRequest": "Service Request",
-        "laboratoryValueSet": "Value Set",
+        "laboratoryDiagnosticReportFormat": "Diagnostic Report Formats",
+        "laboratoryServiceRequest": "Laboratory Requests",
+        "laboratoryValueSet": "Value Sets",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
       },
       "account": {

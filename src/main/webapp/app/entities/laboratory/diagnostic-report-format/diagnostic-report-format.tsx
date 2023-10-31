@@ -17,6 +17,24 @@ export const DiagnosticReportFormat = () => {
   const navigate = useNavigate();
 
   const diagnosticReportFormatList = useAppSelector(state => state.laboratory.diagnosticReportFormat.entities);
+  // const diagnosticReportFormatList = [
+  //   {
+  //     id: 1,
+  //     name: 'name 1',
+  //     createdAt: '2021-08-01',
+  //     createdBy: 'createdBy 1',
+  //     updatedAt: '2021-08-01',
+  //     updatedBy: 'updatedBy 1',
+  //   },
+  //   {
+  //     id: 2,
+  //     name: 'name 2',
+  //     createdAt: '2021-08-02',
+  //     createdBy: 'createdBy 2',
+  //     updatedAt: '2021-08-02',
+  //     updatedBy: 'updatedBy 2',
+  //   },
+  // ];
   const loading = useAppSelector(state => state.laboratory.diagnosticReportFormat.loading);
 
   useEffect(() => {
@@ -59,6 +77,9 @@ export const DiagnosticReportFormat = () => {
                   <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.id">Id</Translate>
                 </th>
                 <th>
+                  <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.name">Name</Translate>
+                </th>
+                <th>
                   <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.createdAt">Created At</Translate>
                 </th>
                 <th>
@@ -70,9 +91,7 @@ export const DiagnosticReportFormat = () => {
                 <th>
                   <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.updatedBy">Updated By</Translate>
                 </th>
-                <th>
-                  <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.deletedAt">Deleted At</Translate>
-                </th>
+
                 <th />
               </tr>
             </thead>
@@ -84,6 +103,7 @@ export const DiagnosticReportFormat = () => {
                       {diagnosticReportFormat.id}
                     </Button>
                   </td>
+                  <td>{diagnosticReportFormat.name}</td>
                   <td>
                     {diagnosticReportFormat.createdAt ? (
                       <TextFormat type="date" value={diagnosticReportFormat.createdAt} format={APP_LOCAL_DATE_FORMAT} />
@@ -96,11 +116,6 @@ export const DiagnosticReportFormat = () => {
                     ) : null}
                   </td>
                   <td>{diagnosticReportFormat.updatedBy}</td>
-                  <td>
-                    {diagnosticReportFormat.deletedAt ? (
-                      <TextFormat type="date" value={diagnosticReportFormat.deletedAt} format={APP_LOCAL_DATE_FORMAT} />
-                    ) : null}
-                  </td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
                       <Button

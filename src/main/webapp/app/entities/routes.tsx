@@ -23,14 +23,10 @@ export default () => {
   return (
     <div>
       <ErrorBoundaryRoutes>
-        {/* prettier-ignore */}
-        <Route path="/patient/*" element={<Patient />} />
         <Route path="/identifier-type/*" element={<IdentifierType />} />
-        <Route path="/diagnostic-report/*" element={<DiagnosticReport />} />
         <Route path="/diagnostic-report-format/*" element={<DiagnosticReportFormat />} />
         <Route path="/service-request/*" element={<ServiceRequest />} />
         <Route path="/value-set/*" element={<ValueSet />} />
-        {/* jhipster-needle-add-route-path - JHipster will add routes here */}
       </ErrorBoundaryRoutes>
     </div>
   );

@@ -98,6 +98,7 @@ export const ServiceRequestUpdate = () => {
                 name="status"
                 data-cy="status"
                 type="select"
+                readOnly
               >
                 {serviceRequestStatusValues.map(serviceRequestStatus => (
                   <option value={serviceRequestStatus} key={serviceRequestStatus}>
@@ -136,14 +137,6 @@ export const ServiceRequestUpdate = () => {
                 }}
               />
               <ValidatedField
-                label={translate('laboratoryApp.laboratoryServiceRequest.doNotPerform')}
-                id="service-request-doNotPerform"
-                name="doNotPerform"
-                data-cy="doNotPerform"
-                check
-                type="checkbox"
-              />
-              <ValidatedField
                 label={translate('laboratoryApp.laboratoryServiceRequest.serviceId')}
                 id="service-request-serviceId"
                 name="serviceId"
@@ -153,53 +146,6 @@ export const ServiceRequestUpdate = () => {
                   required: { value: true, message: translate('entity.validation.required') },
                   validate: v => isNumber(v) || translate('entity.validation.number'),
                 }}
-              />
-              <ValidatedField
-                label={translate('laboratoryApp.laboratoryServiceRequest.createdAt')}
-                id="service-request-createdAt"
-                name="createdAt"
-                data-cy="createdAt"
-                type="date"
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                }}
-              />
-              <ValidatedField
-                label={translate('laboratoryApp.laboratoryServiceRequest.createdBy')}
-                id="service-request-createdBy"
-                name="createdBy"
-                data-cy="createdBy"
-                type="text"
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                }}
-              />
-              <ValidatedField
-                label={translate('laboratoryApp.laboratoryServiceRequest.updatedAt')}
-                id="service-request-updatedAt"
-                name="updatedAt"
-                data-cy="updatedAt"
-                type="date"
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                }}
-              />
-              <ValidatedField
-                label={translate('laboratoryApp.laboratoryServiceRequest.updatedBy')}
-                id="service-request-updatedBy"
-                name="updatedBy"
-                data-cy="updatedBy"
-                type="text"
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                }}
-              />
-              <ValidatedField
-                label={translate('laboratoryApp.laboratoryServiceRequest.deletedAt')}
-                id="service-request-deletedAt"
-                name="deletedAt"
-                data-cy="deletedAt"
-                type="date"
               />
               <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/laboratory/service-request" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />

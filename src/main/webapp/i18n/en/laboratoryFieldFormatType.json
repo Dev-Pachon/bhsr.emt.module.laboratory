@@ -1,0 +1,14 @@
+{
+  "laboratoryApp": {
+    "fieldFormatType": {
+      "DATE": "Date",
+      "NUMBER": "Number",
+      "STRING": "Text",
+      "LONG_STRING": "Long text",
+      "BOOLEAN": "True/False",
+      "REFERENCE": "Reference",
+      "QUANTITY": "Quantity",
+      "TIME_RANGE": "Time range"
+    }
+  }
+}

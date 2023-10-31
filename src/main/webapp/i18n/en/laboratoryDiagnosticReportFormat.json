@@ -6,6 +6,7 @@
         "refreshListLabel": "Refresh list",
         "createLabel": "Create a new Diagnostic Report Format",
         "createOrEditLabel": "Create or edit a Diagnostic Report Format",
+        "editLabel": "Create or edit a Diagnostic Report Format",
         "notFound": "No Diagnostic Report Formats found"
       },
       "created": "A new Diagnostic Report Format is created with identifier {{ param }}",
@@ -14,15 +15,29 @@
       "delete": {
         "question": "Are you sure you want to delete Diagnostic Report Format {{ id }}?"
       },
+      "update": {
+        "createField": "Create new Field",
+        "field": "Field"
+      },
       "detail": {
         "title": "Diagnostic Report Format"
       },
       "id": "Id",
+      "name": "Name",
       "createdAt": "Created At",
       "createdBy": "Created By",
       "updatedAt": "Updated At",
       "updatedBy": "Updated By",
-      "deletedAt": "Deleted At"
+      "deletedAt": "Deleted At",
+      "fields": {
+        "name": "Field name",
+        "dataType": "Data type",
+        "isRequired": "Required",
+        "isSearchable": "Searchable",
+        "defaultValue": "Default value",
+        "valueSet": "Value set",
+        "order": "Order"
+      }
     }
   }
 }

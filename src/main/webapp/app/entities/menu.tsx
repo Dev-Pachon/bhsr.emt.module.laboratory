@@ -14,15 +14,8 @@ const EntitiesMenu = () => {
 
   return (
     <>
-      {/* prettier-ignore */}
-      <MenuItem icon="asterisk" to="/laboratory/patient">
-        <Translate contentKey="global.menu.entities.laboratoryPatient" />
-      </MenuItem>
       <MenuItem icon="asterisk" to="/laboratory/identifier-type">
         <Translate contentKey="global.menu.entities.laboratoryIdentifierType" />
-      </MenuItem>
-      <MenuItem icon="asterisk" to="/laboratory/diagnostic-report">
-        <Translate contentKey="global.menu.entities.laboratoryDiagnosticReport" />
       </MenuItem>
       <MenuItem icon="asterisk" to="/laboratory/diagnostic-report-format">
         <Translate contentKey="global.menu.entities.laboratoryDiagnosticReportFormat" />
@@ -33,7 +26,6 @@ const EntitiesMenu = () => {
       <MenuItem icon="asterisk" to="/laboratory/value-set">
         <Translate contentKey="global.menu.entities.laboratoryValueSet" />
       </MenuItem>
-      {/* jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here */}
     </>
   );
 };
