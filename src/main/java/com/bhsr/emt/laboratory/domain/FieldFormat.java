@@ -12,9 +12,6 @@ import org.springframework.data.annotation.Id;
 @Builder
 public class FieldFormat {
 
-    @Id
-    private String id;
-
     private String name;
 
     private String dataType;

@@ -3,6 +3,7 @@ package com.bhsr.emt.laboratory.domain;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import javax.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,9 +25,11 @@ public class DiagnosticReportFormat implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "must not be null")
     @Id
     private String id;
+
+    @NotNull(message = "must not be null")
+    private String name;
 
     @NotNull(message = "must not be null")
     @Field("created_at")
@@ -48,5 +51,5 @@ public class DiagnosticReportFormat implements Serializable {
     private LocalDate deletedAt;
 
     @Field("FieldFormat")
-    private List<FieldFormat> fieldFormats;
+    private Set<FieldFormat> fieldFormats;
 }

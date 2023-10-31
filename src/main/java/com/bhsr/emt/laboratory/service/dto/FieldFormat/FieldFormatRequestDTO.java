@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FieldFormatRequestDTO {
+
     private String name;
 
     private String dataType;
@@ -21,7 +22,7 @@ public class FieldFormatRequestDTO {
 
     private String defaultValue;
 
-    private ValueSet valueSet;
+    private String valueSet;
 
     private Integer order;
 }

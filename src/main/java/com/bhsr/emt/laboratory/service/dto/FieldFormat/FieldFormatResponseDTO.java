@@ -6,13 +6,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class FieldFormatResponseDTO {
-    private String id;
 
     private String name;
 
@@ -24,7 +22,7 @@ public class FieldFormatResponseDTO {
 
     private String defaultValue;
 
-    private ValueSet valueSet;
+    private String valueSet;
 
     private Integer order;
 }

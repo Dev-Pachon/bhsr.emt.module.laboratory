@@ -1,33 +1,38 @@
 package com.bhsr.emt.laboratory.service.dto.DiagnosticReportFormat;
 
 import com.bhsr.emt.laboratory.service.dto.FieldFormat.FieldFormatResponseDTO;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Set;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-import java.util.Set;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class DiagnosticReportFormatResponseDTO {
+
     private String id;
 
     @NotNull
     private String name;
 
     @NotNull
-    private Set<FieldFormatResponseDTO> fields;
+    private Set<FieldFormatResponseDTO> fieldFormats;
 
     @NotNull
-    private LocalDateTime createdAt;
+    private LocalDate createdAt;
 
     @NotNull
-    private LocalDateTime updatedAt;
+    private String createdBy;
 
-    private LocalDateTime deletedAt;
+    @NotNull
+    private LocalDate updatedAt;
+
+    @NotNull
+    private String updatedBy;
 }
