@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { IValueSet } from 'app/shared/model/laboratory/value-set.model';
 import { getEntities } from './value-set.reducer';
+import { Empty } from 'antd';
 
 export const ValueSet = () => {
   const dispatch = useAppDispatch();
@@ -54,23 +55,27 @@ export const ValueSet = () => {
             <thead>
               <tr>
                 <th>
-                  <Translate contentKey="laboratoryApp.laboratoryValueSet.id">Id</Translate>
+                  <Translate contentKey="laboratoryApp.laboratoryValueSet.name">Name</Translate>
                 </th>
                 <th>
-                  <Translate contentKey="laboratoryApp.laboratoryValueSet.name">Name</Translate>
+                  <Translate contentKey="laboratoryApp.laboratoryValueSet.numConstants">Number of Constants</Translate>
+                </th>
+                <th>
+                  <Translate contentKey="laboratoryApp.laboratoryValueSet.dataType">Datatype</Translate>
+                </th>
+                <th>
+                  <Translate contentKey="laboratoryApp.laboratoryValueSet.description">Description</Translate>
                 </th>
                 <th />
               </tr>
             </thead>
             <tbody>
-              {valueSetList.map((valueSet, i) => (
+              {valueSetList.map((valueSet: IValueSet, i: number) => (
                 <tr key={`entity-${i}`} data-cy="entityTable">
-                  <td>
-                    <Button tag={Link} to={`/laboratory/value-set/${valueSet.id}`} color="link" size="sm">
-                      {valueSet.id}
-                    </Button>
-                  </td>
                   <td>{valueSet.name}</td>
+                  <td>{valueSet.constants.length}</td>
+                  <td>{valueSet.dataType}</td>
+                  <td>{valueSet.description}</td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
                       <Button tag={Link} to={`/laboratory/value-set/${valueSet.id}`} color="info" size="sm" data-cy="entityDetailsButton">
@@ -110,11 +115,7 @@ export const ValueSet = () => {
             </tbody>
           </Table>
         ) : (
-          !loading && (
-            <div className="alert alert-warning">
-              <Translate contentKey="laboratoryApp.laboratoryValueSet.home.notFound">No Value Sets found</Translate>
-            </div>
-          )
+          !loading && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
         )}
       </div>
     </div>

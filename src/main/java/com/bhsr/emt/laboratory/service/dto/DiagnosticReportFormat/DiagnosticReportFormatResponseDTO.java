@@ -1,5 +1,6 @@
 package com.bhsr.emt.laboratory.service.dto.DiagnosticReportFormat;
 
+import com.bhsr.emt.laboratory.domain.User;
 import com.bhsr.emt.laboratory.service.dto.FieldFormat.FieldFormatResponseDTO;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -28,11 +29,11 @@ public class DiagnosticReportFormatResponseDTO {
     private LocalDate createdAt;
 
     @NotNull
-    private String createdBy;
+    private User createdBy;
 
     @NotNull
     private LocalDate updatedAt;
 
     @NotNull
-    private String updatedBy;
+    private User updatedBy;
 }

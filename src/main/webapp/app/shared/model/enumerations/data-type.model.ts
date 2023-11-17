@@ -1,15 +1,12 @@
 export enum DataType {
   STRING = 'STRING',
-
-  LONG_STRING = 'Long text',
-
-  NUMBER = 'NUMBER',
-
-  DATE = 'DATE',
-
+  LONG_STRING = 'LONG_STRING',
+  INTEGER = 'INTEGER',
   BOOLEAN = 'BOOLEAN',
-
-  QUANTITY = 'QUANTITY',
-
-  REFERENCE = 'REFERENCE',
+  FLOAT = 'FLOAT',
+  FILE = 'FILE',
+  IMAGE = 'IMAGE',
+  DATE = 'DATE',
+  TIME_RANGE = 'TIME_RANGE',
+  HOUR_RANGE = 'HOUR_RANGE',
 }

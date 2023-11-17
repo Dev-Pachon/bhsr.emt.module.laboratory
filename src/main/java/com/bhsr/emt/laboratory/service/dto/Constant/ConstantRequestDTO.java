@@ -1,4 +1,4 @@
-package com.bhsr.emt.laboratory.domain;
+package com.bhsr.emt.laboratory.service.dto.Constant;
 
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -7,10 +7,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class Constant {
+public class ConstantRequestDTO {
 
     @NotNull
     private String name;

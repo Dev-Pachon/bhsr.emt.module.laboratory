@@ -37,7 +37,7 @@ public class DiagnosticReportFormat implements Serializable {
 
     @NotNull(message = "must not be null")
     @Field("created_by")
-    private String createdBy;
+    private User createdBy;
 
     @NotNull(message = "must not be null")
     @Field("updated_at")
@@ -45,7 +45,7 @@ public class DiagnosticReportFormat implements Serializable {
 
     @NotNull(message = "must not be null")
     @Field("updated_by")
-    private String updatedBy;
+    private User updatedBy;
 
     @Field("deleted_at")
     private LocalDate deletedAt;

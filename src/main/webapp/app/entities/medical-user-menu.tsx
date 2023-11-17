@@ -5,7 +5,7 @@ import MenuItem from 'app/shared/layout/menus/menu-item';
 import { addTranslationSourcePrefix } from 'app/shared/reducers/locale';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-const EntitiesMenu = () => {
+const MedicalUserMenu = () => {
   const lastChange = useAppSelector(state => state.locale.lastChange);
   const dispatch = useAppDispatch();
   useEffect(() => {
@@ -14,17 +14,11 @@ const EntitiesMenu = () => {
 
   return (
     <>
-      <MenuItem icon="asterisk" to="/laboratory/identifier-type">
-        <Translate contentKey="global.menu.entities.laboratoryIdentifierType" />
-      </MenuItem>
-      <MenuItem icon="asterisk" to="/laboratory/diagnostic-report-format">
-        <Translate contentKey="global.menu.entities.laboratoryDiagnosticReportFormat" />
-      </MenuItem>
-      <MenuItem icon="asterisk" to="/laboratory/value-set">
-        <Translate contentKey="global.menu.entities.laboratoryValueSet" />
+      <MenuItem icon="asterisk" to="/laboratory/service-request">
+        <Translate contentKey="global.menu.entities.laboratoryServiceRequest" />
       </MenuItem>
     </>
   );
 };
 
-export default EntitiesMenu;
+export default MedicalUserMenu;

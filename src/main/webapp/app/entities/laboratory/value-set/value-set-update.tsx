@@ -31,6 +31,7 @@ export const ValueSetUpdate = () => {
 
   const [form] = useForm<IValueSet>();
   const dataType = useWatch('dataType', form);
+  const constantsWatcher = useWatch('constants', form);
 
   const handleClose = () => {
     navigate('/laboratory/value-set');
@@ -45,23 +46,31 @@ export const ValueSetUpdate = () => {
   }, []);
 
   useEffect(() => {
+    if (isNew) {
+      form.setFieldsValue({ dataType: DataType.STRING });
+    } else {
+      form.setFieldsValue({ dataType: valueSetEntity.dataType });
+    }
+  }, [valueSetEntity]);
+
+  useEffect(() => {
     if (updateSuccess) {
       handleClose();
     }
   }, [updateSuccess]);
 
-  const saveEntity = values => {
+  const saveEntity = (values: IValueSet) => {
     console.log(values);
-    // const entity = {
-    //   ...valueSetEntity,
-    //   ...values,
-    // };
-    //
-    // if (isNew) {
-    //   dispatch(createEntity(entity));
-    // } else {
-    //   dispatch(updateEntity(entity));
-    // }
+    const entity = {
+      ...valueSetEntity,
+      ...values,
+    };
+
+    if (isNew) {
+      dispatch(createEntity(entity));
+    } else {
+      dispatch(updateEntity(entity));
+    }
   };
 
   const defaultValues = () =>
@@ -82,7 +91,7 @@ export const ValueSetUpdate = () => {
         return <DatePicker />;
       case DataType.STRING:
         return <Input placeholder={translate('laboratoryApp.laboratoryValueSet.create.values.value')} />;
-      case DataType.NUMBER:
+      case DataType.INTEGER:
         return <InputNumber />;
       default:
         return <Input placeholder={translate('laboratoryApp.laboratoryValueSet.create.values.value')} />;
@@ -105,8 +114,13 @@ export const ValueSetUpdate = () => {
           ) : (
             <Form form={form} initialValues={defaultValues()} onFinish={saveEntity}>
               {!isNew ? (
-                <Form.Item<IValueSet> name="id" label={translate('laboratoryApp.laboratoryValueSet.id')} rules={[{ required: true }]}>
-                  <Input readOnly />
+                <Form.Item<IValueSet>
+                  name="id"
+                  hidden
+                  label={translate('laboratoryApp.laboratoryValueSet.id')}
+                  rules={[{ required: true }]}
+                >
+                  <Input readOnly hidden />
                 </Form.Item>
               ) : null}
               <Form.Item<IValueSet>
@@ -138,48 +152,60 @@ export const ValueSetUpdate = () => {
                   })}
                 />
               </Form.Item>
-              <Form.List name="values">
+              <Form.List name={'constants'} initialValue={isNew ? [{ name: '', description: '', value: '' }] : constantsWatcher}>
                 {(constants, { add, remove }) => (
                   <div style={{ display: 'flex', rowGap: 16, flexDirection: 'column' }}>
-                    {constants.map(constant => (
+                    {constants.map(({ key, name, ...restField }) => (
                       <Card
                         size="small"
-                        title={`Constant ${constant.name + 1}`}
-                        key={constant.key}
+                        title={`Constant ${name + 1}`}
+                        key={key}
                         extra={
                           <DeleteOutlined
                             onClick={() => {
-                              remove(constant.name);
+                              remove(name);
                             }}
                             rev={undefined}
                           />
                         }
                       >
                         <Form.Item
-                          name={[constant.name, 'name']}
+                          {...restField}
+                          name={[name, 'name']}
+                          fieldKey={[key, 'name']}
                           label={translate('laboratoryApp.laboratoryValueSet.create.values.name')}
-                          rules={[{ required: true, message: 'Please fill this field!' }]}
+                          // rules={[{ required: true, message: 'Please fill this field!' }]}
                         >
                           <Input placeholder={translate('laboratoryApp.laboratoryValueSet.create.values.name')} />
                         </Form.Item>
                         <Form.Item
-                          name={[constant.name, 'description']}
+                          {...restField}
+                          name={[name, 'description']}
+                          fieldKey={[key, 'description']}
                           label={translate('laboratoryApp.laboratoryValueSet.create.values.description')}
-                          rules={[{ required: true, message: 'Please fill this field!' }]}
+                          // rules={[{ required: true, message: 'Please fill this field!' }]}
                         >
                           <Input placeholder={translate('laboratoryApp.laboratoryValueSet.create.values.description')} />
                         </Form.Item>
                         <Form.Item
-                          name={[constant.name, 'value']}
+                          {...restField}
+                          name={[name, 'value']}
+                          fieldKey={[key, 'value']}
                           label={translate('laboratoryApp.laboratoryValueSet.create.values.value')}
-                          rules={[{ required: true, message: 'Please fill this field!' }]}
-                          valuePropName={dataType === DataType.BOOLEAN && 'checked'}
+                          // rules={[{ required: true, message: 'Please fill this field!' }]}
+                          valuePropName={dataType === DataType.BOOLEAN ? 'checked' : 'value'}
                         >
                           {addValueField()}
                         </Form.Item>
                       </Card>
                     ))}
-                    <Button type="dashed" onClick={add} block icon={<PlusOutlined rev={undefined} />} className={'mb-4'}>
+                    <Button
+                      type="dashed"
+                      onClick={() => add({ name: '', description: '', value: '' })}
+                      block
+                      icon={<PlusOutlined rev={undefined} />}
+                      className={'mb-4'}
+                    >
                       Add field
                     </Button>
                   </div>

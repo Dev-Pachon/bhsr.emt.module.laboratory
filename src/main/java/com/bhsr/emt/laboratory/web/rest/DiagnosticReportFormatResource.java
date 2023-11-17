@@ -97,14 +97,14 @@ public class DiagnosticReportFormatResource {
                                 .collect(Collectors.toSet())
                         )
                         .createdAt(LocalDate.now())
-                        .createdBy(user.getId())
+                        .createdBy(User.builder().id(user.getId()).firstName(user.getFirstName()).lastName(user.getLastName()).build())
                         .updatedAt(LocalDate.now())
-                        .updatedBy(user.getId())
+                        .updatedBy(User.builder().id(user.getId()).firstName(user.getFirstName()).lastName(user.getLastName()).build())
                         .build();
                     log.debug("REST Formatted object to save : {}", diagnosticReportFormatToSave);
                     return diagnosticReportFormatRepository
                         .save(diagnosticReportFormatToSave)
-                        .map(result -> {
+                        .handle((result, sink) -> {
                             try {
                                 DiagnosticReportFormatResponseDTO response = DiagnosticReportFormatResponseDTO
                                     .builder()
@@ -129,12 +129,14 @@ public class DiagnosticReportFormatResource {
                                             .collect(Collectors.toSet())
                                     )
                                     .build();
-                                return ResponseEntity
-                                    .created(new URI("/api/diagnostic-report-formats/" + response.getId()))
-                                    .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId()))
-                                    .body(response);
+                                sink.next(
+                                    ResponseEntity
+                                        .created(new URI("/api/diagnostic-report-formats/" + response.getId()))
+                                        .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId()))
+                                        .body(response)
+                                );
                             } catch (URISyntaxException e) {
-                                throw new RuntimeException(e);
+                                sink.error(new RuntimeException(e));
                             }
                         });
                 });
@@ -156,7 +158,8 @@ public class DiagnosticReportFormatResource {
     @PutMapping("/diagnostic-report-formats/{id}")
     public Mono<ResponseEntity<DiagnosticReportFormatResponseDTO>> updateDiagnosticReportFormat(
         @PathVariable(value = "id", required = false) final String id,
-        @Valid @RequestBody DiagnosticReportFormatRequestDTO diagnosticReportFormatRequestDTO
+        @Valid @RequestBody DiagnosticReportFormatRequestDTO diagnosticReportFormatRequestDTO,
+        Principal principal
     ) throws URISyntaxException {
         log.debug("REST request to update DiagnosticReportFormat : {}, {}", id, diagnosticReportFormatRequestDTO);
         if (diagnosticReportFormatRequestDTO.getId() == null) {
@@ -166,77 +169,90 @@ public class DiagnosticReportFormatResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        return diagnosticReportFormatRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
+        if (principal instanceof AbstractAuthenticationToken) {
+            return userService
+                .getUserFromAuthentication((AbstractAuthenticationToken) principal)
+                .switchIfEmpty(Mono.just(AdminUserDTO.builder().id("0000001").build()))
+                .flatMap(user ->
+                    diagnosticReportFormatRepository
+                        .existsById(id)
+                        .flatMap(exists -> {
+                            if (!exists) {
+                                return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+                            }
 
-                DiagnosticReportFormat diagnosticReportFormat = DiagnosticReportFormat
-                    .builder()
-                    .id(diagnosticReportFormatRequestDTO.getId())
-                    .name(diagnosticReportFormatRequestDTO.getName())
-                    .fieldFormats(
-                        diagnosticReportFormatRequestDTO
-                            .getFieldFormats()
-                            .stream()
-                            .map(fieldFormat ->
-                                FieldFormat
-                                    .builder()
-                                    .name(fieldFormat.getName())
-                                    .dataType(fieldFormat.getDataType())
-                                    .isRequired(fieldFormat.getIsRequired())
-                                    .isSearchable(fieldFormat.getIsSearchable())
-                                    .defaultValue(fieldFormat.getDefaultValue())
-                                    .valueSet(fieldFormat.getValueSet())
-                                    .order(fieldFormat.getOrder())
-                                    .build()
-                            )
-                            .collect(Collectors.toSet())
-                    )
-                    .updatedAt(LocalDate.now())
-                    .updatedBy("Admin")
-                    .build();
+                            DiagnosticReportFormat diagnosticReportFormat = DiagnosticReportFormat
+                                .builder()
+                                .id(diagnosticReportFormatRequestDTO.getId())
+                                .name(diagnosticReportFormatRequestDTO.getName())
+                                .fieldFormats(
+                                    diagnosticReportFormatRequestDTO
+                                        .getFieldFormats()
+                                        .stream()
+                                        .map(fieldFormat ->
+                                            FieldFormat
+                                                .builder()
+                                                .name(fieldFormat.getName())
+                                                .dataType(fieldFormat.getDataType())
+                                                .isRequired(fieldFormat.getIsRequired())
+                                                .isSearchable(fieldFormat.getIsSearchable())
+                                                .defaultValue(fieldFormat.getDefaultValue())
+                                                .valueSet(fieldFormat.getValueSet())
+                                                .order(fieldFormat.getOrder())
+                                                .build()
+                                        )
+                                        .collect(Collectors.toSet())
+                                )
+                                .updatedAt(LocalDate.now())
+                                .updatedBy(
+                                    User.builder().id(user.getId()).firstName(user.getFirstName()).lastName(user.getLastName()).build()
+                                )
+                                .createdAt(diagnosticReportFormatRequestDTO.getCreatedAt())
+                                .createdBy(diagnosticReportFormatRequestDTO.getCreatedBy())
+                                .build();
 
-                return diagnosticReportFormatRepository
-                    .save(diagnosticReportFormat)
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(result -> {
-                        DiagnosticReportFormatResponseDTO response = DiagnosticReportFormatResponseDTO
-                            .builder()
-                            .id(result.getId())
-                            .name(result.getName())
-                            .fieldFormats(
-                                result
-                                    .getFieldFormats()
-                                    .stream()
-                                    .map(fieldFormat ->
-                                        FieldFormatResponseDTO
-                                            .builder()
-                                            .name(fieldFormat.getName())
-                                            .dataType(fieldFormat.getDataType())
-                                            .isRequired(fieldFormat.getIsRequired())
-                                            .isSearchable(fieldFormat.getIsSearchable())
-                                            .defaultValue(fieldFormat.getDefaultValue())
-                                            .valueSet(fieldFormat.getValueSet())
-                                            .order(fieldFormat.getOrder())
-                                            .build()
-                                    )
-                                    .collect(Collectors.toSet())
-                            )
-                            .createdAt(result.getCreatedAt())
-                            .updatedAt(result.getUpdatedAt())
-                            .createdBy(result.getCreatedBy())
-                            .updatedBy(result.getUpdatedBy())
-                            .build();
+                            return diagnosticReportFormatRepository
+                                .save(diagnosticReportFormat)
+                                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
+                                .map(result -> {
+                                    DiagnosticReportFormatResponseDTO response = DiagnosticReportFormatResponseDTO
+                                        .builder()
+                                        .id(result.getId())
+                                        .name(result.getName())
+                                        .fieldFormats(
+                                            result
+                                                .getFieldFormats()
+                                                .stream()
+                                                .map(fieldFormat ->
+                                                    FieldFormatResponseDTO
+                                                        .builder()
+                                                        .name(fieldFormat.getName())
+                                                        .dataType(fieldFormat.getDataType())
+                                                        .isRequired(fieldFormat.getIsRequired())
+                                                        .isSearchable(fieldFormat.getIsSearchable())
+                                                        .defaultValue(fieldFormat.getDefaultValue())
+                                                        .valueSet(fieldFormat.getValueSet())
+                                                        .order(fieldFormat.getOrder())
+                                                        .build()
+                                                )
+                                                .collect(Collectors.toSet())
+                                        )
+                                        .createdAt(result.getCreatedAt())
+                                        .updatedAt(result.getUpdatedAt())
+                                        .createdBy(result.getCreatedBy())
+                                        .updatedBy(result.getUpdatedBy())
+                                        .build();
 
-                        return ResponseEntity
-                            .ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, response.getId()))
-                            .body(response);
-                    });
-            });
+                                    return ResponseEntity
+                                        .ok()
+                                        .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, response.getId()))
+                                        .body(response);
+                                });
+                        })
+                );
+        } else {
+            throw new BadRequestAlertException("Invalid authToken", ENTITY_NAME, "unauthenticated");
+        }
     }
 
     /**

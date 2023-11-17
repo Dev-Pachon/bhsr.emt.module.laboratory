@@ -17,11 +17,21 @@
       "detail": {
         "title": "Service Request"
       },
+      "create": {
+        "title": "New Service Request",
+        "priority": {
+          "label": "Priority",
+          "LOW": "Low",
+          "MEDIUM": "Medium",
+          "HIGH": "High"
+        },
+        "diagnosticReportIds": "Requested Diagnostic Reports"
+      },
       "id": "Id",
       "status": "Status",
       "category": "Category",
       "priority": "Priority",
-      "code": "Code",
+      "diagnosticReportIds": "Requested Diagnostic Reports",
       "doNotPerform": "Do Not Perform",
       "serviceId": "Service Id",
       "createdAt": "Created At",

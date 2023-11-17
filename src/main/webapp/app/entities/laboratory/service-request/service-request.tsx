@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { IServiceRequest } from 'app/shared/model/laboratory/service-request.model';
 import { getEntities } from './service-request.reducer';
+import { Empty } from 'antd';
 
 export const ServiceRequest = () => {
   const dispatch = useAppDispatch();
@@ -63,7 +64,7 @@ export const ServiceRequest = () => {
                   <Translate contentKey="laboratoryApp.laboratoryServiceRequest.category">Category</Translate>
                 </th>
                 <th>
-                  <Translate contentKey="laboratoryApp.laboratoryServiceRequest.priority">Priority</Translate>
+                  <Translate contentKey="laboratoryApp.laboratoryServiceRequest.priority.label">Priority</Translate>
                 </th>
                 <th>
                   <Translate contentKey="laboratoryApp.laboratoryServiceRequest.code">Code</Translate>
@@ -170,11 +171,7 @@ export const ServiceRequest = () => {
             </tbody>
           </Table>
         ) : (
-          !loading && (
-            <div className="alert alert-warning">
-              <Translate contentKey="laboratoryApp.laboratoryServiceRequest.home.notFound">No Service Requests found</Translate>
-            </div>
-          )
+          !loading && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
         )}
       </div>
     </div>

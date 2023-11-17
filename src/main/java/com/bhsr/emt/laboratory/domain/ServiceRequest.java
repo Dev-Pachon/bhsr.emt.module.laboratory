@@ -26,7 +26,6 @@ public class ServiceRequest implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "must not be null")
     @Id
     private String id;
 
@@ -43,8 +42,8 @@ public class ServiceRequest implements Serializable {
     private String priority;
 
     @NotNull(message = "must not be null")
-    @Field("code")
-    private UUID code;
+    @Field("diagnostic_reports_ids")
+    private String[] diagnosticReportsIds;
 
     @Field("do_not_perform")
     private Boolean doNotPerform;
@@ -53,21 +52,17 @@ public class ServiceRequest implements Serializable {
     @Field("service_id")
     private Integer serviceId;
 
-    @NotNull(message = "must not be null")
     @Field("created_at")
     private LocalDate createdAt;
 
-    @NotNull(message = "must not be null")
     @Field("created_by")
-    private String createdBy;
+    private User createdBy;
 
-    @NotNull(message = "must not be null")
     @Field("updated_at")
     private LocalDate updatedAt;
 
-    @NotNull(message = "must not be null")
     @Field("updated_by")
-    private String updatedBy;
+    private User updatedBy;
 
     @Field("deleted_at")
     private LocalDate deletedAt;

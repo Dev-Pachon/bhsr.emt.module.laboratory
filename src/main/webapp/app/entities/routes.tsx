@@ -15,6 +15,9 @@ import DiagnosticReport from './laboratory/diagnostic-report';
 import DiagnosticReportFormat from './laboratory/diagnostic-report-format';
 import ServiceRequest from './laboratory/service-request';
 import ValueSet from './laboratory/value-set';
+import { LaboratoryHome } from 'app/entities/laboratory';
+import PrivateRoute from 'app/shared/auth/private-route';
+import { AUTHORITIES } from 'app/config/constants';
 /* jhipster-needle-add-route-import - JHipster will add routes here */
 
 export default () => {
@@ -22,12 +25,21 @@ export default () => {
   store.injectReducer('laboratory', combineReducers(entitiesReducers as ReducersMapObject));
   return (
     <div>
-      <ErrorBoundaryRoutes>
-        <Route path="/identifier-type/*" element={<IdentifierType />} />
-        <Route path="/diagnostic-report-format/*" element={<DiagnosticReportFormat />} />
-        <Route path="/service-request/*" element={<ServiceRequest />} />
-        <Route path="/value-set/*" element={<ValueSet />} />
-      </ErrorBoundaryRoutes>
+      <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+        <ErrorBoundaryRoutes>
+          <Route path="/" element={<LaboratoryHome />}>
+            <Route path="/identifier-type/*" element={<IdentifierType />} />
+            <Route path="/diagnostic-report-format/*" element={<DiagnosticReportFormat />} />
+            <Route path="/value-set/*" element={<ValueSet />} />
+          </Route>
+        </ErrorBoundaryRoutes>
+      </PrivateRoute>
+
+      <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+        <ErrorBoundaryRoutes>
+          <Route path="/service-request/*" element={<ServiceRequest />} />
+        </ErrorBoundaryRoutes>
+      </PrivateRoute>
     </div>
   );
 };

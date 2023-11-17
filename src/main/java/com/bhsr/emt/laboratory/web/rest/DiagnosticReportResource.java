@@ -71,48 +71,6 @@ public class DiagnosticReportResource {
     }
 
     /**
-     * {@code PUT  /diagnostic-reports/:id} : Updates an existing diagnosticReport.
-     *
-     * @param id the id of the diagnosticReport to save.
-     * @param diagnosticReport the diagnosticReport to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated diagnosticReport,
-     * or with status {@code 400 (Bad Request)} if the diagnosticReport is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the diagnosticReport couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
-    @PutMapping("/diagnostic-reports/{id}")
-    public Mono<ResponseEntity<DiagnosticReport>> updateDiagnosticReport(
-        @PathVariable(value = "id", required = false) final String id,
-        @Valid @RequestBody DiagnosticReport diagnosticReport
-    ) throws URISyntaxException {
-        log.debug("REST request to update DiagnosticReport : {}, {}", id, diagnosticReport);
-        if (diagnosticReport.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-        if (!Objects.equals(id, diagnosticReport.getId())) {
-            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
-        }
-
-        return diagnosticReportRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
-
-                return diagnosticReportRepository
-                    .save(diagnosticReport)
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(result ->
-                        ResponseEntity
-                            .ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, result.getId()))
-                            .body(result)
-                    );
-            });
-    }
-
-    /**
      * {@code PATCH  /diagnostic-reports/:id} : Partial updates given fields of an existing diagnosticReport, field will ignore if it is null
      *
      * @param id the id of the diagnosticReport to save.
@@ -212,23 +170,5 @@ public class DiagnosticReportResource {
         log.debug("REST request to get DiagnosticReport : {}", id);
         Mono<DiagnosticReport> diagnosticReport = diagnosticReportRepository.findById(id);
         return ResponseUtil.wrapOrNotFound(diagnosticReport);
-    }
-
-    /**
-     * {@code DELETE  /diagnostic-reports/:id} : delete the "id" diagnosticReport.
-     *
-     * @param id the id of the diagnosticReport to delete.
-     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
-     */
-    @DeleteMapping("/diagnostic-reports/{id}")
-    public Mono<ResponseEntity<Void>> deleteDiagnosticReport(@PathVariable String id) {
-        log.debug("REST request to delete DiagnosticReport : {}", id);
-        return diagnosticReportRepository
-            .deleteById(id)
-            .then(
-                Mono.just(
-                    ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id)).build()
-                )
-            );
     }
 }

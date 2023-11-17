@@ -6,7 +6,7 @@ export interface IValueSet {
   name?: string;
   description?: string;
   dataType?: DataType;
-  values?: IConstant[];
+  constants?: IConstant[];
 }
 
 export const defaultValue: Readonly<IValueSet> = {};

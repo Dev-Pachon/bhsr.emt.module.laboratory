@@ -6,7 +6,7 @@
         "refreshListLabel": "Refresh list",
         "createLabel": "Create a new Diagnostic Report Format",
         "createOrEditLabel": "Create or edit a Diagnostic Report Format",
-        "editLabel": "Create or edit a Diagnostic Report Format",
+        "editLabel": "Edit a Diagnostic Report Format",
         "notFound": "No Diagnostic Report Formats found"
       },
       "created": "A new Diagnostic Report Format is created with identifier {{ param }}",

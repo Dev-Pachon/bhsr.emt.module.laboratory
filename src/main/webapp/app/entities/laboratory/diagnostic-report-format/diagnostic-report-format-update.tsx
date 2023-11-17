@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { FormText } from 'reactstrap';
 import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Row, Col, Checkbox, Form, Input, Select, Button } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 
-import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
-import { mapIdList } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { IDiagnosticReportFormat } from 'app/shared/model/laboratory/diagnostic-report-format.model';
@@ -15,6 +12,12 @@ import { getEntity, updateEntity, createEntity, reset } from './diagnostic-repor
 import { IFieldFormat } from 'app/shared/model/laboratory/field-format.model';
 import { DataType } from 'app/shared/model/enumerations/data-type.model';
 import { DiagnosticReportFormatField } from 'app/entities/laboratory/diagnostic-report-format/components/field-component';
+import { getEntities as getValueSetEntities } from 'app/entities/laboratory/value-set/value-set.reducer';
+import { IValueSet } from 'app/shared/model/laboratory/value-set.model';
+import { useForm } from 'antd/es/form/Form';
+import { Typography } from 'antd';
+
+const { Title } = Typography;
 
 export const DiagnosticReportFormatUpdate = () => {
   const dispatch = useAppDispatch();
@@ -25,15 +28,20 @@ export const DiagnosticReportFormatUpdate = () => {
   const isNew = id === undefined;
 
   const diagnosticReportFormatEntity = useAppSelector(state => state.laboratory.diagnosticReportFormat.entity);
+  const valueSetList = useAppSelector(state => state.laboratory.valueSet.entities);
+
   const loading = useAppSelector(state => state.laboratory.diagnosticReportFormat.loading);
   const updating = useAppSelector(state => state.laboratory.diagnosticReportFormat.updating);
   const updateSuccess = useAppSelector(state => state.laboratory.diagnosticReportFormat.updateSuccess);
+  const [form] = useForm<IDiagnosticReportFormat>();
+
   const [fields, setFields] = useState<IFieldFormat[]>([]);
   const handleClose = () => {
     navigate('/laboratory/diagnostic-report-format');
   };
 
   useEffect(() => {
+    dispatch(getValueSetEntities({}));
     if (isNew) {
       dispatch(reset());
     } else {
@@ -45,7 +53,7 @@ export const DiagnosticReportFormatUpdate = () => {
     if (isNew) {
       addField();
     } else {
-      setFields(diagnosticReportFormatEntity.fieldFormats);
+      setFields([...diagnosticReportFormatEntity.fieldFormats]);
     }
   }, [diagnosticReportFormatEntity]);
 
@@ -56,7 +64,6 @@ export const DiagnosticReportFormatUpdate = () => {
   }, [updateSuccess]);
 
   const saveEntity = (values: IDiagnosticReportFormat) => {
-    console.log(values);
     const entity = {
       ...diagnosticReportFormatEntity,
       ...values,
@@ -87,47 +94,58 @@ export const DiagnosticReportFormatUpdate = () => {
     setFields(newFields);
   };
 
-  const defaultValues = () =>
-    isNew
+  const defaultValues = () => {
+    return isNew
       ? {}
       : {
           ...diagnosticReportFormatEntity,
         };
+  };
 
   return (
     <div>
       <Row className="justify-content-center">
-        <Col span="8">
-          <h2
-            id="laboratoryApp.laboratoryDiagnosticReportFormat.home.createOrEditLabel"
-            data-cy="DiagnosticReportFormatCreateUpdateHeading"
-          >
-            {isNew ? (
-              <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.home.createLabel">
-                Create a Diagnostic Report Format
-              </Translate>
-            ) : (
-              <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.home.editLabel">
-                Edit a Diagnostic Report Format
-              </Translate>
-            )}
-          </h2>
-        </Col>
+        <Title
+          level={2}
+          id="laboratoryApp.laboratoryDiagnosticReportFormat.home.createOrEditLabel"
+          data-cy="DiagnosticReportFormatCreateUpdateHeading"
+        >
+          {isNew ? (
+            <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.home.createLabel">
+              Create a Diagnostic Report Format
+            </Translate>
+          ) : (
+            <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.home.editLabel">
+              Edit a Diagnostic Report Format
+            </Translate>
+          )}
+        </Title>
       </Row>
       <Row className="justify-content-center">
-        {loading ? (
+        {loading || diagnosticReportFormatEntity.length === 0 || fields.length === 0 ? (
           <p>Loading...</p>
         ) : (
-          <Form initialValues={defaultValues()} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} onFinish={saveEntity} scrollToFirstError>
+          <Form
+            form={form}
+            layout="horizontal"
+            initialValues={defaultValues()}
+            onFinish={saveEntity}
+            scrollToFirstError
+            style={{ width: '100%' }}
+            wrapperCol={{ span: 16 }}
+            labelCol={{ span: 8 }}
+          >
             {!isNew ? (
-              <Form.Item<IDiagnosticReportFormat> name="id" label={translate('laboratoryApp.laboratoryDiagnosticReportFormat.id')}>
-                <Input readOnly />
+              <Form.Item<IDiagnosticReportFormat> name="id" hidden label={translate('laboratoryApp.laboratoryDiagnosticReportFormat.id')}>
+                <Input />
               </Form.Item>
             ) : null}
             <Form.Item<IDiagnosticReportFormat>
               name="name"
               label={translate('laboratoryApp.laboratoryDiagnosticReportFormat.name')}
               rules={[{ required: true, message: 'Please fill this field!' }]}
+              labelCol={{ span: 8 }}
+              wrapperCol={{ span: 8 }}
             >
               <Input placeholder={translate('laboratoryApp.laboratoryDiagnosticReportFormat.name')} />
             </Form.Item>
@@ -135,23 +153,19 @@ export const DiagnosticReportFormatUpdate = () => {
               fields.length > 0 &&
               fields
                 .sort((fieldA, fieldB) => fieldA.order - fieldB.order)
-                .map((field: IFieldFormat, i: number) => <DiagnosticReportFormatField key={i} idx={i} onDelete={removeField} />)}
+                .map((field: IFieldFormat, i: number) => (
+                  <DiagnosticReportFormatField key={i} idx={i} onDelete={removeField} valueSet={valueSetList} />
+                ))}
             <Button type="dashed" onClick={addField} block icon={<PlusOutlined rev={undefined} />} className={'mb-3'}>
               Add field
             </Button>
-            <Button
-              type="link"
-              id="cancel-save"
-              data-cy="entityCreateCancelButton"
-              href="/laboratory/diagnostic-report-format"
-              color="info"
-            >
+            <Link data-cy="entityCreateCancelButton" to="/laboratory/diagnostic-report-format">
               <FontAwesomeIcon icon="arrow-left" />
               &nbsp;
               <span className="d-none d-md-inline">
                 <Translate contentKey="entity.action.back">Back</Translate>
               </span>
-            </Button>
+            </Link>
             &nbsp;
             <Button id="save-entity" data-cy="entityCreateSaveButton" type="primary" htmlType={'submit'} disabled={updating}>
               <FontAwesomeIcon icon="save" />

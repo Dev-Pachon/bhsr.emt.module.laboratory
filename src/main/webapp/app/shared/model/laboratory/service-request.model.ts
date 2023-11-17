@@ -6,9 +6,10 @@ export interface IServiceRequest {
   status?: ServiceRequestStatus;
   category?: string;
   priority?: string;
-  code?: string;
+  diagnosticReportIds?: string[];
   doNotPerform?: boolean | null;
   serviceId?: number;
+  patientId?: string;
   createdAt?: string;
   createdBy?: string;
   updatedAt?: string;
@@ -18,4 +19,5 @@ export interface IServiceRequest {
 
 export const defaultValue: Readonly<IServiceRequest> = {
   doNotPerform: false,
+  diagnosticReportIds: [],
 };

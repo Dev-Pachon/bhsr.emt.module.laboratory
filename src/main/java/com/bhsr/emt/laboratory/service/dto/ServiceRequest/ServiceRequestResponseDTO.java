@@ -1,10 +1,8 @@
-package com.bhsr.emt.laboratory.service.dto.DiagnosticReportFormat;
+package com.bhsr.emt.laboratory.service.dto.ServiceRequest;
 
 import com.bhsr.emt.laboratory.domain.User;
-import com.bhsr.emt.laboratory.service.dto.FieldFormat.FieldFormatRequestDTO;
+import com.bhsr.emt.laboratory.domain.enumeration.ServiceRequestStatus;
 import java.time.LocalDate;
-import java.util.Set;
-import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,21 +12,17 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DiagnosticReportFormatRequestDTO {
+public class ServiceRequestResponseDTO {
 
     private String id;
-
-    @NotNull
-    private String name;
-
-    @NotNull
-    private Set<FieldFormatRequestDTO> fieldFormats;
-
+    private ServiceRequestStatus status;
+    private String category;
+    private String priority;
+    private String[] diagnosticReportsIds;
+    private Boolean doNotPerform;
+    private Integer serviceId;
     private LocalDate createdAt;
-
     private User createdBy;
-
     private LocalDate updatedAt;
-
     private User updatedBy;
 }

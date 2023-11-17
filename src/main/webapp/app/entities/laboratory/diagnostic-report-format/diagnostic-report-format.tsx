@@ -9,6 +9,9 @@ import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { IDiagnosticReportFormat } from 'app/shared/model/laboratory/diagnostic-report-format.model';
 import { getEntities } from './diagnostic-report-format.reducer';
+import { Empty } from 'antd';
+import { Typography } from 'antd';
+const { Title } = Typography;
 
 export const DiagnosticReportFormat = () => {
   const dispatch = useAppDispatch();
@@ -17,65 +20,22 @@ export const DiagnosticReportFormat = () => {
   const navigate = useNavigate();
 
   const diagnosticReportFormatList = useAppSelector(state => state.laboratory.diagnosticReportFormat.entities);
-  // const diagnosticReportFormatList = [
-  //   {
-  //     id: 1,
-  //     name: 'name 1',
-  //     createdAt: '2021-08-01',
-  //     createdBy: 'createdBy 1',
-  //     updatedAt: '2021-08-01',
-  //     updatedBy: 'updatedBy 1',
-  //   },
-  //   {
-  //     id: 2,
-  //     name: 'name 2',
-  //     createdAt: '2021-08-02',
-  //     createdBy: 'createdBy 2',
-  //     updatedAt: '2021-08-02',
-  //     updatedBy: 'updatedBy 2',
-  //   },
-  // ];
   const loading = useAppSelector(state => state.laboratory.diagnosticReportFormat.loading);
 
   useEffect(() => {
     dispatch(getEntities({}));
   }, []);
 
-  const handleSyncList = () => {
-    dispatch(getEntities({}));
-  };
-
   return (
     <div>
-      <h2 id="diagnostic-report-format-heading" data-cy="DiagnosticReportFormatHeading">
+      <Title level={2} id="diagnostic-report-format-heading" data-cy="DiagnosticReportFormatHeading">
         <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.home.title">Diagnostic Report Formats</Translate>
-        <div className="d-flex justify-content-end">
-          <Button className="me-2" color="info" onClick={handleSyncList} disabled={loading}>
-            <FontAwesomeIcon icon="sync" spin={loading} />{' '}
-            <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.home.refreshListLabel">Refresh List</Translate>
-          </Button>
-          <Link
-            to="/laboratory/diagnostic-report-format/new"
-            className="btn btn-primary jh-create-entity"
-            id="jh-create-entity"
-            data-cy="entityCreateButton"
-          >
-            <FontAwesomeIcon icon="plus" />
-            &nbsp;
-            <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.home.createLabel">
-              Create new Diagnostic Report Format
-            </Translate>
-          </Link>
-        </div>
-      </h2>
+      </Title>
       <div className="table-responsive">
         {diagnosticReportFormatList && diagnosticReportFormatList.length > 0 ? (
           <Table responsive>
             <thead>
               <tr>
-                <th>
-                  <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.id">Id</Translate>
-                </th>
                 <th>
                   <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.name">Name</Translate>
                 </th>
@@ -98,24 +58,19 @@ export const DiagnosticReportFormat = () => {
             <tbody>
               {diagnosticReportFormatList.map((diagnosticReportFormat, i) => (
                 <tr key={`entity-${i}`} data-cy="entityTable">
-                  <td>
-                    <Button tag={Link} to={`/laboratory/diagnostic-report-format/${diagnosticReportFormat.id}`} color="link" size="sm">
-                      {diagnosticReportFormat.id}
-                    </Button>
-                  </td>
                   <td>{diagnosticReportFormat.name}</td>
                   <td>
                     {diagnosticReportFormat.createdAt ? (
                       <TextFormat type="date" value={diagnosticReportFormat.createdAt} format={APP_LOCAL_DATE_FORMAT} />
                     ) : null}
                   </td>
-                  <td>{diagnosticReportFormat.createdBy}</td>
+                  <td>{`${diagnosticReportFormat.createdBy.firstName} ${diagnosticReportFormat.createdBy.lastName}`}</td>
                   <td>
                     {diagnosticReportFormat.updatedAt ? (
                       <TextFormat type="date" value={diagnosticReportFormat.updatedAt} format={APP_LOCAL_DATE_FORMAT} />
                     ) : null}
                   </td>
-                  <td>{diagnosticReportFormat.updatedBy}</td>
+                  <td>{`${diagnosticReportFormat.updatedBy.firstName} ${diagnosticReportFormat.updatedBy.lastName}`}</td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
                       <Button
@@ -161,13 +116,7 @@ export const DiagnosticReportFormat = () => {
             </tbody>
           </Table>
         ) : (
-          !loading && (
-            <div className="alert alert-warning">
-              <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.home.notFound">
-                No Diagnostic Report Formats found
-              </Translate>
-            </div>
-          )
+          !loading && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
         )}
       </div>
     </div>

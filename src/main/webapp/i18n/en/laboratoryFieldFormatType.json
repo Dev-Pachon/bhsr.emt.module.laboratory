@@ -1,14 +1,16 @@
 {
   "laboratoryApp": {
     "fieldFormatType": {
-      "DATE": "Date",
-      "NUMBER": "Number",
-      "STRING": "Text",
-      "LONG_STRING": "Long text",
-      "BOOLEAN": "True/False",
-      "REFERENCE": "Reference",
-      "QUANTITY": "Quantity",
-      "TIME_RANGE": "Time range"
+      "STRING": "STRING",
+      "LONG_STRING": "LONG_STRING",
+      "INTEGER": "INTEGER",
+      "BOOLEAN": "BOOLEAN",
+      "FLOAT": "FLOAT",
+      "FILE": "FILE",
+      "IMAGE": "IMAGE",
+      "DATE": "DATE",
+      "TIME_RANGE": "TIME_RANGE",
+      "HOUR_RANGE": "HOUR_RANGE"
     }
   }
 }
