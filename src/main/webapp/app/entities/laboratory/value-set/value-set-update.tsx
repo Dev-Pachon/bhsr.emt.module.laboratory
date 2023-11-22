@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { IValueSet } from 'app/shared/model/laboratory/value-set.model';
 import { getEntity, updateEntity, createEntity, reset } from './value-set.reducer';
-import { Button, Card, Col, DatePicker, Form, Input, InputNumber, Row, Select, Space, Switch } from 'antd';
+import { Button, Card, Col, DatePicker, Flex, Form, Input, InputNumber, Row, Select, Space, Switch } from 'antd';
 import { useForm, useWatch } from 'antd/es/form/Form';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 
@@ -99,16 +99,16 @@ export const ValueSetUpdate = () => {
   };
 
   return (
-    <div>
+    <>
       <Row className="justify-content-center">
         <Col span="8">
           <h2 id="laboratoryApp.laboratoryValueSet.home.createOrEditLabel" data-cy="ValueSetCreateUpdateHeading">
-            <Translate contentKey="laboratoryApp.laboratoryValueSet.home.createOrEditLabel">Create or edit a ValueSet</Translate>
+            <Translate contentKey="laboratoryApp.laboratoryValueSet.home.createOrEditLabel">Create a set of constants</Translate>
           </h2>
         </Col>
       </Row>
       <Row className="justify-content-center">
-        <Col span="8">
+        <Col span={24}>
           {loading ? (
             <p>Loading...</p>
           ) : (
@@ -123,80 +123,86 @@ export const ValueSetUpdate = () => {
                   <Input readOnly hidden />
                 </Form.Item>
               ) : null}
-              <Form.Item<IValueSet>
-                name="name"
-                label={translate('laboratoryApp.laboratoryValueSet.create.name')}
-                rules={[{ required: true, message: 'Please fill this field.' }]}
-              >
-                <Input placeholder={translate('laboratoryApp.laboratoryValueSet.create.name')} />
-              </Form.Item>
-              <Form.Item<IValueSet>
-                name="description"
-                label={translate('laboratoryApp.laboratoryValueSet.create.description')}
-                rules={[{ required: true }]}
-              >
-                <Input placeholder={translate('laboratoryApp.laboratoryValueSet.create.description')} />
-              </Form.Item>
-              <Form.Item<IValueSet>
-                name="dataType"
-                label={translate('laboratoryApp.laboratoryValueSet.create.dataType')}
-                rules={[{ required: true }]}
-              >
-                <Select
-                  showSearch
-                  placeholder="Select a data type "
-                  optionFilterProp="children"
-                  filterOption={filterOption}
-                  options={Object.keys(DataType).map((key: string) => {
-                    return { value: key, label: translate(`laboratoryApp.fieldFormatType.${key}`) };
-                  })}
-                />
-              </Form.Item>
+              <Flex justify={'space-evenly'} align={'center'}>
+                <Form.Item<IValueSet>
+                  name="name"
+                  label={translate('laboratoryApp.laboratoryValueSet.create.name')}
+                  rules={[{ required: true, message: 'Please fill this field.' }]}
+                >
+                  <Input placeholder={translate('laboratoryApp.laboratoryValueSet.create.name')} />
+                </Form.Item>
+                <Form.Item<IValueSet>
+                  name="description"
+                  label={translate('laboratoryApp.laboratoryValueSet.create.description')}
+                  rules={[{ required: true }]}
+                >
+                  <Input placeholder={translate('laboratoryApp.laboratoryValueSet.create.description')} />
+                </Form.Item>
+                <Form.Item<IValueSet>
+                  name="dataType"
+                  label={translate('laboratoryApp.laboratoryValueSet.create.dataType')}
+                  rules={[{ required: true }]}
+                >
+                  <Select
+                    showSearch
+                    placeholder="Select a data type "
+                    optionFilterProp="children"
+                    filterOption={filterOption}
+                    options={Object.keys(DataType).map((key: string) => {
+                      return { value: key, label: translate(`laboratoryApp.fieldFormatType.${key}`) };
+                    })}
+                  />
+                </Form.Item>
+              </Flex>
               <Form.List name={'constants'} initialValue={isNew ? [{ name: '', description: '', value: '' }] : constantsWatcher}>
                 {(constants, { add, remove }) => (
                   <div style={{ display: 'flex', rowGap: 16, flexDirection: 'column' }}>
                     {constants.map(({ key, name, ...restField }) => (
                       <Card
-                        size="small"
-                        title={`Constant ${name + 1}`}
+                        className={'my-3'}
                         key={key}
+                        title={`Constant ${name + 1}`}
                         extra={
-                          <DeleteOutlined
-                            onClick={() => {
-                              remove(name);
-                            }}
-                            rev={undefined}
-                          />
+                          name > 0 ? (
+                            <DeleteOutlined
+                              onClick={() => {
+                                remove(name);
+                              }}
+                              rev={undefined}
+                            />
+                          ) : null
                         }
                       >
-                        <Form.Item
-                          {...restField}
-                          name={[name, 'name']}
-                          fieldKey={[key, 'name']}
-                          label={translate('laboratoryApp.laboratoryValueSet.create.values.name')}
-                          // rules={[{ required: true, message: 'Please fill this field!' }]}
-                        >
-                          <Input placeholder={translate('laboratoryApp.laboratoryValueSet.create.values.name')} />
-                        </Form.Item>
-                        <Form.Item
-                          {...restField}
-                          name={[name, 'description']}
-                          fieldKey={[key, 'description']}
-                          label={translate('laboratoryApp.laboratoryValueSet.create.values.description')}
-                          // rules={[{ required: true, message: 'Please fill this field!' }]}
-                        >
-                          <Input placeholder={translate('laboratoryApp.laboratoryValueSet.create.values.description')} />
-                        </Form.Item>
-                        <Form.Item
-                          {...restField}
-                          name={[name, 'value']}
-                          fieldKey={[key, 'value']}
-                          label={translate('laboratoryApp.laboratoryValueSet.create.values.value')}
-                          // rules={[{ required: true, message: 'Please fill this field!' }]}
-                          valuePropName={dataType === DataType.BOOLEAN ? 'checked' : 'value'}
-                        >
-                          {addValueField()}
-                        </Form.Item>
+                        <Flex justify={'space-evenly'} align={'center'}>
+                          <Form.Item
+                            {...restField}
+                            name={[name, 'name']}
+                            fieldKey={[key, 'name']}
+                            label={translate('laboratoryApp.laboratoryValueSet.create.values.name')}
+                            rules={[{ required: true, message: 'Please fill this field!' }]}
+                          >
+                            <Input placeholder={translate('laboratoryApp.laboratoryValueSet.create.values.name')} />
+                          </Form.Item>
+                          <Form.Item
+                            {...restField}
+                            name={[name, 'description']}
+                            fieldKey={[key, 'description']}
+                            label={translate('laboratoryApp.laboratoryValueSet.create.values.description')}
+                            rules={[{ required: true, message: 'Please fill this field!' }]}
+                          >
+                            <Input placeholder={translate('laboratoryApp.laboratoryValueSet.create.values.description')} />
+                          </Form.Item>
+                          <Form.Item
+                            {...restField}
+                            name={[name, 'value']}
+                            fieldKey={[key, 'value']}
+                            label={translate('laboratoryApp.laboratoryValueSet.create.values.value')}
+                            rules={[{ required: true, message: 'Please fill this field!' }]}
+                            valuePropName={dataType === DataType.BOOLEAN ? 'checked' : 'value'}
+                          >
+                            {addValueField()}
+                          </Form.Item>
+                        </Flex>
                       </Card>
                     ))}
                     <Button
@@ -228,7 +234,7 @@ export const ValueSetUpdate = () => {
           )}
         </Col>
       </Row>
-    </div>
+    </>
   );
 };
 

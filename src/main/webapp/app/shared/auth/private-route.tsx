@@ -30,13 +30,7 @@ export const PrivateRoute = ({ children, hasAnyAuthorities = [], ...rest }: IOwn
       return <ErrorBoundary>{children}</ErrorBoundary>;
     }
 
-    return (
-      <div className="insufficient-authority">
-        <div className="alert alert-danger">
-          <Translate contentKey="error.http.403">You are not authorized to access this page.</Translate>
-        </div>
-      </div>
-    );
+    return <></>;
   }
 
   return (

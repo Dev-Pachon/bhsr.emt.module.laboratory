@@ -29,6 +29,9 @@ public class ServiceRequest implements Serializable {
     @Id
     private String id;
 
+    @Field
+    private String patientId;
+
     @NotNull(message = "must not be null")
     @Field("status")
     private ServiceRequestStatus status;

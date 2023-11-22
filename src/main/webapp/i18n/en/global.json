@@ -98,13 +98,14 @@
       "addblob": "Add blob",
       "addimage": "Add image",
       "back": "Back",
-      "cancel": "Cancel",
+      "cancel": "Cancel {{entity}}",
       "delete": "Delete",
       "edit": "Edit",
       "open": "Open",
       "save": "Save",
       "view": "View",
-      "show": "Show {{otherEntity}}"
+      "show": "Show {{otherEntity}}",
+      "start": "Start {{entity}}"
     },
     "detail": {
       "field": "Field",

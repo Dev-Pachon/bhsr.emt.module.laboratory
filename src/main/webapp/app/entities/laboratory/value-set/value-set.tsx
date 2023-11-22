@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Table } from 'reactstrap';
-import { Translate } from 'react-jhipster';
+import { translate, Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
@@ -32,22 +32,12 @@ export const ValueSet = () => {
     <div>
       <h2 id="value-set-heading" data-cy="ValueSetHeading">
         <Translate contentKey="laboratoryApp.laboratoryValueSet.home.title">Value Sets</Translate>
-        <div className="d-flex justify-content-end">
-          <Button className="me-2" color="info" onClick={handleSyncList} disabled={loading}>
-            <FontAwesomeIcon icon="sync" spin={loading} />{' '}
-            <Translate contentKey="laboratoryApp.laboratoryValueSet.home.refreshListLabel">Refresh List</Translate>
-          </Button>
-          <Link
-            to="/laboratory/value-set/new"
-            className="btn btn-primary jh-create-entity"
-            id="jh-create-entity"
-            data-cy="entityCreateButton"
-          >
-            <FontAwesomeIcon icon="plus" />
-            &nbsp;
-            <Translate contentKey="laboratoryApp.laboratoryValueSet.home.createLabel">Create new Value Set</Translate>
-          </Link>
-        </div>
+        {/*<div className="d-flex justify-content-end">*/}
+        {/*  <Button className="me-2" color="info" onClick={handleSyncList} disabled={loading}>*/}
+        {/*    <FontAwesomeIcon icon="sync" spin={loading} />{' '}*/}
+        {/*    <Translate contentKey="laboratoryApp.laboratoryValueSet.home.refreshListLabel">Refresh List</Translate>*/}
+        {/*  </Button>*/}
+        {/*</div>*/}
       </h2>
       <div className="table-responsive">
         {valueSetList && valueSetList.length > 0 ? (
@@ -74,7 +64,7 @@ export const ValueSet = () => {
                 <tr key={`entity-${i}`} data-cy="entityTable">
                   <td>{valueSet.name}</td>
                   <td>{valueSet.constants.length}</td>
-                  <td>{valueSet.dataType}</td>
+                  <td>{translate(`laboratoryApp.fieldFormatType.${valueSet.dataType}`)}</td>
                   <td>{valueSet.description}</td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">

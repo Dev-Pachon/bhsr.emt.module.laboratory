@@ -23,8 +23,17 @@ import { AUTHORITIES } from 'app/config/constants';
 export default () => {
   const store = getStore();
   store.injectReducer('laboratory', combineReducers(entitiesReducers as ReducersMapObject));
+
   return (
     <div>
+      <PrivateRoute hasAnyAuthorities={[AUTHORITIES.MED, AUTHORITIES.LAB]}>
+        <ErrorBoundaryRoutes>
+          <Route path="/">
+            <Route path="/service-request/*" element={<ServiceRequest />} />
+          </Route>
+        </ErrorBoundaryRoutes>
+      </PrivateRoute>
+
       <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
         <ErrorBoundaryRoutes>
           <Route path="/" element={<LaboratoryHome />}>
@@ -32,12 +41,6 @@ export default () => {
             <Route path="/diagnostic-report-format/*" element={<DiagnosticReportFormat />} />
             <Route path="/value-set/*" element={<ValueSet />} />
           </Route>
-        </ErrorBoundaryRoutes>
-      </PrivateRoute>
-
-      <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
-        <ErrorBoundaryRoutes>
-          <Route path="/service-request/*" element={<ServiceRequest />} />
         </ErrorBoundaryRoutes>
       </PrivateRoute>
     </div>

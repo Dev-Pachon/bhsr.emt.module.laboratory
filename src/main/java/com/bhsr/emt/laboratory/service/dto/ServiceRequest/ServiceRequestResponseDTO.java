@@ -1,5 +1,6 @@
 package com.bhsr.emt.laboratory.service.dto.ServiceRequest;
 
+import com.bhsr.emt.laboratory.domain.Patient;
 import com.bhsr.emt.laboratory.domain.User;
 import com.bhsr.emt.laboratory.domain.enumeration.ServiceRequestStatus;
 import java.time.LocalDate;
@@ -15,6 +16,7 @@ import lombok.NoArgsConstructor;
 public class ServiceRequestResponseDTO {
 
     private String id;
+    private Patient subject;
     private ServiceRequestStatus status;
     private String category;
     private String priority;

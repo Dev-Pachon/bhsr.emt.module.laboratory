@@ -52,8 +52,7 @@ const ServiceRequestModal: React.FC<ServiceRequestModalProps> = ({ patient, ...p
   const serviceRequestEntity = useAppSelector(state => state.laboratory.serviceRequest.entity);
   const diagnosticReportFormatEntity = useAppSelector(state => state.laboratory.diagnosticReportFormat.entities);
   const loadingFormats = useAppSelector(state => state.laboratory.diagnosticReportFormat.loading);
-  const loading = useAppSelector(state => state.laboratory.serviceRequest.loading);
-  const updating = useAppSelector(state => state.laboratory.serviceRequest.updating);
+
   const updateSuccess = useAppSelector(state => state.laboratory.serviceRequest.updateSuccess);
 
   useEffect(() => {
@@ -73,7 +72,10 @@ const ServiceRequestModal: React.FC<ServiceRequestModalProps> = ({ patient, ...p
 
   useEffect(() => {
     if (updateSuccess) {
+      setConfirmLoading(false);
       handleCancel();
+    } else if (!confirmLoading) {
+      console.log('error');
     }
   }, [updateSuccess]);
 
@@ -95,14 +97,25 @@ const ServiceRequestModal: React.FC<ServiceRequestModalProps> = ({ patient, ...p
 
   const handleOk = () => {
     setConfirmLoading(true);
-    setTimeout(() => {
-      setOpen(false);
-      setConfirmLoading(false);
-    }, 2000);
+    form
+      .validateFields()
+      .then(values => {
+        form.resetFields();
+        saveEntity(values);
+        setOpen(false);
+        setConfirmLoading(false);
+        dispatch(resetServiceRequest());
+        form.resetFields();
+      })
+      .catch(info => {
+        console.log('Validate Failed:', info);
+        setConfirmLoading(false);
+      });
   };
 
   const handleCancel = () => {
     setOpen(false);
+    form.resetFields();
   };
 
   const defaultValues = { status: 'DRAFT', patientId: patient.id, category: 'LABORATORY_PROCEDURE' };
@@ -121,10 +134,17 @@ const ServiceRequestModal: React.FC<ServiceRequestModalProps> = ({ patient, ...p
             title={translate('laboratoryApp.laboratoryServiceRequest.home.createLabel')}
             open={open}
             onOk={handleOk}
-            confirmLoading={confirmLoading}
             onCancel={handleCancel}
+            footer={[
+              <Button key="back" onClick={handleCancel}>
+                Cancel
+              </Button>,
+              <Button key="submit" type="primary" loading={confirmLoading} onClick={handleOk}>
+                Request Service
+              </Button>,
+            ]}
           >
-            <Form form={form} initialValues={defaultValues} onFinish={saveEntity} layout={'vertical'}>
+            <Form form={form} initialValues={defaultValues} onFinish={saveEntity} layout={'vertical'} disabled={confirmLoading}>
               <Title level={4}>Patient: {patient.name.text}</Title>
 
               <Form.Item<IServiceRequest>
@@ -177,7 +197,7 @@ const ServiceRequestModal: React.FC<ServiceRequestModalProps> = ({ patient, ...p
               </Form.Item>
 
               <Form.Item<IServiceRequest>
-                name="diagnosticReportIds"
+                name="diagnosticReportsIds"
                 label={translate('laboratoryApp.laboratoryServiceRequest.create.diagnosticReportIds')}
                 valuePropName={'targetKeys'}
                 rules={[{ required: true }]}

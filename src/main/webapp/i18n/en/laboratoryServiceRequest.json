@@ -25,13 +25,13 @@
           "MEDIUM": "Medium",
           "HIGH": "High"
         },
-        "diagnosticReportIds": "Requested Diagnostic Reports"
+        "diagnosticReportIds": "# Requested Diagnostic Reports"
       },
       "id": "Id",
       "status": "Status",
       "category": "Category",
       "priority": "Priority",
-      "diagnosticReportIds": "Requested Diagnostic Reports",
+      "diagnosticReportsIds": "Requested Diagnostic Reports",
       "doNotPerform": "Do Not Perform",
       "serviceId": "Service Id",
       "createdAt": "Created At",

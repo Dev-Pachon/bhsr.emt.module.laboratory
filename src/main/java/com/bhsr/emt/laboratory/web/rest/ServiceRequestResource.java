@@ -1,5 +1,6 @@
 package com.bhsr.emt.laboratory.web.rest;
 
+import com.bhsr.emt.laboratory.domain.Patient;
 import com.bhsr.emt.laboratory.domain.ServiceRequest;
 import com.bhsr.emt.laboratory.domain.User;
 import com.bhsr.emt.laboratory.repository.ServiceRequestRepository;
@@ -67,6 +68,8 @@ public class ServiceRequestResource {
     ) {
         log.debug("REST request to save ServiceRequest : {}", serviceRequest);
 
+        //Call the microservice to get the subject/patient and verify it exists
+
         if (principal instanceof AbstractAuthenticationToken) {
             return userService
                 .getUserFromAuthentication((AbstractAuthenticationToken) principal)
@@ -78,7 +81,8 @@ public class ServiceRequestResource {
                         .category(serviceRequest.getCategory())
                         .priority(serviceRequest.getPriority())
                         .diagnosticReportsIds(serviceRequest.getDiagnosticReportsIds())
-                        .doNotPerform(serviceRequest.getDoNotPerform())
+                        .doNotPerform(false)
+                        .patientId(serviceRequest.getPatientId())
                         .serviceId(TESTING_SERVICE_ID)
                         .createdAt(LocalDate.now())
                         .createdBy(User.builder().id(user.getId()).firstName(user.getFirstName()).lastName(user.getLastName()).build())
@@ -102,6 +106,8 @@ public class ServiceRequestResource {
                                                 .priority(result.getPriority())
                                                 .diagnosticReportsIds(result.getDiagnosticReportsIds())
                                                 .doNotPerform(result.getDoNotPerform())
+                                                //Create a correct subject
+                                                .subject(Patient.builder().id(result.getPatientId()).build())
                                                 .serviceId(result.getServiceId())
                                                 .createdAt(result.getCreatedAt())
                                                 .createdBy(result.getCreatedBy())
@@ -226,6 +232,7 @@ public class ServiceRequestResource {
                             .priority(serviceRequest.getPriority())
                             .diagnosticReportsIds(serviceRequest.getDiagnosticReportsIds())
                             .doNotPerform(serviceRequest.getDoNotPerform())
+                            .subject(Patient.builder().id(serviceRequest.getPatientId()).build())
                             .serviceId(serviceRequest.getServiceId())
                             .createdAt(serviceRequest.getCreatedAt())
                             .createdBy(serviceRequest.getCreatedBy())
@@ -269,6 +276,7 @@ public class ServiceRequestResource {
                         .priority(result.getPriority())
                         .diagnosticReportsIds(result.getDiagnosticReportsIds())
                         .doNotPerform(result.getDoNotPerform())
+                        .subject(Patient.builder().id(result.getPatientId()).build())
                         .serviceId(result.getServiceId())
                         .createdAt(result.getCreatedAt())
                         .createdBy(result.getCreatedBy())

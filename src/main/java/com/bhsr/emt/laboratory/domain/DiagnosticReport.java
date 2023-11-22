@@ -51,11 +51,15 @@ public class DiagnosticReport implements Serializable {
     @Field("deleted_at")
     private LocalDate deletedAt;
 
+    @NotNull(message = "must not be null")
     @Field("subject")
-    private Patient subject;
+    private String patientId;
 
     @Field("format")
     private DiagnosticReportFormat format;
+
+    @Field("fields")
+    private CustomField[] fields;
 
     @Field("basedOn")
     private ServiceRequest basedOn;
