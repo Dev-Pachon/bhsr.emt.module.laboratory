@@ -40,15 +40,15 @@ export const LaboratoryHome = () => {
         { key: 'create-constant', label: 'Create', href: '/laboratory/value-set/new', icon: PlusOutlined },
       ],
     },
-    {
-      key: 'settings',
-      label: 'General settings',
-      subMenus: [
-        { key: 'getAll-settings', label: 'Settings', href: '/laboratory/identifier-type', icon: null },
-        { key: 'create-settings', label: 'Create', href: '/laboratory/identifier-type/new', icon: null },
-        { key: 'getAll-roles', label: 'Roles', href: '/laboratory/roles-management', icon: null },
-      ],
-    },
+    // {
+    //   key: 'settings',
+    //   label: 'General settings',
+    //   subMenus: [
+    //     { key: 'getAll-settings', label: 'Settings', href: '/laboratory/identifier-type', icon: null },
+    //     { key: 'create-settings', label: 'Create', href: '/laboratory/identifier-type/new', icon: null },
+    //     { key: 'getAll-roles', label: 'Roles', href: '/laboratory/roles-management', icon: null },
+    //   ],
+    // },
   ].map((topMenu, index) => {
     const key = String(index + 1);
 

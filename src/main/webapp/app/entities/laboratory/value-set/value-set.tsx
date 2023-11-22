@@ -9,7 +9,8 @@ import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { IValueSet } from 'app/shared/model/laboratory/value-set.model';
 import { getEntities } from './value-set.reducer';
-import { Empty } from 'antd';
+import { Empty, Typography } from 'antd';
+const { Title } = Typography;
 
 export const ValueSet = () => {
   const dispatch = useAppDispatch();
@@ -31,7 +32,6 @@ export const ValueSet = () => {
   return (
     <div>
       <h2 id="value-set-heading" data-cy="ValueSetHeading">
-        <Translate contentKey="laboratoryApp.laboratoryValueSet.home.title">Value Sets</Translate>
         {/*<div className="d-flex justify-content-end">*/}
         {/*  <Button className="me-2" color="info" onClick={handleSyncList} disabled={loading}>*/}
         {/*    <FontAwesomeIcon icon="sync" spin={loading} />{' '}*/}
@@ -39,6 +39,7 @@ export const ValueSet = () => {
         {/*  </Button>*/}
         {/*</div>*/}
       </h2>
+      <Title level={2}>{translate('laboratoryApp.laboratoryValueSet.home.title')}</Title>
       <div className="table-responsive">
         {valueSetList && valueSetList.length > 0 ? (
           <Table responsive>

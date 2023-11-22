@@ -1,20 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Table } from 'reactstrap';
-import { Translate, TextFormat, translate } from 'react-jhipster';
+import { TextFormat, Translate, translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT, AUTHORITIES } from 'app/config/constants';
+import { APP_LOCAL_DATE_FORMAT, AUTHORITIES } from 'app/config/constants';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { IServiceRequest } from 'app/shared/model/laboratory/service-request.model';
-import { getEntities } from './service-request.reducer';
+import { getEntities, partialUpdateEntity } from './service-request.reducer';
 import { Empty } from 'antd';
-import UserManagement from 'app/shared/reducers/user-management';
 import { hasAnyAuthority } from 'app/shared/auth/private-route';
 import ServiceRequestModal from 'app/entities/laboratory/service-request/service-request-update';
 import { IPatient } from 'app/shared/model/laboratory/patient.model';
 import { AdministrativeGender } from 'app/shared/model/enumerations/administrative-gender.model';
+import { ServiceRequestStatus } from 'app/shared/model/enumerations/service-request-status.model';
 
 const samplePatient: IPatient = {
   id: '1',
@@ -68,6 +68,16 @@ export const ServiceRequest = () => {
     dispatch(getEntities({}));
     console.log(`isLabUser: ${isLabUser}`);
   }, []);
+
+  const onCancel = (serviceRequest: IServiceRequest) => {
+    const newServiceRequest = {
+      ...serviceRequest,
+      status: ServiceRequestStatus.REVOKED,
+    };
+
+    dispatch(partialUpdateEntity(newServiceRequest));
+    dispatch(getEntities({}));
+  };
 
   const handleSyncList = () => {
     dispatch(getEntities({}));
@@ -161,7 +171,7 @@ export const ServiceRequest = () => {
                         </Button>
                       )}
                       {isMedUser && (
-                        <Button color="danger" size="sm">
+                        <Button color="danger" size="sm" onClick={() => onCancel(serviceRequest)}>
                           <FontAwesomeIcon icon="cancel" />{' '}
                           <span className="d-none d-md-inline">
                             <Translate contentKey="entity.action.cancel" interpolate={{ entity: 'Request' }}>

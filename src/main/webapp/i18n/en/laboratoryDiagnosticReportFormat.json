@@ -36,7 +36,8 @@
         "isSearchable": "Searchable",
         "defaultValue": "Default value",
         "valueSet": "Value set",
-        "order": "Order"
+        "order": "Order",
+        "hasValueSet": "Has value set"
       }
     }
   }

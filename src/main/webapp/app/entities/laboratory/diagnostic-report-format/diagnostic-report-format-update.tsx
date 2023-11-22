@@ -159,13 +159,19 @@ export const DiagnosticReportFormatUpdate = () => {
             <Button type="dashed" onClick={addField} block icon={<PlusOutlined rev={undefined} />} className={'mb-3'}>
               Add field
             </Button>
-            <Link data-cy="entityCreateCancelButton" to="/laboratory/diagnostic-report-format">
+            <Button
+              type="link"
+              id="cancel-save"
+              data-cy="entityCreateCancelButton"
+              href="/laboratory/diagnostic-report-format"
+              color="info"
+            >
               <FontAwesomeIcon icon="arrow-left" />
               &nbsp;
               <span className="d-none d-md-inline">
                 <Translate contentKey="entity.action.back">Back</Translate>
               </span>
-            </Link>
+            </Button>
             &nbsp;
             <Button id="save-entity" data-cy="entityCreateSaveButton" type="primary" htmlType={'submit'} disabled={updating}>
               <FontAwesomeIcon icon="save" />

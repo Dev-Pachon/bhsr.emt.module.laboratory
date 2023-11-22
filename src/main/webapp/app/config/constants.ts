@@ -2,7 +2,7 @@ export const AUTHORITIES = {
   ADMIN: 'ROLE_ADMIN',
   USER: 'ROLE_USER',
   MED: 'ROLE_MEDICAL_USER',
-  LAB: 'ROLE_LAB',
+  LAB: 'ROLE_LAB_USER',
 };
 
 export const messages = {
