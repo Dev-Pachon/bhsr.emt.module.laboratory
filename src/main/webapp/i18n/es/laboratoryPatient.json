@@ -1,0 +1,26 @@
+{
+  "laboratoryApp": {
+    "laboratoryPatient": {
+      "home": {
+        "title": "Pacientes",
+        "refreshListLabel": "Actualizar lista",
+        "createLabel": "Crear un nuevo Paciente",
+        "createOrEditLabel": "Crear o editar un Paciente",
+        "notFound": "No se encontraron Pacientes"
+      },
+      "created": "Se ha creado un nuevo Paciente con el identificador {{ param }}",
+      "updated": "Se ha actualizado un Paciente con el identificador {{ param }}",
+      "deleted": "Se ha eliminado un Paciente con el identificador {{ param }}",
+      "delete": {
+        "question": "¿Estás seguro de que deseas eliminar el Paciente {{ id }}?"
+      },
+      "detail": {
+        "title": "Paciente"
+      },
+      "id": "Id",
+      "active": "Activo",
+      "gender": "Género",
+      "birthDate": "Fecha de Nacimiento"
+    }
+  }
+}

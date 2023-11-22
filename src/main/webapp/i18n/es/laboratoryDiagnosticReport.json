@@ -1,0 +1,32 @@
+{
+  "laboratoryApp": {
+    "laboratoryDiagnosticReport": {
+      "home": {
+        "title": "Informes de Diagnóstico",
+        "refreshListLabel": "Actualizar lista",
+        "createLabel": "Crear un nuevo Informe de Diagnóstico",
+        "createOrEditLabel": "Crear o editar un Informe de Diagnóstico",
+        "notFound": "No se encontraron Informes de Diagnóstico"
+      },
+      "created": "Se ha creado un nuevo Informe de Diagnóstico con el identificador {{ param }}",
+      "updated": "Se ha actualizado un Informe de Diagnóstico con el identificador {{ param }}",
+      "deleted": "Se ha eliminado un Informe de Diagnóstico con el identificador {{ param }}",
+      "delete": {
+        "question": "¿Estás seguro de que deseas eliminar el Informe de Diagnóstico {{ id }}?"
+      },
+      "detail": {
+        "title": "Informe de Diagnóstico"
+      },
+      "id": "Id",
+      "status": "Estado",
+      "createdAt": "Creado en",
+      "createdBy": "Creado por",
+      "updatedAt": "Actualizado en",
+      "updatedBy": "Actualizado por",
+      "deletedAt": "Eliminado en",
+      "subject": "Asunto",
+      "format": "Formato",
+      "basedOn": "Basado en"
+    }
+  }
+}

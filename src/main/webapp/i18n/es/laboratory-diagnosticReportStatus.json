@@ -1,0 +1,18 @@
+{
+  "laboratoryApp": {
+    "DiagnosticReportStatus": {
+      "null": "",
+      "REGISTERED": "REGISTRADO",
+      "PARTIAL": "PARCIAL",
+      "PRELIMINARY": "PRELIMINAR",
+      "MODIFIED": "MODIFICADO",
+      "FINAL": "FINAL",
+      "AMENDED": "MODIFICADO",
+      "CORRECTED": "CORREGIDO",
+      "APPENDED": "ANEXADO",
+      "CANCELLED": "CANCELADO",
+      "ENTERED_IN_ERROR": "INGRESADO_POR_ERROR",
+      "UNKNOWN": "DESCONOCIDO"
+    }
+  }
+}

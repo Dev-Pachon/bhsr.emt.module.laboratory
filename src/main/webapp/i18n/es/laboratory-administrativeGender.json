@@ -1,0 +1,11 @@
+{
+  "laboratoryApp": {
+    "AdministrativeGender": {
+      "null": "",
+      "MALE": "HOMBRE",
+      "FEMALE": "MUJER",
+      "OTHER": "OTRO",
+      "UNKNOWN": "DESCONOCIDO"
+    }
+  }
+}

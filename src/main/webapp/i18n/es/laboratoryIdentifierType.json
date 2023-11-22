@@ -1,0 +1,24 @@
+{
+  "laboratoryApp": {
+    "laboratoryIdentifierType": {
+      "home": {
+        "title": "Tipos de Identificadores",
+        "refreshListLabel": "Actualizar lista",
+        "createLabel": "Crear un nuevo Tipo de Identificador",
+        "createOrEditLabel": "Crear o editar un Tipo de Identificador",
+        "notFound": "No se encontraron Tipos de Identificadores"
+      },
+      "created": "Se ha creado un nuevo Tipo de Identificador con el identificador {{ param }}",
+      "updated": "Se ha actualizado un Tipo de Identificador con el identificador {{ param }}",
+      "deleted": "Se ha eliminado un Tipo de Identificador con el identificador {{ param }}",
+      "delete": {
+        "question": "¿Estás seguro de que deseas eliminar el Tipo de Identificador {{ id }}?"
+      },
+      "detail": {
+        "title": "Tipo de Identificador"
+      },
+      "id": "Id",
+      "name": "Nombre"
+    }
+  }
+}
