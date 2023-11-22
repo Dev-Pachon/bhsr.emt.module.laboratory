@@ -8,6 +8,7 @@ import PlusOutlined from '@ant-design/icons/PlusOutlined';
 import LaptopOutlined from '@ant-design/icons/LaptopOutlined';
 import NotificationOutlined from '@ant-design/icons/NotificationOutlined';
 import { Navigate, Outlet, useNavigate } from 'react-router-dom';
+import { translate } from 'react-jhipster';
 
 export const LaboratoryHome = () => {
   const navigate = useNavigate();
@@ -16,17 +17,19 @@ export const LaboratoryHome = () => {
   const items2: MenuProps['items'] = [
     {
       key: 'format-management',
-      label: 'Formats Management',
+      label: translate('laboratoryApp.laboratoryDiagnosticReportFormat.home.title'),
       subMenus: [
         {
           key: 'getAll-diagnosticReport',
-          label: 'Home',
+          label: translate('global.menu.home'),
           href: '/laboratory/diagnostic-report-format',
           icon: ContainerOutlined,
         },
         {
           key: 'create-diagnosticReport',
-          label: 'Create',
+          label: translate('global.create', {
+            entity: translate('laboratoryApp.laboratoryDiagnosticReportFormat.home.title'),
+          }),
           href: '/laboratory/diagnostic-report-format/new',
           icon: PlusOutlined,
         },
@@ -34,10 +37,17 @@ export const LaboratoryHome = () => {
     },
     {
       key: 'constants-management',
-      label: 'Constants Management',
+      label: translate('laboratoryApp.laboratoryValueSet.home.title'),
       subMenus: [
-        { key: 'getAll-constants', label: 'Home', href: '/laboratory/value-set', icon: ContainerOutlined },
-        { key: 'create-constant', label: 'Create', href: '/laboratory/value-set/new', icon: PlusOutlined },
+        { key: 'getAll-constants', label: translate('global.menu.home'), href: '/laboratory/value-set', icon: ContainerOutlined },
+        {
+          key: 'create-constant',
+          label: translate('global.create', {
+            entity: translate('laboratoryApp.laboratoryValueSet.home.title'),
+          }),
+          href: '/laboratory/value-set/new',
+          icon: PlusOutlined,
+        },
       ],
     },
     // {

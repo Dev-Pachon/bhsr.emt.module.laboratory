@@ -1,5 +1,8 @@
 {
   "global": {
+    "true": "Si",
+    "false": "No",
+    "create": "Crear {{entity}}",
     "title": "Laboratorio",
     "browsehappy": "Estás utilizando un <strong>navegador desactualizado</strong>. Por favor, <a href=\"http://browsehappy.com/?locale=es\">actualiza tu navegador</a> para mejorar tu experiencia.",
     "menu": {

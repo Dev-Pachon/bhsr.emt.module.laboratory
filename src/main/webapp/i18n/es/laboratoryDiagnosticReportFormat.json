@@ -36,6 +36,7 @@
         "isSearchable": "Búsqueda habilitada",
         "defaultValue": "Valor por defecto",
         "valueSet": "Conjunto de Valores",
+        "hasValueSet": "Tiene Conjunto de Valores",
         "order": "Orden"
       }
     }
