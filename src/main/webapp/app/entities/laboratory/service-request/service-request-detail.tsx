@@ -1,16 +1,77 @@
 import React, { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Button, Row, Col } from 'reactstrap';
-import { Translate, TextFormat } from 'react-jhipster';
+import { Button, Col, Row } from 'reactstrap';
+import { TextFormat, translate, Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import type { ColumnsType } from 'antd/es/table';
 
-import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { APP_DATE_FORMAT, AUTHORITIES } from 'app/config/constants';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { getEntity } from './service-request.reducer';
+import { IServiceRequestResponse } from 'app/shared/model/laboratory/service-request.model';
+import { Descriptions, Space, Table } from 'antd';
+import { hasAnyAuthority } from 'app/shared/auth/private-route';
+import { IDiagnosticReport } from 'app/shared/model/laboratory/diagnostic-report.model';
 
 export const ServiceRequestDetail = () => {
   const dispatch = useAppDispatch();
+  const isLabUser = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.LAB]));
+
+  const columns: ColumnsType<IDiagnosticReport> = [
+    {
+      title: 'Name',
+      dataIndex: 'format',
+      key: 'format',
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (text, record) => translate(`laboratoryApp.DiagnosticReportStatus.${record.status}`),
+    },
+    {
+      title: 'Created At',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      render: (text, record) => <TextFormat value={record.createdAt} type="date" format={APP_DATE_FORMAT} />,
+    },
+    {
+      title: 'Created By',
+      dataIndex: 'createdBy',
+      key: 'createdBy',
+      render: (text, record) => `${record?.createdBy?.firstName} ${record?.createdBy?.lastName}`,
+    },
+    {
+      title: 'Updated At',
+      dataIndex: 'updatedAt',
+      key: 'updatedAt',
+      render: (text, record) => <TextFormat value={record.updatedAt} type="date" format={APP_DATE_FORMAT} />,
+    },
+    {
+      title: 'Updated By',
+      dataIndex: 'updatedBy',
+      key: 'updatedBy',
+      render: (text, record) => `${record?.updatedBy?.firstName} ${record?.updatedBy?.lastName}`,
+    },
+    {
+      title: 'Action',
+      dataIndex: '',
+      key: 'x',
+      render: (text, record) => (
+        <Space size="middle">
+          <Link to={`diagnostic-report/${record.id}`}>
+            <Translate contentKey="entity.action.view">View</Translate>
+          </Link>
+          {isLabUser ? (
+            <Link to={`diagnostic-report/${record.id}/edit`}>
+              <Translate contentKey="entity.action.complete">Complete</Translate>
+            </Link>
+          ) : null}
+        </Space>
+      ),
+    },
+  ];
 
   const { id } = useParams<'id'>();
 
@@ -19,111 +80,79 @@ export const ServiceRequestDetail = () => {
   }, []);
 
   const serviceRequestEntity = useAppSelector(state => state.laboratory.serviceRequest.entity);
+
+  const mapperToDescriptionItem = (serviceRequest: IServiceRequestResponse) => {
+    const items = [
+      {
+        key: 'patientId',
+        label: 'Patient',
+        children: serviceRequest.subject?.name?.text,
+      },
+      {
+        key: 'diagnosticReports',
+        label: '# Diagnostic Reports',
+        children: serviceRequest.diagnosticReports?.length,
+      },
+      {
+        key: 'status',
+        label: 'Status',
+        children: translate(`laboratoryApp.ServiceRequestStatus.${serviceRequest.status}`),
+      },
+      {
+        key: 'priority',
+        label: 'Priority',
+        children: translate(`laboratoryApp.laboratoryServiceRequest.create.priority.${serviceRequest.priority}`),
+      },
+      {
+        key: 'createdBy',
+        label: 'Created by',
+        children: `${serviceRequest?.createdBy?.firstName} ${serviceRequest?.createdBy?.lastName}`,
+      },
+      {
+        key: 'createdAt',
+        label: 'Created at',
+        children: <TextFormat value={serviceRequest.createdAt} type="date" format={APP_DATE_FORMAT} />,
+      },
+      {
+        key: 'updatedBy',
+        label: 'Last update by',
+        children: `${serviceRequest?.updatedBy?.firstName} ${serviceRequest?.updatedBy?.lastName}`,
+      },
+      {
+        key: 'updateAt',
+        label: 'Last update at',
+        children: <TextFormat value={serviceRequest.updatedAt} type="date" format={APP_DATE_FORMAT} />,
+      },
+    ];
+    return items;
+  };
+
   return (
     <Row>
-      <Col md="8">
-        <h2 data-cy="serviceRequestDetailsHeading">
-          <Translate contentKey="laboratoryApp.laboratoryServiceRequest.detail.title">ServiceRequest</Translate>
-        </h2>
-        <dl className="jh-entity-details">
-          <dt>
-            <span id="id">
-              <Translate contentKey="laboratoryApp.laboratoryServiceRequest.id">Id</Translate>
-            </span>
-          </dt>
-          <dd>{serviceRequestEntity.id}</dd>
-          <dt>
-            <span id="status">
-              <Translate contentKey="laboratoryApp.laboratoryServiceRequest.status">Status</Translate>
-            </span>
-          </dt>
-          <dd>{serviceRequestEntity.status}</dd>
-          <dt>
-            <span id="category">
-              <Translate contentKey="laboratoryApp.laboratoryServiceRequest.category">Category</Translate>
-            </span>
-          </dt>
-          <dd>{serviceRequestEntity.category}</dd>
-          <dt>
-            <span id="priority">
-              <Translate contentKey="laboratoryApp.laboratoryServiceRequest.priority">Priority</Translate>
-            </span>
-          </dt>
-          <dd>{serviceRequestEntity.priority}</dd>
-          <dt>
-            <span id="code">
-              <Translate contentKey="laboratoryApp.laboratoryServiceRequest.code">Code</Translate>
-            </span>
-          </dt>
-          <dd>{serviceRequestEntity.code}</dd>
-          <dt>
-            <span id="doNotPerform">
-              <Translate contentKey="laboratoryApp.laboratoryServiceRequest.doNotPerform">Do Not Perform</Translate>
-            </span>
-          </dt>
-          <dd>{serviceRequestEntity.doNotPerform ? 'true' : 'false'}</dd>
-          <dt>
-            <span id="serviceId">
-              <Translate contentKey="laboratoryApp.laboratoryServiceRequest.serviceId">Service Id</Translate>
-            </span>
-          </dt>
-          <dd>{serviceRequestEntity.serviceId}</dd>
-          <dt>
-            <span id="createdAt">
-              <Translate contentKey="laboratoryApp.laboratoryServiceRequest.createdAt">Created At</Translate>
-            </span>
-          </dt>
-          <dd>
-            {serviceRequestEntity.createdAt ? (
-              <TextFormat value={serviceRequestEntity.createdAt} type="date" format={APP_LOCAL_DATE_FORMAT} />
-            ) : null}
-          </dd>
-          <dt>
-            <span id="createdBy">
-              <Translate contentKey="laboratoryApp.laboratoryServiceRequest.createdBy">Created By</Translate>
-            </span>
-          </dt>
-          <dd>{serviceRequestEntity.createdBy}</dd>
-          <dt>
-            <span id="updatedAt">
-              <Translate contentKey="laboratoryApp.laboratoryServiceRequest.updatedAt">Updated At</Translate>
-            </span>
-          </dt>
-          <dd>
-            {serviceRequestEntity.updatedAt ? (
-              <TextFormat value={serviceRequestEntity.updatedAt} type="date" format={APP_LOCAL_DATE_FORMAT} />
-            ) : null}
-          </dd>
-          <dt>
-            <span id="updatedBy">
-              <Translate contentKey="laboratoryApp.laboratoryServiceRequest.updatedBy">Updated By</Translate>
-            </span>
-          </dt>
-          <dd>{serviceRequestEntity.updatedBy}</dd>
-          <dt>
-            <span id="deletedAt">
-              <Translate contentKey="laboratoryApp.laboratoryServiceRequest.deletedAt">Deleted At</Translate>
-            </span>
-          </dt>
-          <dd>
-            {serviceRequestEntity.deletedAt ? (
-              <TextFormat value={serviceRequestEntity.deletedAt} type="date" format={APP_LOCAL_DATE_FORMAT} />
-            ) : null}
-          </dd>
-        </dl>
-        <Button tag={Link} to="/laboratory/service-request" replace color="info" data-cy="entityDetailsBackButton">
-          <FontAwesomeIcon icon="arrow-left" />{' '}
-          <span className="d-none d-md-inline">
-            <Translate contentKey="entity.action.back">Back</Translate>
-          </span>
-        </Button>
-        &nbsp;
-        <Button tag={Link} to={`/laboratory/service-request/${serviceRequestEntity.id}/edit`} replace color="primary">
-          <FontAwesomeIcon icon="pencil-alt" />{' '}
-          <span className="d-none d-md-inline">
-            <Translate contentKey="entity.action.edit">Edit</Translate>
-          </span>
-        </Button>
+      <Col>
+        <Space size={'middle'} direction={'vertical'} style={{ width: '100%' }}>
+          <h2 data-cy="serviceRequestDetailsHeading">
+            <Translate contentKey="laboratoryApp.laboratoryServiceRequest.detail.title">ServiceRequest</Translate>
+          </h2>
+          <Descriptions bordered size={'small'} items={mapperToDescriptionItem(serviceRequestEntity)} column={4} />
+          <Table columns={columns} dataSource={serviceRequestEntity?.diagnosticReports} rowKey={r => r.id} />
+
+          <Space>
+            <Button tag={Link} to="/laboratory/service-request" replace color="info" data-cy="entityDetailsBackButton">
+              <FontAwesomeIcon icon="arrow-left" />{' '}
+              <span className="d-none d-md-inline">
+                <Translate contentKey="entity.action.back">Back</Translate>
+              </span>
+            </Button>
+            &nbsp;
+            <Button tag={Link} to={`/laboratory/service-request/${serviceRequestEntity.id}/edit`} replace color="primary">
+              <FontAwesomeIcon icon="pencil-alt" />{' '}
+              <span className="d-none d-md-inline">
+                <Translate contentKey="entity.action.edit">Edit</Translate>
+              </span>
+            </Button>
+          </Space>
+        </Space>
       </Col>
     </Row>
   );

@@ -1,11 +1,8 @@
 package com.bhsr.emt.laboratory.service.dto.ServiceRequest;
 
-import com.bhsr.emt.laboratory.domain.DiagnosticReportFormat;
 import com.bhsr.emt.laboratory.domain.Patient;
 import com.bhsr.emt.laboratory.domain.User;
 import com.bhsr.emt.laboratory.domain.enumeration.ServiceRequestStatus;
-import com.bhsr.emt.laboratory.service.dto.DiagnosticReport.DiagnosticReportResponseDTO;
-import com.bhsr.emt.laboratory.service.dto.DiagnosticReport.DiagnosticReportResponseLightDTO;
 import com.bhsr.emt.laboratory.service.dto.DiagnosticReportFormat.DiagnosticReportFormatResponseDTO;
 import java.time.LocalDate;
 import java.util.Set;
@@ -18,14 +15,14 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ServiceRequestResponseDTO {
+public class ServiceRequestResponseLightDTO {
 
     private String id;
     private Patient subject;
     private ServiceRequestStatus status;
     private String category;
     private String priority;
-    private Set<DiagnosticReportResponseLightDTO> diagnosticReports;
+    private Set<String> diagnosticReportsFormats;
     private Boolean doNotPerform;
     private Integer serviceId;
     private LocalDate createdAt;

@@ -106,7 +106,9 @@ export const DiagnosticReportFormat = () => {
                       >
                         <FontAwesomeIcon icon="trash" />{' '}
                         <span className="d-none d-md-inline">
-                          <Translate contentKey="entity.action.delete">Delete</Translate>
+                          <Translate contentKey="entity.action.delete" interpolate={'Diagnostico'}>
+                            Delete
+                          </Translate>
                         </span>
                       </Button>
                     </div>

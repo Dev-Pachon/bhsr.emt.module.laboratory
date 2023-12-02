@@ -12,6 +12,7 @@ import com.bhsr.emt.laboratory.service.dto.AdminUserDTO;
 import com.bhsr.emt.laboratory.service.dto.DiagnosticReportFormat.DiagnosticReportFormatRequestDTO;
 import com.bhsr.emt.laboratory.service.dto.DiagnosticReportFormat.DiagnosticReportFormatResponseDTO;
 import com.bhsr.emt.laboratory.service.dto.FieldFormat.FieldFormatResponseDTO;
+import com.bhsr.emt.laboratory.service.mapper.DiagnosticReportFormatMapper;
 import com.bhsr.emt.laboratory.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -55,6 +56,8 @@ public class DiagnosticReportFormatResource {
     private final UserService userService;
 
     private final DiagnosticReportFormatRepository diagnosticReportFormatRepository;
+
+    private final DiagnosticReportFormatMapper diagnosticReportFormatMapper;
 
     /**
      * {@code POST  /diagnostic-report-formats} : Create a new diagnosticReportFormat.
@@ -330,35 +333,7 @@ public class DiagnosticReportFormatResource {
         log.debug("REST request to get all DiagnosticReportFormats");
         return diagnosticReportFormatRepository
             .findAll()
-            .map(item ->
-                DiagnosticReportFormatResponseDTO
-                    .builder()
-                    .id(item.getId())
-                    .name(item.getName())
-                    .fieldFormats(
-                        item
-                            .getFieldFormats()
-                            .stream()
-                            .map(fieldFormat ->
-                                FieldFormatResponseDTO
-                                    .builder()
-                                    .name(fieldFormat.getName())
-                                    .dataType(fieldFormat.getDataType())
-                                    .isRequired(fieldFormat.getIsRequired())
-                                    .isSearchable(fieldFormat.getIsSearchable())
-                                    .defaultValue(fieldFormat.getDefaultValue())
-                                    .valueSet(fieldFormat.getValueSet())
-                                    .order(fieldFormat.getOrder())
-                                    .build()
-                            )
-                            .collect(Collectors.toSet())
-                    )
-                    .createdAt(item.getCreatedAt())
-                    .updatedAt(item.getUpdatedAt())
-                    .createdBy(item.getCreatedBy())
-                    .updatedBy(item.getUpdatedBy())
-                    .build()
-            )
+            .map(diagnosticReportFormatMapper::DiagnosticReportFormatToResponseDTO)
             .collectList();
     }
 

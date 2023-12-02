@@ -5,8 +5,6 @@ import { Content } from 'antd/es/layout/layout';
 import Menu, { MenuProps } from 'antd/es/menu';
 import ContainerOutlined from '@ant-design/icons/ContainerOutlined';
 import PlusOutlined from '@ant-design/icons/PlusOutlined';
-import LaptopOutlined from '@ant-design/icons/LaptopOutlined';
-import NotificationOutlined from '@ant-design/icons/NotificationOutlined';
 import { Navigate, Outlet, useNavigate } from 'react-router-dom';
 import { translate } from 'react-jhipster';
 

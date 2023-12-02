@@ -24,7 +24,6 @@ public class DiagnosticReport implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "must not be null")
     @Id
     private String id;
 
@@ -38,7 +37,7 @@ public class DiagnosticReport implements Serializable {
 
     @NotNull(message = "must not be null")
     @Field("created_by")
-    private String createdBy;
+    private User createdBy;
 
     @NotNull(message = "must not be null")
     @Field("updated_at")
@@ -46,14 +45,14 @@ public class DiagnosticReport implements Serializable {
 
     @NotNull(message = "must not be null")
     @Field("updated_by")
-    private String updatedBy;
+    private User updatedBy;
 
     @Field("deleted_at")
     private LocalDate deletedAt;
 
     @NotNull(message = "must not be null")
     @Field("subject")
-    private String patientId;
+    private String subject;
 
     @Field("format")
     private DiagnosticReportFormat format;

@@ -1,22 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Button, Row, Col, FormText } from 'reactstrap';
-import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
+import { Button, Col, Row } from 'reactstrap';
+import { Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
-import { mapIdList } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
-
-import { IPatient } from 'app/shared/model/laboratory/patient.model';
 import { getEntities as getPatients } from 'app/entities/laboratory/patient/patient.reducer';
-import { IDiagnosticReportFormat } from 'app/shared/model/laboratory/diagnostic-report-format.model';
 import { getEntities as getDiagnosticReportFormats } from 'app/entities/laboratory/diagnostic-report-format/diagnostic-report-format.reducer';
-import { IServiceRequest } from 'app/shared/model/laboratory/service-request.model';
 import { getEntities as getServiceRequests } from 'app/entities/laboratory/service-request/service-request.reducer';
-import { IDiagnosticReport } from 'app/shared/model/laboratory/diagnostic-report.model';
 import { DiagnosticReportStatus } from 'app/shared/model/enumerations/diagnostic-report-status.model';
-import { getEntity, updateEntity, createEntity, reset } from './diagnostic-report.reducer';
+import { createEntity, getEntity, reset, updateEntity } from './diagnostic-report.reducer';
 
 export const DiagnosticReportUpdate = () => {
   const dispatch = useAppDispatch();
@@ -171,22 +163,6 @@ export const DiagnosticReportUpdate = () => {
                 data-cy="deletedAt"
                 type="date"
               />
-              <ValidatedField
-                id="diagnostic-report-subject"
-                name="subject"
-                data-cy="subject"
-                label={translate('laboratoryApp.laboratoryDiagnosticReport.subject')}
-                type="select"
-              >
-                <option value="" key="0" />
-                {patients
-                  ? patients.map(otherEntity => (
-                      <option value={otherEntity.id} key={otherEntity.id}>
-                        {otherEntity.id}
-                      </option>
-                    ))
-                  : null}
-              </ValidatedField>
               <ValidatedField
                 id="diagnostic-report-format"
                 name="format"

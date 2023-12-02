@@ -3,7 +3,6 @@ package com.bhsr.emt.laboratory.service.dto.DiagnosticReportFormat;
 import com.bhsr.emt.laboratory.domain.User;
 import com.bhsr.emt.laboratory.service.dto.FieldFormat.FieldFormatResponseDTO;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Set;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

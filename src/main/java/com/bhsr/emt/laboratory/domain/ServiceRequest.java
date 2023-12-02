@@ -3,7 +3,7 @@ package com.bhsr.emt.laboratory.domain;
 import com.bhsr.emt.laboratory.domain.enumeration.ServiceRequestStatus;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.UUID;
+import java.util.Set;
 import javax.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,7 +21,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@SuppressWarnings("common-java:DuplicatedBlocks")
 public class ServiceRequest implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -30,7 +29,7 @@ public class ServiceRequest implements Serializable {
     private String id;
 
     @Field
-    private String patientId;
+    private String subject;
 
     @NotNull(message = "must not be null")
     @Field("status")
@@ -46,7 +45,7 @@ public class ServiceRequest implements Serializable {
 
     @NotNull(message = "must not be null")
     @Field("diagnostic_reports_ids")
-    private String[] diagnosticReportsIds;
+    private Set<String> diagnosticReportsIds;
 
     @Field("do_not_perform")
     private Boolean doNotPerform;

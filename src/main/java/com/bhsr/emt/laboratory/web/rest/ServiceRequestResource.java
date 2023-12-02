@@ -1,13 +1,21 @@
 package com.bhsr.emt.laboratory.web.rest;
 
+import com.bhsr.emt.laboratory.domain.DiagnosticReport;
 import com.bhsr.emt.laboratory.domain.Patient;
 import com.bhsr.emt.laboratory.domain.ServiceRequest;
 import com.bhsr.emt.laboratory.domain.User;
+import com.bhsr.emt.laboratory.domain.enumeration.DiagnosticReportStatus;
+import com.bhsr.emt.laboratory.repository.DiagnosticReportFormatRepository;
+import com.bhsr.emt.laboratory.repository.DiagnosticReportRepository;
+import com.bhsr.emt.laboratory.repository.DiagnosticReportRepositoryAlternative;
 import com.bhsr.emt.laboratory.repository.ServiceRequestRepository;
 import com.bhsr.emt.laboratory.service.UserService;
 import com.bhsr.emt.laboratory.service.dto.AdminUserDTO;
+import com.bhsr.emt.laboratory.service.dto.DiagnosticReport.DiagnosticReportResponseLightDTO;
 import com.bhsr.emt.laboratory.service.dto.ServiceRequest.ServiceRequestRequestDTO;
 import com.bhsr.emt.laboratory.service.dto.ServiceRequest.ServiceRequestResponseDTO;
+import com.bhsr.emt.laboratory.service.dto.ServiceRequest.ServiceRequestResponseLightDTO;
+import com.bhsr.emt.laboratory.service.mapper.DiagnosticReportFormatMapper;
 import com.bhsr.emt.laboratory.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -15,8 +23,6 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -55,6 +61,12 @@ public class ServiceRequestResource {
 
     private final ServiceRequestRepository serviceRequestRepository;
 
+    private final DiagnosticReportFormatRepository diagnosticReportFormatRepository;
+
+    private final DiagnosticReportRepositoryAlternative diagnosticReportRepository;
+
+    private final DiagnosticReportFormatMapper diagnosticReportFormatMapper;
+
     /**
      * {@code POST  /service-requests} : Create a new serviceRequest.
      *
@@ -62,7 +74,7 @@ public class ServiceRequestResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new serviceRequest, or with status {@code 400 (Bad Request)} if the serviceRequest has already an ID.
      */
     @PostMapping("/service-requests")
-    public Mono<ResponseEntity<ServiceRequestResponseDTO>> createServiceRequest(
+    public Mono<ResponseEntity<ServiceRequestResponseLightDTO>> createServiceRequest(
         @Valid @RequestBody ServiceRequestRequestDTO serviceRequest,
         Principal principal
     ) {
@@ -80,9 +92,44 @@ public class ServiceRequestResource {
                         .status(serviceRequest.getStatus())
                         .category(serviceRequest.getCategory())
                         .priority(serviceRequest.getPriority())
-                        .diagnosticReportsIds(serviceRequest.getDiagnosticReportsIds())
+                        .diagnosticReportsIds(
+                            serviceRequest
+                                .getDiagnosticReportsFormats()
+                                .stream()
+                                .map(format -> {
+                                    DiagnosticReport diagnosticReport = DiagnosticReport
+                                        .builder()
+                                        .status(DiagnosticReportStatus.REGISTERED)
+                                        .createdAt(LocalDate.now())
+                                        .createdBy(
+                                            User
+                                                .builder()
+                                                .id(user.getId())
+                                                .firstName(user.getFirstName())
+                                                .lastName(user.getLastName())
+                                                .build()
+                                        )
+                                        .updatedAt(LocalDate.now())
+                                        .updatedBy(
+                                            User
+                                                .builder()
+                                                .id(user.getId())
+                                                .firstName(user.getFirstName())
+                                                .lastName(user.getLastName())
+                                                .build()
+                                        )
+                                        .format(
+                                            diagnosticReportFormatMapper.DiagnosticReportFormatRequestDTOToDiagnosticReportFormat(format)
+                                        )
+                                        .subject(serviceRequest.getSubject())
+                                        .build();
+                                    DiagnosticReport saved = diagnosticReportRepository.save(diagnosticReport);
+                                    return saved.getId();
+                                })
+                                .collect(Collectors.toSet())
+                        )
                         .doNotPerform(false)
-                        .patientId(serviceRequest.getPatientId())
+                        .subject(serviceRequest.getSubject())
                         .serviceId(TESTING_SERVICE_ID)
                         .createdAt(LocalDate.now())
                         .createdBy(User.builder().id(user.getId()).firstName(user.getFirstName()).lastName(user.getLastName()).build())
@@ -98,16 +145,16 @@ public class ServiceRequestResource {
                                         .created(new URI("/api/service-requests/" + result.getId()))
                                         .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId()))
                                         .body(
-                                            ServiceRequestResponseDTO
+                                            ServiceRequestResponseLightDTO
                                                 .builder()
                                                 .id(result.getId())
                                                 .status(result.getStatus())
                                                 .category(result.getCategory())
                                                 .priority(result.getPriority())
-                                                .diagnosticReportsIds(result.getDiagnosticReportsIds())
+                                                .diagnosticReportsFormats(result.getDiagnosticReportsIds())
                                                 .doNotPerform(result.getDoNotPerform())
                                                 //Create a correct subject
-                                                .subject(Patient.builder().id(result.getPatientId()).build())
+                                                .subject(Patient.builder().id(result.getSubject()).build())
                                                 .serviceId(result.getServiceId())
                                                 .createdAt(result.getCreatedAt())
                                                 .createdBy(result.getCreatedBy())
@@ -135,13 +182,12 @@ public class ServiceRequestResource {
      * or with status {@code 400 (Bad Request)} if the serviceRequest is not valid,
      * or with status {@code 404 (Not Found)} if the serviceRequest is not found,
      * or with status {@code 500 (Internal Server Error)} if the serviceRequest couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/service-requests/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public Mono<ResponseEntity<ServiceRequest>> partialUpdateServiceRequest(
         @PathVariable(value = "id", required = false) final String id,
         @NotNull @RequestBody ServiceRequest serviceRequest
-    ) throws URISyntaxException {
+    ) {
         log.debug("REST request to partial update ServiceRequest partially : {}, {}", id, serviceRequest);
         if (serviceRequest.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -215,33 +261,28 @@ public class ServiceRequestResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of serviceRequests in body.
      */
     @GetMapping("/service-requests")
-    public Mono<List<ServiceRequestResponseDTO>> getAllServiceRequests() {
+    public Mono<List<ServiceRequestResponseLightDTO>> getAllServiceRequests() {
         log.debug("REST request to get all ServiceRequests");
         return serviceRequestRepository
             .findAll()
-            .collectList()
-            .map(serviceRequests ->
-                serviceRequests
-                    .stream()
-                    .map(serviceRequest ->
-                        ServiceRequestResponseDTO
-                            .builder()
-                            .id(serviceRequest.getId())
-                            .status(serviceRequest.getStatus())
-                            .category(serviceRequest.getCategory())
-                            .priority(serviceRequest.getPriority())
-                            .diagnosticReportsIds(serviceRequest.getDiagnosticReportsIds())
-                            .doNotPerform(serviceRequest.getDoNotPerform())
-                            .subject(Patient.builder().id(serviceRequest.getPatientId()).build())
-                            .serviceId(serviceRequest.getServiceId())
-                            .createdAt(serviceRequest.getCreatedAt())
-                            .createdBy(serviceRequest.getCreatedBy())
-                            .updatedAt(serviceRequest.getUpdatedAt())
-                            .updatedBy(serviceRequest.getUpdatedBy())
-                            .build()
-                    )
-                    .collect(Collectors.toList())
-            );
+            .map(serviceRequest ->
+                ServiceRequestResponseLightDTO
+                    .builder()
+                    .id(serviceRequest.getId())
+                    .status(serviceRequest.getStatus())
+                    .category(serviceRequest.getCategory())
+                    .priority(serviceRequest.getPriority())
+                    .doNotPerform(serviceRequest.getDoNotPerform())
+                    .subject(Patient.builder().id(serviceRequest.getSubject()).build())
+                    .diagnosticReportsFormats(serviceRequest.getDiagnosticReportsIds())
+                    .serviceId(serviceRequest.getServiceId())
+                    .createdAt(serviceRequest.getCreatedAt())
+                    .createdBy(serviceRequest.getCreatedBy())
+                    .updatedAt(serviceRequest.getUpdatedAt())
+                    .updatedBy(serviceRequest.getUpdatedBy())
+                    .build()
+            )
+            .collectList();
     }
 
     /**
@@ -274,9 +315,29 @@ public class ServiceRequestResource {
                         .status(result.getStatus())
                         .category(result.getCategory())
                         .priority(result.getPriority())
-                        .diagnosticReportsIds(result.getDiagnosticReportsIds())
+                        .diagnosticReports(
+                            result
+                                .getDiagnosticReportsIds()
+                                .stream()
+                                .map(reportId -> {
+                                    DiagnosticReport diagnosticReport = diagnosticReportRepository
+                                        .findById(reportId)
+                                        .orElse(DiagnosticReport.builder().build());
+                                    return DiagnosticReportResponseLightDTO
+                                        .builder()
+                                        .id(diagnosticReport.getId())
+                                        .status(diagnosticReport.getStatus())
+                                        .createdAt(diagnosticReport.getCreatedAt())
+                                        .createdBy(diagnosticReport.getCreatedBy())
+                                        .updatedAt(diagnosticReport.getUpdatedAt())
+                                        .updatedBy(diagnosticReport.getUpdatedBy())
+                                        .format(diagnosticReport.getFormat().getName())
+                                        .build();
+                                })
+                                .collect(Collectors.toSet())
+                        )
                         .doNotPerform(result.getDoNotPerform())
-                        .subject(Patient.builder().id(result.getPatientId()).build())
+                        .subject(Patient.builder().id(result.getSubject()).build())
                         .serviceId(result.getServiceId())
                         .createdAt(result.getCreatedAt())
                         .createdBy(result.getCreatedBy())

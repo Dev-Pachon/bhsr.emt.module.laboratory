@@ -1,28 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Button, Form, Input, Modal, Select, Transfer } from 'antd';
-import { Row, Col, FormText } from 'reactstrap';
-import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Button, Form, Input, Modal, Select, Transfer, Typography } from 'antd';
+import { translate } from 'react-jhipster';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
-
-import { ServiceRequestStatus } from 'app/shared/model/enumerations/service-request-status.model';
-import {
-  getEntity as getServiceRequest,
-  createEntity as createServiceRequest,
-  reset as resetServiceRequest,
-} from './service-request.reducer';
+import { createEntity as createServiceRequest, reset as resetServiceRequest } from './service-request.reducer';
 import { getEntities as getFormats } from '../diagnostic-report-format/diagnostic-report-format.reducer';
-
-import { IValueSet } from 'app/shared/model/laboratory/value-set.model';
 import { useForm } from 'antd/es/form/Form';
 import { IPatient } from 'app/shared/model/laboratory/patient.model';
-import { DataType } from 'app/shared/model/enumerations/data-type.model';
 import { IServiceRequest } from 'app/shared/model/laboratory/service-request.model';
 import { ServiceRequestPriority } from 'app/shared/model/enumerations/service-request-priority.model';
-import { ServiceRequestCategory } from 'app/shared/model/enumerations/service-request-category.model';
 import { IDiagnosticReportFormat } from 'app/shared/model/laboratory/diagnostic-report-format.model';
-import { Typography } from 'antd';
 
 const { Title } = Typography;
 
@@ -40,7 +27,7 @@ interface ServiceRequestModalProps {
 const ServiceRequestModal: React.FC<ServiceRequestModalProps> = ({ patient, ...props }) => {
   const [open, setOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const [form] = useForm<IValueSet>();
+  const [form] = useForm<IServiceRequest>();
   const [diagnosticReportFormatOptions, setDiagnosticReportFormatOptions] = useState<TransferItem[]>([]);
   const dispatch = useAppDispatch();
 
@@ -63,8 +50,8 @@ const ServiceRequestModal: React.FC<ServiceRequestModalProps> = ({ patient, ...p
   useEffect(() => {
     if (diagnosticReportFormatEntity && diagnosticReportFormatEntity.length > 0) {
       setDiagnosticReportFormatOptions(
-        diagnosticReportFormatEntity.map((item: IDiagnosticReportFormat) => {
-          return { key: item.id, title: item.name };
+        diagnosticReportFormatEntity.map((item: IDiagnosticReportFormat, idx) => {
+          return { key: idx, title: item.name };
         })
       );
     }
@@ -97,11 +84,17 @@ const ServiceRequestModal: React.FC<ServiceRequestModalProps> = ({ patient, ...p
 
   const handleOk = () => {
     setConfirmLoading(true);
+    console.log(form.getFieldsValue());
     form
       .validateFields()
       .then(values => {
         form.resetFields();
-        saveEntity(values);
+
+        const valuesToSave = { ...values };
+
+        valuesToSave.diagnosticReportsFormats = values.diagnosticReportsFormats.map(item => diagnosticReportFormatEntity[item]);
+
+        saveEntity(valuesToSave);
         setOpen(false);
         setConfirmLoading(false);
         dispatch(resetServiceRequest());
@@ -118,7 +111,7 @@ const ServiceRequestModal: React.FC<ServiceRequestModalProps> = ({ patient, ...p
     form.resetFields();
   };
 
-  const defaultValues = { status: 'DRAFT', patientId: patient.id, category: 'LABORATORY_PROCEDURE' };
+  const defaultValues = { status: 'DRAFT', subject: patient.id, category: 'LABORATORY_PROCEDURE' };
 
   const filterOption = (input: string, option?: { label: string; value: string }) =>
     (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
@@ -150,7 +143,7 @@ const ServiceRequestModal: React.FC<ServiceRequestModalProps> = ({ patient, ...p
               <Form.Item<IServiceRequest>
                 label={translate('laboratoryApp.laboratoryServiceRequest.patient')}
                 id="service-request-patient"
-                name="patientId"
+                name="subject"
                 data-cy="patient"
                 hidden
               >
@@ -197,7 +190,7 @@ const ServiceRequestModal: React.FC<ServiceRequestModalProps> = ({ patient, ...p
               </Form.Item>
 
               <Form.Item<IServiceRequest>
-                name="diagnosticReportsIds"
+                name="diagnosticReportsFormats"
                 label={translate('laboratoryApp.laboratoryServiceRequest.create.diagnosticReportIds')}
                 valuePropName={'targetKeys'}
                 rules={[{ required: true }]}

@@ -8,6 +8,7 @@ import ServiceRequestDetail from './service-request-detail';
 import ServiceRequestUpdate from './service-request-update';
 import { IPatient } from 'app/shared/model/laboratory/patient.model';
 import { AdministrativeGender } from 'app/shared/model/enumerations/administrative-gender.model';
+import DiagnosticReport from 'app/entities/laboratory/diagnostic-report';
 
 const ServiceRequestRoutes = () => {
   const samplePatient: IPatient = {
@@ -52,6 +53,7 @@ const ServiceRequestRoutes = () => {
       <Route path="new" element={<ServiceRequestUpdate patient={samplePatient} />} />
       <Route path=":id">
         <Route index element={<ServiceRequestDetail />} />
+        <Route path="diagnostic-report/*" element={<DiagnosticReport />} />
       </Route>
     </ErrorBoundaryRoutes>
   );

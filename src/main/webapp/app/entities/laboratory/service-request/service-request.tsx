@@ -7,14 +7,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { APP_LOCAL_DATE_FORMAT, AUTHORITIES } from 'app/config/constants';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-import { IServiceRequest } from 'app/shared/model/laboratory/service-request.model';
+import { IServiceRequest, IServiceRequestResponse } from 'app/shared/model/laboratory/service-request.model';
 import { getEntities, partialUpdateEntity } from './service-request.reducer';
-import { Empty } from 'antd';
+import { Empty, Tag } from 'antd';
 import { hasAnyAuthority } from 'app/shared/auth/private-route';
 import ServiceRequestModal from 'app/entities/laboratory/service-request/service-request-update';
 import { IPatient } from 'app/shared/model/laboratory/patient.model';
 import { AdministrativeGender } from 'app/shared/model/enumerations/administrative-gender.model';
 import { ServiceRequestStatus } from 'app/shared/model/enumerations/service-request-status.model';
+import { ServiceRequestPriority } from 'app/shared/model/enumerations/service-request-priority.model';
 
 const samplePatient: IPatient = {
   id: '1',
@@ -61,7 +62,7 @@ export const ServiceRequest = () => {
 
   const isLabUser = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.LAB]));
   const isMedUser = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.MED]));
-  const serviceRequestList = useAppSelector(state => state.laboratory.serviceRequest.entities);
+  const serviceRequestList: IServiceRequest[] = useAppSelector(state => state.laboratory.serviceRequest.entities);
   const loading = useAppSelector(state => state.laboratory.serviceRequest.loading);
 
   useEffect(() => {
@@ -71,16 +72,36 @@ export const ServiceRequest = () => {
 
   const onCancel = (serviceRequest: IServiceRequest) => {
     const newServiceRequest = {
-      ...serviceRequest,
+      id: serviceRequest.id,
       status: ServiceRequestStatus.REVOKED,
     };
-
     dispatch(partialUpdateEntity(newServiceRequest));
-    dispatch(getEntities({}));
+  };
+
+  const onStartRequest = (serviceRequest: IServiceRequest) => {
+    const newServiceRequest = {
+      id: serviceRequest.id,
+      status: ServiceRequestStatus.ACTIVE,
+    };
+    dispatch(partialUpdateEntity(newServiceRequest));
+    navigate(`${serviceRequest.id}`);
   };
 
   const handleSyncList = () => {
     dispatch(getEntities({}));
+  };
+
+  const getTagColor = (serviceRequestResponse: IServiceRequest) => {
+    switch (ServiceRequestPriority[serviceRequestResponse.priority]) {
+      case ServiceRequestPriority.HIGH:
+        return 'error';
+      case ServiceRequestPriority.MEDIUM:
+        return 'warning';
+      case ServiceRequestPriority.LOW:
+        return 'processing';
+      default:
+        return 'processing';
+    }
   };
 
   return (
@@ -126,8 +147,12 @@ export const ServiceRequest = () => {
                   <td>
                     <Translate contentKey={`laboratoryApp.ServiceRequestStatus.${serviceRequest.status}`} />
                   </td>
-                  <td>{translate(`laboratoryApp.laboratoryServiceRequest.create.priority.${serviceRequest.priority}`)}</td>
-                  <td>{serviceRequest.diagnosticReportsIds.length}</td>
+                  <td>
+                    <Tag color={getTagColor(serviceRequest)}>
+                      {translate(`laboratoryApp.laboratoryServiceRequest.create.priority.${serviceRequest.priority}`)}
+                    </Tag>
+                  </td>
+                  <td>{serviceRequest.diagnosticReportsFormats?.length}</td>
                   <td>
                     {serviceRequest.createdAt ? (
                       <TextFormat type="date" value={serviceRequest.createdAt} format={APP_LOCAL_DATE_FORMAT} />
@@ -154,14 +179,8 @@ export const ServiceRequest = () => {
                           <Translate contentKey="entity.action.view">View</Translate>
                         </span>
                       </Button>
-                      {isLabUser && (
-                        <Button
-                          tag={Link}
-                          to={`/laboratory/service-request/${serviceRequest.id}`}
-                          color="primary"
-                          size="sm"
-                          data-cy="entityDetailsButton"
-                        >
+                      {isLabUser && serviceRequest.status === ServiceRequestStatus.DRAFT && (
+                        <Button color="primary" size="sm" onClick={() => onStartRequest(serviceRequest)}>
                           <FontAwesomeIcon icon="eye" />{' '}
                           <span className="d-none d-md-inline">
                             <Translate contentKey="entity.action.start" interpolate={{ entity: 'Request' }}>

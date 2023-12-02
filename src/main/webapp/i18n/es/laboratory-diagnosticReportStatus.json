@@ -2,11 +2,11 @@
   "laboratoryApp": {
     "DiagnosticReportStatus": {
       "null": "",
-      "REGISTERED": "REGISTRADO",
-      "PARTIAL": "PARCIAL",
-      "PRELIMINARY": "PRELIMINAR",
-      "MODIFIED": "MODIFICADO",
-      "FINAL": "FINAL",
+      "REGISTERED": "Registrado",
+      "PARTIAL": "Parcial",
+      "PRELIMINARY": "Preliminar",
+      "MODIFIED": "Modificado",
+      "FINAL": "Final",
       "AMENDED": "MODIFICADO",
       "CORRECTED": "CORREGIDO",
       "APPENDED": "ANEXADO",
