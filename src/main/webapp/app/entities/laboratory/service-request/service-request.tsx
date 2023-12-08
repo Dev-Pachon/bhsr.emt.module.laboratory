@@ -189,7 +189,7 @@ export const ServiceRequest = () => {
                           </span>
                         </Button>
                       )}
-                      {isMedUser && (
+                      {isMedUser && serviceRequest.status === ServiceRequestStatus.DRAFT && (
                         <Button color="danger" size="sm" onClick={() => onCancel(serviceRequest)}>
                           <FontAwesomeIcon icon="cancel" />{' '}
                           <span className="d-none d-md-inline">

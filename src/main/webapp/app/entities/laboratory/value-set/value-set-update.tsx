@@ -15,6 +15,7 @@ import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 
 import { DataType } from 'app/shared/model/enumerations/data-type.model';
 import { IConstant } from 'app/shared/model/laboratory/constant.model';
+import FormItemCustom from 'app/entities/laboratory/shared/FormItemCustom';
 
 export const ValueSetUpdate = () => {
   const dispatch = useAppDispatch();
@@ -82,21 +83,6 @@ export const ValueSetUpdate = () => {
 
   const filterOption = (input: string, option?: { label: string; value: string }) =>
     (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
-
-  const addValueField = () => {
-    switch (dataType) {
-      case DataType.BOOLEAN:
-        return <Switch />;
-      case DataType.DATE:
-        return <DatePicker />;
-      case DataType.STRING:
-        return <Input placeholder={translate('laboratoryApp.laboratoryValueSet.create.values.value')} />;
-      case DataType.INTEGER:
-        return <InputNumber />;
-      default:
-        return <Input placeholder={translate('laboratoryApp.laboratoryValueSet.create.values.value')} />;
-    }
-  };
 
   return (
     <>
@@ -192,16 +178,14 @@ export const ValueSetUpdate = () => {
                           >
                             <Input placeholder={translate('laboratoryApp.laboratoryValueSet.create.values.description')} />
                           </Form.Item>
-                          <Form.Item
+
+                          <FormItemCustom
                             {...restField}
                             name={[name, 'value']}
                             fieldKey={[key, 'value']}
                             label={translate('laboratoryApp.laboratoryValueSet.create.values.value')}
-                            rules={[{ required: true, message: 'Please fill this field!' }]}
-                            valuePropName={dataType === DataType.BOOLEAN ? 'checked' : 'value'}
-                          >
-                            {addValueField()}
-                          </Form.Item>
+                            dataType={dataType}
+                          />
                         </Flex>
                       </Card>
                     ))}

@@ -1,17 +1,14 @@
 import React from 'react';
-import { Route } from 'react-router-dom';
+import { Navigate, Route } from 'react-router-dom';
 
 import ErrorBoundaryRoutes from 'app/shared/error/error-boundary-routes';
 
-import { ReducersMapObject, combineReducers } from '@reduxjs/toolkit';
+import { combineReducers, ReducersMapObject } from '@reduxjs/toolkit';
 
 import getStore from 'app/config/store';
 
 import entitiesReducers from './reducers';
-
-import Patient from './laboratory/patient';
 import IdentifierType from './laboratory/identifier-type';
-import DiagnosticReport from './laboratory/diagnostic-report';
 import DiagnosticReportFormat from './laboratory/diagnostic-report-format';
 import ServiceRequest from './laboratory/service-request';
 import ValueSet from './laboratory/value-set';
@@ -28,7 +25,7 @@ export default () => {
     <div>
       <PrivateRoute hasAnyAuthorities={[AUTHORITIES.MED, AUTHORITIES.LAB]}>
         <ErrorBoundaryRoutes>
-          <Route path="/">
+          <Route>
             <Route path="/service-request/*" element={<ServiceRequest />} />
           </Route>
         </ErrorBoundaryRoutes>
@@ -36,13 +33,17 @@ export default () => {
 
       <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
         <ErrorBoundaryRoutes>
-          <Route path="/" element={<LaboratoryHome />}>
+          <Route element={<LaboratoryHome />}>
             <Route path="/identifier-type/*" element={<IdentifierType />} />
             <Route path="/diagnostic-report-format/*" element={<DiagnosticReportFormat />} />
             <Route path="/value-set/*" element={<ValueSet />} />
           </Route>
         </ErrorBoundaryRoutes>
       </PrivateRoute>
+
+      <ErrorBoundaryRoutes>
+        <Route path={'/'} element={<Navigate to="/404" />} />
+      </ErrorBoundaryRoutes>
     </div>
   );
 };

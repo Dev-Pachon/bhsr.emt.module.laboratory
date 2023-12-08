@@ -2,17 +2,17 @@
   "laboratoryApp": {
     "DiagnosticReportStatus": {
       "null": "",
-      "REGISTERED": "REGISTERED",
-      "PARTIAL": "PARTIAL",
-      "PRELIMINARY": "PRELIMINARY",
-      "MODIFIED": "MODIFIED",
-      "FINAL": "FINAL",
-      "AMENDED": "AMENDED",
-      "CORRECTED": "CORRECTED",
-      "APPENDED": "APPENDED",
-      "CANCELLED": "CANCELLED",
-      "ENTERED_IN_ERROR": "ENTERED_IN_ERROR",
-      "UNKNOWN": "UNKNOWN"
+      "REGISTERED": "Registered",
+      "PARTIAL": "Partial",
+      "PRELIMINARY": "Preliminary",
+      "MODIFIED": "Modified",
+      "FINAL": "Final",
+      "AMENDED": "Amended",
+      "CORRECTED": "Corrected",
+      "APPENDED": "Appended",
+      "CANCELLED": "Cancelled",
+      "ENTERED_IN_ERROR": "Entered in error",
+      "UNKNOWN": "Uknown"
     }
   }
 }

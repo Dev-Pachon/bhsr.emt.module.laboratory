@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { Breadcrumb, Layout } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Layout } from 'antd';
 import Sider from 'antd/es/layout/Sider';
 import { Content } from 'antd/es/layout/layout';
 import Menu, { MenuProps } from 'antd/es/menu';
 import ContainerOutlined from '@ant-design/icons/ContainerOutlined';
 import PlusOutlined from '@ant-design/icons/PlusOutlined';
-import { Navigate, Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { translate } from 'react-jhipster';
 
 export const LaboratoryHome = () => {
@@ -18,13 +18,13 @@ export const LaboratoryHome = () => {
       label: translate('laboratoryApp.laboratoryDiagnosticReportFormat.home.title'),
       subMenus: [
         {
-          key: 'getAll-diagnosticReport',
+          key: '/laboratory/diagnostic-report-format',
           label: translate('global.menu.home'),
           href: '/laboratory/diagnostic-report-format',
           icon: ContainerOutlined,
         },
         {
-          key: 'create-diagnosticReport',
+          key: '/laboratory/diagnostic-report-format/new',
           label: translate('global.create', {
             entity: translate('laboratoryApp.laboratoryDiagnosticReportFormat.home.title'),
           }),
@@ -37,9 +37,14 @@ export const LaboratoryHome = () => {
       key: 'constants-management',
       label: translate('laboratoryApp.laboratoryValueSet.home.title'),
       subMenus: [
-        { key: 'getAll-constants', label: translate('global.menu.home'), href: '/laboratory/value-set', icon: ContainerOutlined },
         {
-          key: 'create-constant',
+          key: '/laboratory/value-set',
+          label: translate('global.menu.home'),
+          href: '/laboratory/value-set',
+          icon: ContainerOutlined,
+        },
+        {
+          key: '/laboratory/value-set/new',
           label: translate('global.create', {
             entity: translate('laboratoryApp.laboratoryValueSet.home.title'),
           }),
@@ -80,6 +85,12 @@ export const LaboratoryHome = () => {
 
   const [openKeys, setOpenKeys] = useState(['sub1']);
 
+  const props = useLocation();
+
+  useEffect(() => {
+    const path = props.pathname;
+    setSelectedKey([path]);
+  }, [props]);
   const onOpenChange: MenuProps['onOpenChange'] = keys => {
     const latestOpenKey = keys.find(key => openKeys.indexOf(key) === -1);
     if (latestOpenKey && rootSubmenuKeys.indexOf(latestOpenKey!) === -1) {
@@ -91,7 +102,7 @@ export const LaboratoryHome = () => {
 
   return (
     <Layout>
-      <Sider width={200}>
+      <Sider width={200} breakpoint="lg" collapsedWidth="0">
         <Menu
           mode="inline"
           selectedKeys={selectedKey}

@@ -138,19 +138,9 @@ export const ServiceRequestDetail = () => {
           <Table columns={columns} dataSource={serviceRequestEntity?.diagnosticReports} rowKey={r => r.id} />
 
           <Space>
-            <Button tag={Link} to="/laboratory/service-request" replace color="info" data-cy="entityDetailsBackButton">
-              <FontAwesomeIcon icon="arrow-left" />{' '}
-              <span className="d-none d-md-inline">
-                <Translate contentKey="entity.action.back">Back</Translate>
-              </span>
-            </Button>
-            &nbsp;
-            <Button tag={Link} to={`/laboratory/service-request/${serviceRequestEntity.id}/edit`} replace color="primary">
-              <FontAwesomeIcon icon="pencil-alt" />{' '}
-              <span className="d-none d-md-inline">
-                <Translate contentKey="entity.action.edit">Edit</Translate>
-              </span>
-            </Button>
+            <Link to={`/laboratory/service-request`}>
+              <FontAwesomeIcon icon="arrow-left" /> <Translate contentKey="entity.action.back">Back</Translate>
+            </Link>
           </Space>
         </Space>
       </Col>

@@ -76,7 +76,6 @@ public class DiagnosticReportFormatResource {
         if (principal instanceof AbstractAuthenticationToken) {
             return userService
                 .getUserFromAuthentication((AbstractAuthenticationToken) principal)
-                .switchIfEmpty(Mono.just(AdminUserDTO.builder().id("0000001").build()))
                 .flatMap(user -> {
                     DiagnosticReportFormat diagnosticReportFormatToSave = DiagnosticReportFormat
                         .builder()

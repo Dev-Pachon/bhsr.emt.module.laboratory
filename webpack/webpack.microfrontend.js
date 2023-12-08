@@ -19,7 +19,6 @@ module.exports = ({ serve }) => {
         exposes: {
           './entities-menu': './src/main/webapp/app/entities/menu',
           './entities-routes': './src/main/webapp/app/entities/routes',
-          './medical-user-menu': './src/main/webapp/app/entities/medical-user-menu',
         },
         shared: {
           ...Object.fromEntries(
