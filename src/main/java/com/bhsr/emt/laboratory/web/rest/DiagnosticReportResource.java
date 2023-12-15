@@ -1,7 +1,10 @@
 package com.bhsr.emt.laboratory.web.rest;
 
 import com.bhsr.emt.laboratory.domain.DiagnosticReport;
+import com.bhsr.emt.laboratory.domain.enumeration.DiagnosticReportStatus;
 import com.bhsr.emt.laboratory.repository.DiagnosticReportRepository;
+import com.bhsr.emt.laboratory.service.dto.DiagnosticReport.DiagnosticReportResponseDTO;
+import com.bhsr.emt.laboratory.service.mapper.DiagnosticReportMapper;
 import com.bhsr.emt.laboratory.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -9,6 +12,7 @@ import java.util.List;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,20 +31,17 @@ import tech.jhipster.web.util.reactive.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class DiagnosticReportResource {
 
-    private final Logger log = LoggerFactory.getLogger(DiagnosticReportResource.class);
-
     private static final String ENTITY_NAME = "laboratoryDiagnosticReport";
+    private final Logger log = LoggerFactory.getLogger(DiagnosticReportResource.class);
+    private final DiagnosticReportRepository diagnosticReportRepository;
+    private final DiagnosticReportMapper diagnosticReportMapper;
+    private final PatientResource patientResource;
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
-
-    private final DiagnosticReportRepository diagnosticReportRepository;
-
-    public DiagnosticReportResource(DiagnosticReportRepository diagnosticReportRepository) {
-        this.diagnosticReportRepository = diagnosticReportRepository;
-    }
 
     /**
      * {@code POST  /diagnostic-reports} : Create a new diagnosticReport.
@@ -73,7 +74,7 @@ public class DiagnosticReportResource {
     /**
      * {@code PUT  /diagnostic-reports/:id} : Updates an existing diagnosticReport.
      *
-     * @param id the id of the diagnosticReport to save.
+     * @param id               the id of the diagnosticReport to save.
      * @param diagnosticReport the diagnosticReport to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated diagnosticReport,
      * or with status {@code 400 (Bad Request)} if the diagnosticReport is not valid,
@@ -81,9 +82,9 @@ public class DiagnosticReportResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/diagnostic-reports/{id}")
-    public Mono<ResponseEntity<DiagnosticReport>> updateDiagnosticReport(
+    public Mono<ResponseEntity<DiagnosticReportResponseDTO>> updateDiagnosticReport(
         @PathVariable(value = "id", required = false) final String id,
-        @Valid @RequestBody DiagnosticReport diagnosticReport
+        @Valid @RequestBody DiagnosticReportResponseDTO diagnosticReport
     ) throws URISyntaxException {
         log.debug("REST request to update DiagnosticReport : {}, {}", id, diagnosticReport);
         if (diagnosticReport.getId() == null) {
@@ -100,14 +101,18 @@ public class DiagnosticReportResource {
                     return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
                 }
 
+                if (diagnosticReport.getStatus() == DiagnosticReportStatus.REGISTERED) {
+                    diagnosticReport.setStatus(DiagnosticReportStatus.FINAL);
+                }
+
                 return diagnosticReportRepository
-                    .save(diagnosticReport)
+                    .save(diagnosticReportMapper.DiagnosticReportResponseDTOToDiagnosticReport(diagnosticReport))
                     .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
                     .map(result ->
                         ResponseEntity
                             .ok()
                             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, result.getId()))
-                            .body(result)
+                            .body(diagnosticReportMapper.DiagnosticReporToResponseDTO(result))
                     );
             });
     }
@@ -115,7 +120,7 @@ public class DiagnosticReportResource {
     /**
      * {@code PATCH  /diagnostic-reports/:id} : Partial updates given fields of an existing diagnosticReport, field will ignore if it is null
      *
-     * @param id the id of the diagnosticReport to save.
+     * @param id               the id of the diagnosticReport to save.
      * @param diagnosticReport the diagnosticReport to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated diagnosticReport,
      * or with status {@code 400 (Bad Request)} if the diagnosticReport is not valid,
@@ -193,6 +198,7 @@ public class DiagnosticReportResource {
 
     /**
      * {@code GET  /diagnostic-reports} : get all the diagnosticReports as a stream.
+     *
      * @return the {@link Flux} of diagnosticReports.
      */
     @GetMapping(value = "/diagnostic-reports", produces = MediaType.APPLICATION_NDJSON_VALUE)
@@ -208,9 +214,20 @@ public class DiagnosticReportResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the diagnosticReport, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/diagnostic-reports/{id}")
-    public Mono<ResponseEntity<DiagnosticReport>> getDiagnosticReport(@PathVariable String id) {
+    public Mono<ResponseEntity<DiagnosticReportResponseDTO>> getDiagnosticReport(@PathVariable String id) {
         log.debug("REST request to get DiagnosticReport : {}", id);
-        Mono<DiagnosticReport> diagnosticReport = diagnosticReportRepository.findById(id);
+        Mono<DiagnosticReportResponseDTO> diagnosticReport = diagnosticReportRepository
+            .findById(id)
+            .flatMap(element ->
+                patientResource
+                    .getPatientById(element.getSubject())
+                    .flatMap(patient -> {
+                        DiagnosticReportResponseDTO diagnosticReportResponse = diagnosticReportMapper.DiagnosticReporToResponseDTO(element);
+                        diagnosticReportResponse.setSubject(patient);
+                        return Mono.just(diagnosticReportResponse);
+                    })
+            );
+
         return ResponseUtil.wrapOrNotFound(diagnosticReport);
     }
 }

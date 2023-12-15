@@ -29,7 +29,7 @@ export const DiagnosticReport = () => {
   };
 
   return (
-    <div>
+    <>
       <h2 id="diagnostic-report-heading" data-cy="DiagnosticReportHeading">
         <Translate contentKey="laboratoryApp.laboratoryDiagnosticReport.home.title">Diagnostic Reports</Translate>
         <div className="d-flex justify-content-end">
@@ -184,7 +184,7 @@ export const DiagnosticReport = () => {
           !loading && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
         )}
       </div>
-    </div>
+    </>
   );
 };
 

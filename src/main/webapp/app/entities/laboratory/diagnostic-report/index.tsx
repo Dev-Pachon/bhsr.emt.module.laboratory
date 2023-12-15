@@ -10,7 +10,6 @@ import DiagnosticReportDeleteDialog from './diagnostic-report-delete-dialog';
 
 const DiagnosticReportRoutes = () => (
   <ErrorBoundaryRoutes>
-    <Route index element={<DiagnosticReport />} />
     <Route path=":diagnosticReportId">
       <Route index element={<DiagnosticReportDetail />} />
       <Route path="edit" element={<DiagnosticReportUpdate />} />

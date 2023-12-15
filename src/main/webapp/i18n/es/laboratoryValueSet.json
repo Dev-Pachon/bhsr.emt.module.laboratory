@@ -5,7 +5,7 @@
         "title": "Conjuntos de Valores",
         "refreshListLabel": "Actualizar lista",
         "createLabel": "Crear un nuevo Conjunto de Valores",
-        "createOrEditLabel": "Crear o editar un Conjunto de Valores",
+        "editLabel": "Editar un Conjunto de Valores",
         "notFound": "No se encontraron Conjuntos de Valores"
       },
       "create": {

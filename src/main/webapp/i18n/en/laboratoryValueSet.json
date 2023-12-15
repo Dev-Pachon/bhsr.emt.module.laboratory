@@ -5,7 +5,7 @@
         "title": "Value Sets",
         "refreshListLabel": "Refresh list",
         "createLabel": "Create a new Value Set",
-        "createOrEditLabel": "Create or edit a Value Set",
+        "editLabel": "Edit a Value Set",
         "notFound": "No Value Sets found"
       },
       "create": {

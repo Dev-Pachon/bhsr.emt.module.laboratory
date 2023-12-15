@@ -1,21 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Translate, translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
-import { mapIdList } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { IValueSet } from 'app/shared/model/laboratory/value-set.model';
-import { getEntity, updateEntity, createEntity, reset } from './value-set.reducer';
-import { Button, Card, Col, DatePicker, Flex, Form, Input, InputNumber, Row, Select, Space, Switch } from 'antd';
+import { createEntity, getEntity, reset, updateEntity } from './value-set.reducer';
+import { Button, Card, Col, Flex, Form, Input, Row, Select } from 'antd';
 import { useForm, useWatch } from 'antd/es/form/Form';
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 
 import { DataType } from 'app/shared/model/enumerations/data-type.model';
-import { IConstant } from 'app/shared/model/laboratory/constant.model';
 import FormItemCustom from 'app/entities/laboratory/shared/FormItemCustom';
+import PageHeader from 'app/entities/laboratory/shared/page-header';
+import { LeftOutlined } from '@ant-design/icons';
 
 export const ValueSetUpdate = () => {
   const dispatch = useAppDispatch();
@@ -86,13 +84,18 @@ export const ValueSetUpdate = () => {
 
   return (
     <>
-      <Row className="justify-content-center">
-        <Col span="8">
-          <h2 id="laboratoryApp.laboratoryValueSet.home.createOrEditLabel" data-cy="ValueSetCreateUpdateHeading">
-            <Translate contentKey="laboratoryApp.laboratoryValueSet.home.createOrEditLabel">Create a set of constants</Translate>
-          </h2>
-        </Col>
-      </Row>
+      <PageHeader
+        title={
+          isNew
+            ? translate('laboratoryApp.laboratoryValueSet.home.createLabel')
+            : translate('laboratoryApp.laboratoryValueSet.home.editLabel')
+        }
+        leftAction={
+          <Link to={`/laboratory/value-set`} style={{ placeSelf: 'end' }}>
+            <LeftOutlined style={{ fontSize: '24px', color: 'white' }} rev={undefined} />
+          </Link>
+        }
+      />
       <Row className="justify-content-center">
         <Col span={24}>
           {loading ? (
@@ -181,6 +184,7 @@ export const ValueSetUpdate = () => {
 
                           <FormItemCustom
                             {...restField}
+                            form={form}
                             name={[name, 'value']}
                             fieldKey={[key, 'value']}
                             label={translate('laboratoryApp.laboratoryValueSet.create.values.value')}
@@ -201,14 +205,6 @@ export const ValueSetUpdate = () => {
                   </div>
                 )}
               </Form.List>
-              <Button type="link" id="cancel-save" data-cy="entityCreateCancelButton" href="/laboratory/value-set" color="info">
-                <FontAwesomeIcon icon="arrow-left" />
-                &nbsp;
-                <span className="d-none d-md-inline">
-                  <Translate contentKey="entity.action.back">Back</Translate>
-                </span>
-              </Button>
-              &nbsp;
               <Button type="primary" id="save-entity" data-cy="entityCreateSaveButton" htmlType="submit" disabled={updating}>
                 <FontAwesomeIcon icon="save" />
                 &nbsp;

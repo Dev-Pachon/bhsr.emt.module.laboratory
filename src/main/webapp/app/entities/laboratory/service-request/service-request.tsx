@@ -6,53 +6,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { APP_LOCAL_DATE_FORMAT, AUTHORITIES } from 'app/config/constants';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
-
-import { IServiceRequest, IServiceRequestResponse } from 'app/shared/model/laboratory/service-request.model';
 import { getEntities, partialUpdateEntity } from './service-request.reducer';
 import { Empty, Tag } from 'antd';
 import { hasAnyAuthority } from 'app/shared/auth/private-route';
-import ServiceRequestModal from 'app/entities/laboratory/service-request/service-request-update';
-import { IPatient } from 'app/shared/model/laboratory/patient.model';
-import { AdministrativeGender } from 'app/shared/model/enumerations/administrative-gender.model';
 import { ServiceRequestStatus } from 'app/shared/model/enumerations/service-request-status.model';
 import { ServiceRequestPriority } from 'app/shared/model/enumerations/service-request-priority.model';
-
-const samplePatient: IPatient = {
-  id: '1',
-  name: {
-    text: 'John Doe',
-    given: 'John',
-    family: 'Doe',
-  },
-  active: true,
-  gender: AdministrativeGender.MALE,
-  birthDate: '1990-01-01',
-  address: {
-    line: '123 Main St',
-    city: 'Anytown',
-    state: 'NY',
-    country: 'US',
-    text: '123 Main St, Anytown, NY, US',
-    district: 'Anydistrict',
-  },
-  contact: {
-    address: {
-      line: '465 Main St',
-      city: 'Anytown',
-      state: 'SF',
-      country: 'US',
-      text: '465 Main St, Anytown, SF, US',
-      district: 'Anydistrict',
-    },
-    gender: AdministrativeGender.FEMALE,
-    name: {
-      text: 'Jane Doe',
-      given: 'Jane',
-      family: 'Doe',
-    },
-    id: '2',
-  },
-};
+import PageHeader from 'app/entities/laboratory/shared/page-header';
+import { PlusOutlined } from '@ant-design/icons';
 
 export const ServiceRequest = () => {
   const dispatch = useAppDispatch();
@@ -62,15 +22,14 @@ export const ServiceRequest = () => {
 
   const isLabUser = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.LAB]));
   const isMedUser = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.MED]));
-  const serviceRequestList: IServiceRequest[] = useAppSelector(state => state.laboratory.serviceRequest.entities);
+  const serviceRequestList: [] = useAppSelector(state => state.laboratory.serviceRequest.entities);
   const loading = useAppSelector(state => state.laboratory.serviceRequest.loading);
 
   useEffect(() => {
     dispatch(getEntities({}));
-    console.log(`isLabUser: ${isLabUser}`);
   }, []);
 
-  const onCancel = (serviceRequest: IServiceRequest) => {
+  const onCancel = serviceRequest => {
     const newServiceRequest = {
       id: serviceRequest.id,
       status: ServiceRequestStatus.REVOKED,
@@ -78,7 +37,7 @@ export const ServiceRequest = () => {
     dispatch(partialUpdateEntity(newServiceRequest));
   };
 
-  const onStartRequest = (serviceRequest: IServiceRequest) => {
+  const onStartRequest = serviceRequest => {
     const newServiceRequest = {
       id: serviceRequest.id,
       status: ServiceRequestStatus.ACTIVE,
@@ -91,7 +50,7 @@ export const ServiceRequest = () => {
     dispatch(getEntities({}));
   };
 
-  const getTagColor = (serviceRequestResponse: IServiceRequest) => {
+  const getTagColor = serviceRequestResponse => {
     switch (ServiceRequestPriority[serviceRequestResponse.priority]) {
       case ServiceRequestPriority.HIGH:
         return 'error';
@@ -105,13 +64,15 @@ export const ServiceRequest = () => {
   };
 
   return (
-    <div>
-      <h2 id="service-request-heading" data-cy="ServiceRequestHeading">
-        <Translate contentKey="laboratoryApp.laboratoryServiceRequest.home.title">Service Requests</Translate>
-        <div className="d-flex justify-content-end">
-          <ServiceRequestModal patient={samplePatient} />
-        </div>
-      </h2>
+    <>
+      <PageHeader
+        title={translate('laboratoryApp.laboratoryServiceRequest.home.title')}
+        rightAction={
+          <Link to={`new`}>
+            <PlusOutlined style={{ fontSize: '24px', color: 'white' }} rev={undefined} />
+          </Link>
+        }
+      />
       <div className="table-responsive">
         {serviceRequestList && serviceRequestList.length > 0 ? (
           <Table responsive>
@@ -122,6 +83,9 @@ export const ServiceRequest = () => {
                 </th>
                 <th>
                   <Translate contentKey="laboratoryApp.laboratoryServiceRequest.priority">Priority</Translate>
+                </th>
+                <th>
+                  <Translate contentKey="laboratoryApp.laboratoryPatient.detail.title">Subject</Translate>
                 </th>
                 <th>
                   <Translate contentKey="laboratoryApp.laboratoryServiceRequest.diagnosticReportsIds"># of diagnostic reports</Translate>
@@ -142,74 +106,77 @@ export const ServiceRequest = () => {
               </tr>
             </thead>
             <tbody>
-              {serviceRequestList.map((serviceRequest: IServiceRequest, i: number) => (
-                <tr key={`entity-${i}`} data-cy="entityTable">
-                  <td>
-                    <Translate contentKey={`laboratoryApp.ServiceRequestStatus.${serviceRequest.status}`} />
-                  </td>
-                  <td>
-                    <Tag color={getTagColor(serviceRequest)}>
-                      {translate(`laboratoryApp.laboratoryServiceRequest.create.priority.${serviceRequest.priority}`)}
-                    </Tag>
-                  </td>
-                  <td>{serviceRequest.diagnosticReportsFormats?.length}</td>
-                  <td>
-                    {serviceRequest.createdAt ? (
-                      <TextFormat type="date" value={serviceRequest.createdAt} format={APP_LOCAL_DATE_FORMAT} />
-                    ) : null}
-                  </td>
-                  <td>{`${serviceRequest.createdBy.firstName} ${serviceRequest.createdBy.lastName}`}</td>
-                  <td>
-                    {serviceRequest.updatedAt ? (
-                      <TextFormat type="date" value={serviceRequest.updatedAt} format={APP_LOCAL_DATE_FORMAT} />
-                    ) : null}
-                  </td>
-                  <td>{`${serviceRequest.updatedBy.firstName} ${serviceRequest.updatedBy.lastName}`}</td>
-                  <td className="text-end">
-                    <div className="btn-group flex-btn-group-container">
-                      <Button
-                        tag={Link}
-                        to={`/laboratory/service-request/${serviceRequest.id}`}
-                        color="info"
-                        size="sm"
-                        data-cy="entityDetailsButton"
-                      >
-                        <FontAwesomeIcon icon="eye" />{' '}
-                        <span className="d-none d-md-inline">
-                          <Translate contentKey="entity.action.view">View</Translate>
-                        </span>
-                      </Button>
-                      {isLabUser && serviceRequest.status === ServiceRequestStatus.DRAFT && (
-                        <Button color="primary" size="sm" onClick={() => onStartRequest(serviceRequest)}>
+              {[...serviceRequestList]
+                .sort((actual: any, previous: any) => actual?.id?.localeCompare(previous?.id))
+                .map((serviceRequest: any, i: number) => (
+                  <tr key={`entity-${i}`} data-cy="entityTable">
+                    <td>
+                      <Translate contentKey={`laboratoryApp.ServiceRequestStatus.${serviceRequest.status}`} />
+                    </td>
+                    <td>
+                      <Tag color={getTagColor(serviceRequest)}>
+                        {translate(`laboratoryApp.laboratoryServiceRequest.create.priority.${serviceRequest.priority}`)}
+                      </Tag>
+                    </td>
+                    <td>{serviceRequest.subject?.name?.text}</td>
+                    <td>{serviceRequest.diagnosticReportsFormats?.length}</td>
+                    <td>
+                      {serviceRequest.createdAt ? (
+                        <TextFormat type="date" value={serviceRequest.createdAt} format={APP_LOCAL_DATE_FORMAT} />
+                      ) : null}
+                    </td>
+                    <td>{`${serviceRequest.createdBy.firstName} ${serviceRequest.createdBy.lastName}`}</td>
+                    <td>
+                      {serviceRequest.updatedAt ? (
+                        <TextFormat type="date" value={serviceRequest.updatedAt} format={APP_LOCAL_DATE_FORMAT} />
+                      ) : null}
+                    </td>
+                    <td>{`${serviceRequest.updatedBy.firstName} ${serviceRequest.updatedBy.lastName}`}</td>
+                    <td className="text-end">
+                      <div className="btn-group flex-btn-group-container">
+                        <Button
+                          tag={Link}
+                          to={`/laboratory/service-request/${serviceRequest.id}`}
+                          color="info"
+                          size="sm"
+                          data-cy="entityDetailsButton"
+                        >
                           <FontAwesomeIcon icon="eye" />{' '}
                           <span className="d-none d-md-inline">
-                            <Translate contentKey="entity.action.start" interpolate={{ entity: 'Request' }}>
-                              Start Request
-                            </Translate>
+                            <Translate contentKey="entity.action.view">View</Translate>
                           </span>
                         </Button>
-                      )}
-                      {isMedUser && serviceRequest.status === ServiceRequestStatus.DRAFT && (
-                        <Button color="danger" size="sm" onClick={() => onCancel(serviceRequest)}>
-                          <FontAwesomeIcon icon="cancel" />{' '}
-                          <span className="d-none d-md-inline">
-                            <Translate contentKey="entity.action.cancel" interpolate={{ entity: 'Request' }}>
-                              Cancel Request
-                            </Translate>
-                          </span>
-                        </Button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                        {isLabUser && serviceRequest.status === ServiceRequestStatus.DRAFT && (
+                          <Button color="primary" size="sm" onClick={() => onStartRequest(serviceRequest)}>
+                            <FontAwesomeIcon icon="eye" />{' '}
+                            <span className="d-none d-md-inline">
+                              <Translate contentKey="entity.action.start" interpolate={{ entity: 'Request' }}>
+                                Start Request
+                              </Translate>
+                            </span>
+                          </Button>
+                        )}
+                        {isMedUser && serviceRequest.status === ServiceRequestStatus.DRAFT && (
+                          <Button color="danger" size="sm" onClick={() => onCancel(serviceRequest)}>
+                            <FontAwesomeIcon icon="cancel" />{' '}
+                            <span className="d-none d-md-inline">
+                              <Translate contentKey="entity.action.cancel" interpolate={{ entity: 'Request' }}>
+                                Cancel Request
+                              </Translate>
+                            </span>
+                          </Button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </Table>
         ) : (
           !loading && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
         )}
       </div>
-    </div>
+    </>
   );
 };
 

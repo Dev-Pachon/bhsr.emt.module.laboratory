@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Table } from 'reactstrap';
 import { translate, Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { IValueSet } from 'app/shared/model/laboratory/value-set.model';
 import { getEntities } from './value-set.reducer';
-import { Empty, Typography } from 'antd';
-const { Title } = Typography;
+import { Empty } from 'antd';
+import PageHeader from 'app/entities/laboratory/shared/page-header';
+import { PlusOutlined } from '@ant-design/icons';
 
 export const ValueSet = () => {
   const dispatch = useAppDispatch();
@@ -31,15 +30,14 @@ export const ValueSet = () => {
 
   return (
     <div>
-      <h2 id="value-set-heading" data-cy="ValueSetHeading">
-        {/*<div className="d-flex justify-content-end">*/}
-        {/*  <Button className="me-2" color="info" onClick={handleSyncList} disabled={loading}>*/}
-        {/*    <FontAwesomeIcon icon="sync" spin={loading} />{' '}*/}
-        {/*    <Translate contentKey="laboratoryApp.laboratoryValueSet.home.refreshListLabel">Refresh List</Translate>*/}
-        {/*  </Button>*/}
-        {/*</div>*/}
-      </h2>
-      <Title level={2}>{translate('laboratoryApp.laboratoryValueSet.home.title')}</Title>
+      <PageHeader
+        title={translate('laboratoryApp.laboratoryValueSet.home.title')}
+        rightAction={
+          <Link to={`new`}>
+            <PlusOutlined style={{ fontSize: '24px', color: 'white' }} rev={undefined} />
+          </Link>
+        }
+      />
       <div className="table-responsive">
         {valueSetList && valueSetList.length > 0 ? (
           <Table responsive>

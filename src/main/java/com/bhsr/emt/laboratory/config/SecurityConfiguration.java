@@ -32,7 +32,6 @@ import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
 import org.springframework.security.web.server.header.ReferrerPolicyServerHttpHeadersWriter;
 import org.springframework.security.web.server.header.XFrameOptionsServerHttpHeadersWriter.Mode;
 import org.springframework.security.web.server.savedrequest.NoOpServerRequestCache;
@@ -42,7 +41,6 @@ import org.springframework.web.cors.reactive.CorsWebFilter;
 import org.zalando.problem.spring.webflux.advice.security.SecurityProblemSupport;
 import reactor.core.publisher.Mono;
 import tech.jhipster.config.JHipsterProperties;
-import tech.jhipster.web.filter.reactive.CookieCsrfFilter;
 
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity

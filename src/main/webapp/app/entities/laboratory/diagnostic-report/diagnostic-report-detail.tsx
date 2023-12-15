@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Button, Col, Row } from 'reactstrap';
-import { Translate } from 'react-jhipster';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { translate } from 'react-jhipster';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { getEntity } from './diagnostic-report.reducer';
-import { Descriptions, Divider } from 'antd';
+import { Descriptions, Divider, Space } from 'antd';
 import { IDiagnosticReport } from 'app/shared/model/laboratory/diagnostic-report.model';
 import DiagnosticReportPatientDescriptions from 'app/entities/laboratory/diagnostic-report/diagnostic-report-patient-descriptions';
+import PageHeader from 'app/entities/laboratory/shared/page-header';
+import { LeftOutlined } from '@ant-design/icons';
 
 export const DiagnosticReportDetail = () => {
   const dispatch = useAppDispatch();
@@ -44,19 +44,21 @@ export const DiagnosticReportDetail = () => {
   };
 
   return (
-    <Row>
-      <Col>
-        <h2 data-cy="diagnosticReportDetailsHeading">
+    <>
+      <PageHeader
+        title={translate('laboratoryApp.laboratoryDiagnosticReport.detail.title')}
+        leftAction={
           <Link to={`/laboratory/service-request/${id}`}>
-            <FontAwesomeIcon icon="arrow-left" />
-          </Link>{' '}
-          <Translate contentKey="laboratoryApp.laboratoryDiagnosticReport.detail.title">DiagnosticReport</Translate>
-        </h2>
+            <LeftOutlined style={{ fontSize: '24px', color: 'white' }} rev={undefined} />
+          </Link>
+        }
+      />
+      <Space direction={'vertical'} style={{ width: '100%' }}>
         <DiagnosticReportPatientDescriptions subject={diagnosticReportEntity?.subject} />
         <Divider />
         <Descriptions title={diagnosticReportEntity?.format?.name} bordered items={getItems(diagnosticReportEntity)} column={4} />
-      </Col>
-    </Row>
+      </Space>
+    </>
   );
 };
 

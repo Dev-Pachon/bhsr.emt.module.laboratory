@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Button, Col, Row } from 'reactstrap';
 import { TextFormat, translate, Translate } from 'react-jhipster';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import type { ColumnsType } from 'antd/es/table';
 
 import { APP_DATE_FORMAT, AUTHORITIES } from 'app/config/constants';
@@ -13,49 +11,60 @@ import { IServiceRequestResponse } from 'app/shared/model/laboratory/service-req
 import { Descriptions, Space, Table } from 'antd';
 import { hasAnyAuthority } from 'app/shared/auth/private-route';
 import { IDiagnosticReport } from 'app/shared/model/laboratory/diagnostic-report.model';
+import PageHeader from 'app/entities/laboratory/shared/page-header';
+import { LeftOutlined } from '@ant-design/icons';
+import { ServiceRequestStatus } from 'app/shared/model/enumerations/service-request-status.model';
+import { DiagnosticReportStatus } from 'app/shared/model/enumerations/diagnostic-report-status.model';
 
 export const ServiceRequestDetail = () => {
   const dispatch = useAppDispatch();
   const isLabUser = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.LAB]));
+  const { id } = useParams<'id'>();
+
+  useEffect(() => {
+    dispatch(getEntity(id));
+  }, []);
+
+  const serviceRequestEntity = useAppSelector(state => state.laboratory.serviceRequest.entity);
 
   const columns: ColumnsType<IDiagnosticReport> = [
     {
-      title: 'Name',
+      title: 'Nombre',
       dataIndex: 'format',
       key: 'format',
     },
     {
-      title: 'Status',
+      title: 'Estado',
       dataIndex: 'status',
       key: 'status',
       render: (text, record) => translate(`laboratoryApp.DiagnosticReportStatus.${record.status}`),
     },
     {
-      title: 'Created At',
+      title: 'Creado en',
       dataIndex: 'createdAt',
       key: 'createdAt',
       render: (text, record) => <TextFormat value={record.createdAt} type="date" format={APP_DATE_FORMAT} />,
     },
     {
-      title: 'Created By',
+      title: 'Creado por',
       dataIndex: 'createdBy',
       key: 'createdBy',
       render: (text, record) => `${record?.createdBy?.firstName} ${record?.createdBy?.lastName}`,
     },
     {
-      title: 'Updated At',
+      title: 'Actualizado en',
       dataIndex: 'updatedAt',
       key: 'updatedAt',
       render: (text, record) => <TextFormat value={record.updatedAt} type="date" format={APP_DATE_FORMAT} />,
     },
     {
-      title: 'Updated By',
+      title: 'Actualizado por',
       dataIndex: 'updatedBy',
       key: 'updatedBy',
       render: (text, record) => `${record?.updatedBy?.firstName} ${record?.updatedBy?.lastName}`,
     },
     {
-      title: 'Action',
+      title: 'Acción',
       dataIndex: '',
       key: 'x',
       render: (text, record) => (
@@ -63,7 +72,10 @@ export const ServiceRequestDetail = () => {
           <Link to={`diagnostic-report/${record.id}`}>
             <Translate contentKey="entity.action.view">View</Translate>
           </Link>
-          {isLabUser ? (
+          {isLabUser &&
+          serviceRequestEntity &&
+          ServiceRequestStatus[serviceRequestEntity.status] === ServiceRequestStatus.ACTIVE &&
+          DiagnosticReportStatus[record.status] !== DiagnosticReportStatus.FINAL ? (
             <Link to={`diagnostic-report/${record.id}/edit`}>
               <Translate contentKey="entity.action.complete">Complete</Translate>
             </Link>
@@ -72,14 +84,6 @@ export const ServiceRequestDetail = () => {
       ),
     },
   ];
-
-  const { id } = useParams<'id'>();
-
-  useEffect(() => {
-    dispatch(getEntity(id));
-  }, []);
-
-  const serviceRequestEntity = useAppSelector(state => state.laboratory.serviceRequest.entity);
 
   const mapperToDescriptionItem = (serviceRequest: IServiceRequestResponse) => {
     const items = [
@@ -128,23 +132,20 @@ export const ServiceRequestDetail = () => {
   };
 
   return (
-    <Row>
-      <Col>
-        <Space size={'middle'} direction={'vertical'} style={{ width: '100%' }}>
-          <h2 data-cy="serviceRequestDetailsHeading">
-            <Translate contentKey="laboratoryApp.laboratoryServiceRequest.detail.title">ServiceRequest</Translate>
-          </h2>
-          <Descriptions bordered size={'small'} items={mapperToDescriptionItem(serviceRequestEntity)} column={4} />
-          <Table columns={columns} dataSource={serviceRequestEntity?.diagnosticReports} rowKey={r => r.id} />
-
-          <Space>
-            <Link to={`/laboratory/service-request`}>
-              <FontAwesomeIcon icon="arrow-left" /> <Translate contentKey="entity.action.back">Back</Translate>
-            </Link>
-          </Space>
-        </Space>
-      </Col>
-    </Row>
+    <>
+      <PageHeader
+        title={translate('laboratoryApp.laboratoryServiceRequest.detail.title')}
+        leftAction={
+          <Link to={`/laboratory/service-request`}>
+            <LeftOutlined style={{ fontSize: '24px', color: 'white' }} rev={undefined} />
+          </Link>
+        }
+      />
+      <Space size={'middle'} direction={'vertical'} style={{ width: '100%' }}>
+        <Descriptions bordered size={'small'} items={mapperToDescriptionItem(serviceRequestEntity)} column={4} />
+        <Table columns={columns} dataSource={serviceRequestEntity?.diagnosticReports} rowKey={r => r.id} />
+      </Space>
+    </>
   );
 };
 

@@ -56,7 +56,8 @@ export const DiagnosticReportFormatField = ({ idx, onDelete, valueSet }) => {
         <Form.Item<IDiagnosticReportFormat>
           name={['fieldFormats', idx, 'defaultValue']}
           label={translate('laboratoryApp.laboratoryDiagnosticReportFormat.fields.defaultValue')}
-          rules={[{ required: true, message: 'Please fill this field!' }]}
+          // rules={[{ required: true, message: 'Please fill this field!' }]}
+          hidden
         >
           <Input placeholder={translate('laboratoryApp.laboratoryDiagnosticReportFormat.fields.defaultValue')} />
         </Form.Item>

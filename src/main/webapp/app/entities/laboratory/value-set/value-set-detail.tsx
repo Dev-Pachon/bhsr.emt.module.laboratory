@@ -1,14 +1,13 @@
 import React, { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Button, Row, Col } from 'reactstrap';
-import { Translate } from 'react-jhipster';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { getEntity } from './value-set.reducer';
 import { Space, Table, Typography } from 'antd';
+import PageHeader from 'app/entities/laboratory/shared/page-header';
+import { translate } from 'react-jhipster';
+import { LeftOutlined } from '@ant-design/icons';
+
 const { Title } = Typography;
 
 const columns = [
@@ -40,11 +39,21 @@ export const ValueSetDetail = () => {
 
   const valueSetEntity = useAppSelector(state => state.laboratory.valueSet.entity);
   return (
-    <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
-      <Title level={2}>{valueSetEntity.name}</Title>
-      <Typography>{valueSetEntity.description}</Typography>
-      <Table columns={columns} dataSource={valueSetEntity.constants}></Table>
-    </Space>
+    <>
+      <PageHeader
+        title={translate('laboratoryApp.laboratoryValueSet.detail.title')}
+        leftAction={
+          <Link to={`/laboratory/value-set`} style={{ placeSelf: 'end' }}>
+            <LeftOutlined style={{ fontSize: '24px', color: 'white' }} rev={undefined} />
+          </Link>
+        }
+      />
+      <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
+        <Title level={3}>{valueSetEntity.name}</Title>
+        <Typography>{valueSetEntity.description}</Typography>
+        <Table columns={columns} dataSource={valueSetEntity.constants}></Table>
+      </Space>
+    </>
   );
 };
 

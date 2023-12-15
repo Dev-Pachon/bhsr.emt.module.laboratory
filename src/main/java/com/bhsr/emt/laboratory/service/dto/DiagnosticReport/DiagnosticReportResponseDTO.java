@@ -2,6 +2,7 @@ package com.bhsr.emt.laboratory.service.dto.DiagnosticReport;
 
 import com.bhsr.emt.laboratory.domain.CustomField;
 import com.bhsr.emt.laboratory.domain.DiagnosticReportFormat;
+import com.bhsr.emt.laboratory.domain.Patient;
 import com.bhsr.emt.laboratory.domain.User;
 import com.bhsr.emt.laboratory.domain.enumeration.DiagnosticReportStatus;
 import com.bhsr.emt.laboratory.service.dto.DiagnosticReportFormat.DiagnosticReportFormatResponseDTO;
@@ -34,7 +35,7 @@ public class DiagnosticReportResponseDTO {
 
     private LocalDate deletedAt;
 
-    private String subject;
+    private Patient subject;
 
     private DiagnosticReportFormatResponseDTO format;
 

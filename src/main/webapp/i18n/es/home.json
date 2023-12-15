@@ -1,6 +1,6 @@
 {
   "home": {
-    "title": "¡Bienvenido, Java Hipster!",
+    "title": "¡Bienvenido, al módulo de exámenes de laboratorio!",
     "subtitle": "Esta es tu página de inicio",
     "logged": {
       "message": "Has iniciado sesión como usuario \"{{username}}\"."

@@ -50,6 +50,10 @@ public class Patient implements Serializable {
     private Contact contact;
 
     @NotNull(message = "must not be null")
-    @Field("humanName")
-    private HumanName humanName;
+    @Field("name")
+    private HumanName name;
+
+    @NotNull(message = "must not be null")
+    @Field("identifier")
+    private Identifier identifier;
 }

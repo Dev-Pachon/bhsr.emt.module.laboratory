@@ -1,6 +1,7 @@
 import { Descriptions } from 'antd';
 import { IPatient } from 'app/shared/model/laboratory/patient.model';
 import React from 'react';
+import { translate } from 'react-jhipster';
 
 export const DiagnosticReportPatientDescriptions = ({ subject }) => {
   const getPatientItems = (subjectEl: IPatient) => {
@@ -13,17 +14,17 @@ export const DiagnosticReportPatientDescriptions = ({ subject }) => {
       {
         key: 'identifierType',
         label: 'Id Type',
-        children: subjectEl?.identifierType?.name,
+        children: subjectEl?.identifier?.type?.name,
       },
       {
         key: 'identifier',
         label: 'Id',
-        children: subjectEl?.identifier,
+        children: subjectEl?.identifier?.value,
       },
       {
         key: 'gender',
         label: 'Gender',
-        children: subjectEl?.gender,
+        children: translate(`laboratoryApp.AdministrativeGender.${subjectEl?.gender}`),
       },
       {
         key: 'birthDate',

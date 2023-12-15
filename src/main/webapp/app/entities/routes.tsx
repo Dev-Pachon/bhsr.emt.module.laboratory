@@ -12,7 +12,6 @@ import IdentifierType from './laboratory/identifier-type';
 import DiagnosticReportFormat from './laboratory/diagnostic-report-format';
 import ServiceRequest from './laboratory/service-request';
 import ValueSet from './laboratory/value-set';
-import { LaboratoryHome } from 'app/entities/laboratory';
 import PrivateRoute from 'app/shared/auth/private-route';
 import { AUTHORITIES } from 'app/config/constants';
 /* jhipster-needle-add-route-import - JHipster will add routes here */
@@ -25,25 +24,25 @@ export default () => {
     <div>
       <PrivateRoute hasAnyAuthorities={[AUTHORITIES.MED, AUTHORITIES.LAB]}>
         <ErrorBoundaryRoutes>
-          <Route>
-            <Route path="/service-request/*" element={<ServiceRequest />} />
-          </Route>
+          <Route path="/service-request/*" element={<ServiceRequest />} />
         </ErrorBoundaryRoutes>
       </PrivateRoute>
 
       <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
         <ErrorBoundaryRoutes>
-          <Route element={<LaboratoryHome />}>
-            <Route path="/identifier-type/*" element={<IdentifierType />} />
-            <Route path="/diagnostic-report-format/*" element={<DiagnosticReportFormat />} />
-            <Route path="/value-set/*" element={<ValueSet />} />
-          </Route>
+          <Route path="/identifier-type/*" element={<IdentifierType />} />
+          <Route path="/diagnostic-report-format/*" element={<DiagnosticReportFormat />} />
+          <Route path="/value-set/*" element={<ValueSet />} />
         </ErrorBoundaryRoutes>
       </PrivateRoute>
 
-      <ErrorBoundaryRoutes>
-        <Route path={'/'} element={<Navigate to="/404" />} />
-      </ErrorBoundaryRoutes>
+      <PrivateRoute hasAnyAuthorities={[AUTHORITIES.USER]}>
+        <ErrorBoundaryRoutes>
+          <Route>
+            <Route path="/" element={<Navigate to="/404" />} />
+          </Route>
+        </ErrorBoundaryRoutes>
+      </PrivateRoute>
     </div>
   );
 };

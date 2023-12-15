@@ -7,6 +7,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 
 import com.bhsr.emt.laboratory.IntegrationTest;
 import com.bhsr.emt.laboratory.domain.DiagnosticReport;
+import com.bhsr.emt.laboratory.domain.User;
 import com.bhsr.emt.laboratory.domain.enumeration.DiagnosticReportStatus;
 import com.bhsr.emt.laboratory.repository.DiagnosticReportRepository;
 import java.time.Duration;
@@ -36,14 +37,14 @@ class DiagnosticReportResourceIT {
     private static final LocalDate DEFAULT_CREATED_AT = LocalDate.ofEpochDay(0L);
     private static final LocalDate UPDATED_CREATED_AT = LocalDate.now(ZoneId.systemDefault());
 
-    private static final String DEFAULT_CREATED_BY = "AAAAAAAAAA";
-    private static final String UPDATED_CREATED_BY = "BBBBBBBBBB";
+    private static final User DEFAULT_CREATED_BY = User.builder().firstName("AAAAAAAAAA").build();
+    private static final User UPDATED_CREATED_BY = User.builder().firstName("BBBBBBBBBB").build();
 
     private static final LocalDate DEFAULT_UPDATED_AT = LocalDate.ofEpochDay(0L);
     private static final LocalDate UPDATED_UPDATED_AT = LocalDate.now(ZoneId.systemDefault());
 
-    private static final String DEFAULT_UPDATED_BY = "AAAAAAAAAA";
-    private static final String UPDATED_UPDATED_BY = "BBBBBBBBBB";
+    private static final User DEFAULT_UPDATED_BY = User.builder().firstName("AAAAAAAAAAA").build();
+    private static final User UPDATED_UPDATED_BY = User.builder().firstName("BBBBBBBBBB").build();
 
     private static final LocalDate DEFAULT_DELETED_AT = LocalDate.ofEpochDay(0L);
     private static final LocalDate UPDATED_DELETED_AT = LocalDate.now(ZoneId.systemDefault());

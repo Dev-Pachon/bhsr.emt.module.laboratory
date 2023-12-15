@@ -20,6 +20,8 @@ spring:
   config:
     activate:
       on-profile: '!api-docs'
+  jackson:
+    property-naming-strategy: SNAKE_CASE
 springdoc:
   api-docs:
     enabled: false
@@ -141,7 +143,7 @@ spring:
       client:
         provider:
           oidc:
-            issuer-uri: http://localhost:9080/realms/jhipster
+            issuer-uri: http://localhost:9080/auth/realms/EMT
         registration:
           oidc:
             client-id: internal

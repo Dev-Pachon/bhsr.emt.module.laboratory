@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import FormItemCustom from 'app/entities/laboratory/shared/FormItemCustom';
 import { Form, Radio, Select } from 'antd';
 
-export const DiagnosticReportUpdateField = ({ el, index }) => {
+export const DiagnosticReportUpdateField = ({ el, index, form }) => {
   const dispatch = useAppDispatch();
   const { valueSet } = el;
   const [custom, setCustom] = React.useState(false);
@@ -35,7 +35,7 @@ export const DiagnosticReportUpdateField = ({ el, index }) => {
           </Radio.Group>
 
           {custom ? (
-            <FormItemCustom name={el?.name} label={el?.name} dataType={el.dataType} />
+            <FormItemCustom form={form} name={el?.name} label={el?.name} dataType={el.dataType} />
           ) : (
             <Form.Item name={el?.name} label={el?.name} rules={[{ required: el?.isRequired }]}>
               <Select
@@ -53,7 +53,7 @@ export const DiagnosticReportUpdateField = ({ el, index }) => {
           )}
         </>
       ) : (
-        <FormItemCustom name={el?.name} label={el?.name} dataType={el?.dataType} isRequired={el?.isRequired} />
+        <FormItemCustom form={form} name={el?.name} label={el?.name} dataType={el?.dataType} isRequired={el?.isRequired} />
       )}
     </>
   );

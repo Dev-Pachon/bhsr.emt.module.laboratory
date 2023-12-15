@@ -1,23 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
+import { Translate, translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Row, Col, Checkbox, Form, Input, Select, Button } from 'antd';
+import { Button, Form, Input, Row } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { IDiagnosticReportFormat } from 'app/shared/model/laboratory/diagnostic-report-format.model';
-import { getEntity, updateEntity, createEntity, reset } from './diagnostic-report-format.reducer';
+import { createEntity, getEntity, reset, updateEntity } from './diagnostic-report-format.reducer';
 import { IFieldFormat } from 'app/shared/model/laboratory/field-format.model';
 import { DataType } from 'app/shared/model/enumerations/data-type.model';
 import { DiagnosticReportFormatField } from 'app/entities/laboratory/diagnostic-report-format/components/field-component';
 import { getEntities as getValueSetEntities } from 'app/entities/laboratory/value-set/value-set.reducer';
-import { IValueSet } from 'app/shared/model/laboratory/value-set.model';
 import { useForm } from 'antd/es/form/Form';
-import { Typography } from 'antd';
-
-const { Title } = Typography;
+import PageHeader from 'app/entities/laboratory/shared/page-header';
+import { LeftOutlined } from '@ant-design/icons';
 
 export const DiagnosticReportFormatUpdate = () => {
   const dispatch = useAppDispatch();
@@ -80,7 +78,7 @@ export const DiagnosticReportFormatUpdate = () => {
     const newField: IFieldFormat = {
       name: '',
       dataType: DataType.STRING,
-      defaultValue: '',
+      defaultValue: 's',
       isRequired: false,
       isSearchable: false,
       order: fields.length + 1,
@@ -103,24 +101,19 @@ export const DiagnosticReportFormatUpdate = () => {
   };
 
   return (
-    <div>
-      <Row className="justify-content-center">
-        <Title
-          level={2}
-          id="laboratoryApp.laboratoryDiagnosticReportFormat.home.createOrEditLabel"
-          data-cy="DiagnosticReportFormatCreateUpdateHeading"
-        >
-          {isNew ? (
-            <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.home.createLabel">
-              Create a Diagnostic Report Format
-            </Translate>
-          ) : (
-            <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.home.editLabel">
-              Edit a Diagnostic Report Format
-            </Translate>
-          )}
-        </Title>
-      </Row>
+    <>
+      <PageHeader
+        title={
+          isNew
+            ? translate('laboratoryApp.laboratoryDiagnosticReportFormat.home.createLabel')
+            : translate('laboratoryApp.laboratoryDiagnosticReportFormat.home.editLabel')
+        }
+        leftAction={
+          <Link to={`/laboratory/diagnostic-report-format`} style={{ placeSelf: 'end' }}>
+            <LeftOutlined style={{ fontSize: '24px', color: 'white' }} rev={undefined} />
+          </Link>
+        }
+      />
       <Row className="justify-content-center">
         {loading || diagnosticReportFormatEntity.length === 0 || fields.length === 0 ? (
           <p>Loading...</p>
@@ -159,20 +152,6 @@ export const DiagnosticReportFormatUpdate = () => {
             <Button type="dashed" onClick={addField} block icon={<PlusOutlined rev={undefined} />} className={'mb-3'}>
               Add field
             </Button>
-            <Button
-              type="link"
-              id="cancel-save"
-              data-cy="entityCreateCancelButton"
-              href="/laboratory/diagnostic-report-format"
-              color="info"
-            >
-              <FontAwesomeIcon icon="arrow-left" />
-              &nbsp;
-              <span className="d-none d-md-inline">
-                <Translate contentKey="entity.action.back">Back</Translate>
-              </span>
-            </Button>
-            &nbsp;
             <Button id="save-entity" data-cy="entityCreateSaveButton" type="primary" htmlType={'submit'} disabled={updating}>
               <FontAwesomeIcon icon="save" />
               &nbsp;
@@ -181,7 +160,7 @@ export const DiagnosticReportFormatUpdate = () => {
           </Form>
         )}
       </Row>
-    </div>
+    </>
   );
 };
 

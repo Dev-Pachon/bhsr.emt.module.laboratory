@@ -7,8 +7,10 @@ import { IIdentifierType } from 'app/shared/model/laboratory/identifier-type.mod
 
 export interface IPatient {
   id?: string;
-  identifierType?: IIdentifierType;
-  identifier?: string;
+  identifier?: {
+    value?: string;
+    type?: IIdentifierType;
+  };
   active?: boolean;
   gender?: AdministrativeGender;
   birthDate?: string;

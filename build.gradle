@@ -187,14 +187,15 @@ dependencies {
     implementation "org.mongodb:mongodb-driver-reactivestreams"
     // Mongo db driver was excluded from starter, adding manually
     implementation "org.mongodb:mongodb-driver-sync"
-    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
-    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+
     compileOnly 'org.projectlombok:lombok:1.18.22'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
     testCompileOnly 'org.projectlombok:lombok:1.18.22'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
-
+    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
     annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+
 
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
     implementation "org.springframework.boot:spring-boot-loader-tools"

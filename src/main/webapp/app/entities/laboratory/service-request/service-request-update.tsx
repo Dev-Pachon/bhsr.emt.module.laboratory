@@ -88,11 +88,14 @@ const ServiceRequestModal: React.FC<ServiceRequestModalProps> = ({ patient, ...p
     form
       .validateFields()
       .then(values => {
+        console.log(values);
         form.resetFields();
 
         const valuesToSave = { ...values };
 
         valuesToSave.diagnosticReportsFormats = values.diagnosticReportsFormats.map(item => diagnosticReportFormatEntity[item]);
+
+        console.log(valuesToSave);
 
         saveEntity(valuesToSave);
         setOpen(false);
@@ -113,12 +116,14 @@ const ServiceRequestModal: React.FC<ServiceRequestModalProps> = ({ patient, ...p
 
   const defaultValues = { status: 'DRAFT', subject: patient.id, category: 'LABORATORY_PROCEDURE' };
 
+  console.log(defaultValues);
+
   const filterOption = (input: string, option?: { label: string; value: string }) =>
     (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
 
   return (
     <>
-      {patient === undefined ? null : (
+      {!patient ? null : (
         <>
           <Button type="primary" onClick={showModal}>
             Request a Service

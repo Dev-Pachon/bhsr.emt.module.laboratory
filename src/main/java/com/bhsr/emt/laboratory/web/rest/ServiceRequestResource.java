@@ -1,21 +1,21 @@
 package com.bhsr.emt.laboratory.web.rest;
 
 import com.bhsr.emt.laboratory.domain.DiagnosticReport;
-import com.bhsr.emt.laboratory.domain.Patient;
 import com.bhsr.emt.laboratory.domain.ServiceRequest;
 import com.bhsr.emt.laboratory.domain.User;
 import com.bhsr.emt.laboratory.domain.enumeration.DiagnosticReportStatus;
 import com.bhsr.emt.laboratory.repository.DiagnosticReportFormatRepository;
-import com.bhsr.emt.laboratory.repository.DiagnosticReportRepository;
 import com.bhsr.emt.laboratory.repository.DiagnosticReportRepositoryAlternative;
 import com.bhsr.emt.laboratory.repository.ServiceRequestRepository;
+import com.bhsr.emt.laboratory.security.oauth2.OAuthIdpTokenResponseDTO;
 import com.bhsr.emt.laboratory.service.UserService;
-import com.bhsr.emt.laboratory.service.dto.AdminUserDTO;
 import com.bhsr.emt.laboratory.service.dto.DiagnosticReport.DiagnosticReportResponseLightDTO;
+import com.bhsr.emt.laboratory.service.dto.Patient.PatientServiceResponse;
 import com.bhsr.emt.laboratory.service.dto.ServiceRequest.ServiceRequestRequestDTO;
 import com.bhsr.emt.laboratory.service.dto.ServiceRequest.ServiceRequestResponseDTO;
 import com.bhsr.emt.laboratory.service.dto.ServiceRequest.ServiceRequestResponseLightDTO;
 import com.bhsr.emt.laboratory.service.mapper.DiagnosticReportFormatMapper;
+import com.bhsr.emt.laboratory.service.mapper.PatientMapper;
 import com.bhsr.emt.laboratory.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -34,7 +34,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -50,22 +54,19 @@ import tech.jhipster.web.util.reactive.ResponseUtil;
 public class ServiceRequestResource {
 
     private static final Integer TESTING_SERVICE_ID = 1;
-    private final Logger log = LoggerFactory.getLogger(ServiceRequestResource.class);
-
     private static final String ENTITY_NAME = "laboratoryServiceRequest";
+    private final Logger log = LoggerFactory.getLogger(ServiceRequestResource.class);
+    private final WebClient webClient;
+    private final UserService userService;
+    private final ServiceRequestRepository serviceRequestRepository;
+    private final DiagnosticReportFormatRepository diagnosticReportFormatRepository;
+    private final PatientResource patientResource;
+    private final DiagnosticReportRepositoryAlternative diagnosticReportRepository;
+    private final DiagnosticReportFormatMapper diagnosticReportFormatMapper;
+    private final PatientMapper patientMapper;
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
-
-    private final UserService userService;
-
-    private final ServiceRequestRepository serviceRequestRepository;
-
-    private final DiagnosticReportFormatRepository diagnosticReportFormatRepository;
-
-    private final DiagnosticReportRepositoryAlternative diagnosticReportRepository;
-
-    private final DiagnosticReportFormatMapper diagnosticReportFormatMapper;
 
     /**
      * {@code POST  /service-requests} : Create a new serviceRequest.
@@ -78,99 +79,169 @@ public class ServiceRequestResource {
         @Valid @RequestBody ServiceRequestRequestDTO serviceRequest,
         Principal principal
     ) {
+        if (!(principal instanceof AbstractAuthenticationToken)) {
+            return Mono.error(new BadRequestAlertException("Invalid authToken", ENTITY_NAME, "unauthenticated"));
+        }
+
         log.debug("REST request to save ServiceRequest : {}", serviceRequest);
 
-        //Call the microservice to get the subject/patient and verify it exists
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("username", "admin");
+        formData.add("password", "admin");
+        formData.add("grant_type", "password");
+        formData.add("client_id", "web_app");
+        formData.add("client_secret", "web_app");
 
-        if (principal instanceof AbstractAuthenticationToken) {
-            return userService
-                .getUserFromAuthentication((AbstractAuthenticationToken) principal)
-                .switchIfEmpty(Mono.just(AdminUserDTO.builder().id("0000001").build()))
-                .flatMap(user -> {
-                    ServiceRequest serviceRequestToSave = ServiceRequest
-                        .builder()
-                        .status(serviceRequest.getStatus())
-                        .category(serviceRequest.getCategory())
-                        .priority(serviceRequest.getPriority())
-                        .diagnosticReportsIds(
-                            serviceRequest
-                                .getDiagnosticReportsFormats()
-                                .stream()
-                                .map(format -> {
-                                    DiagnosticReport diagnosticReport = DiagnosticReport
-                                        .builder()
-                                        .status(DiagnosticReportStatus.REGISTERED)
-                                        .createdAt(LocalDate.now())
-                                        .createdBy(
-                                            User
-                                                .builder()
-                                                .id(user.getId())
-                                                .firstName(user.getFirstName())
-                                                .lastName(user.getLastName())
-                                                .build()
+        return webClient
+            .post()
+            .uri("http://localhost:9080/auth/realms/EMT/protocol/openid-connect/token")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .body(BodyInserters.fromFormData(formData))
+            .exchangeToMono(clientResponse -> {
+                if (clientResponse.statusCode().isError()) {
+                    return Mono.error(
+                        new BadRequestAlertException("Something went wrong for request token", ENTITY_NAME, "badclientrequest")
+                    );
+                }
+                return clientResponse
+                    .bodyToFlux(OAuthIdpTokenResponseDTO.class)
+                    .collectList()
+                    .flatMap(responseTokenAsList ->
+                        webClient
+                            .get()
+                            .uri("http://localhost:5161/api/Pacient/" + serviceRequest.getSubject())
+                            .header("Authorization", "Bearer " + responseTokenAsList.get(0).getAccessToken())
+                            .retrieve()
+                            .onStatus(
+                                HttpStatus::isError,
+                                clientResponse2 ->
+                                    Mono.error(
+                                        new BadRequestAlertException(
+                                            "Something went wrong while getting the patient",
+                                            ENTITY_NAME,
+                                            "badclientrequest"
                                         )
-                                        .updatedAt(LocalDate.now())
-                                        .updatedBy(
-                                            User
-                                                .builder()
-                                                .id(user.getId())
-                                                .firstName(user.getFirstName())
-                                                .lastName(user.getLastName())
-                                                .build()
-                                        )
-                                        .format(
-                                            diagnosticReportFormatMapper.DiagnosticReportFormatRequestDTOToDiagnosticReportFormat(format)
-                                        )
-                                        .subject(serviceRequest.getSubject())
-                                        .build();
-                                    DiagnosticReport saved = diagnosticReportRepository.save(diagnosticReport);
-                                    return saved.getId();
-                                })
-                                .collect(Collectors.toSet())
-                        )
-                        .doNotPerform(false)
-                        .subject(serviceRequest.getSubject())
-                        .serviceId(TESTING_SERVICE_ID)
-                        .createdAt(LocalDate.now())
-                        .createdBy(User.builder().id(user.getId()).firstName(user.getFirstName()).lastName(user.getLastName()).build())
-                        .updatedAt(LocalDate.now())
-                        .updatedBy(User.builder().id(user.getId()).firstName(user.getFirstName()).lastName(user.getLastName()).build())
-                        .build();
-                    return serviceRequestRepository
-                        .save(serviceRequestToSave)
-                        .handle((result, sink) -> {
-                            try {
-                                sink.next(
-                                    ResponseEntity
-                                        .created(new URI("/api/service-requests/" + result.getId()))
-                                        .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId()))
-                                        .body(
-                                            ServiceRequestResponseLightDTO
-                                                .builder()
-                                                .id(result.getId())
-                                                .status(result.getStatus())
-                                                .category(result.getCategory())
-                                                .priority(result.getPriority())
-                                                .diagnosticReportsFormats(result.getDiagnosticReportsIds())
-                                                .doNotPerform(result.getDoNotPerform())
-                                                //Create a correct subject
-                                                .subject(Patient.builder().id(result.getSubject()).build())
-                                                .serviceId(result.getServiceId())
-                                                .createdAt(result.getCreatedAt())
-                                                .createdBy(result.getCreatedBy())
-                                                .updatedAt(result.getUpdatedAt())
-                                                .updatedBy(result.getUpdatedBy())
-                                                .build()
-                                        )
-                                );
-                            } catch (URISyntaxException e) {
-                                sink.error(new RuntimeException(e));
-                            }
-                        });
-                });
-        } else {
-            throw new BadRequestAlertException("Invalid authToken", ENTITY_NAME, "unauthenticated");
-        }
+                                    )
+                            )
+                            .bodyToFlux(PatientServiceResponse.class)
+                            .collectList()
+                            .flatMap(patientServiceResponse -> {
+                                if (patientServiceResponse == null) {
+                                    return Mono.error(new BadRequestAlertException("Invalid patient", ENTITY_NAME, "patientinvalid"));
+                                }
+
+                                return userService
+                                    .getUserFromAuthentication((AbstractAuthenticationToken) principal)
+                                    .flatMap(user -> {
+                                        ServiceRequest serviceRequestToSave = ServiceRequest
+                                            .builder()
+                                            .status(serviceRequest.getStatus())
+                                            .category(serviceRequest.getCategory())
+                                            .priority(serviceRequest.getPriority())
+                                            .diagnosticReportsIds(
+                                                serviceRequest
+                                                    .getDiagnosticReportsFormats()
+                                                    .stream()
+                                                    .map(format -> {
+                                                        DiagnosticReport diagnosticReport = DiagnosticReport
+                                                            .builder()
+                                                            .status(DiagnosticReportStatus.REGISTERED)
+                                                            .createdAt(LocalDate.now())
+                                                            .createdBy(
+                                                                User
+                                                                    .builder()
+                                                                    .id(user.getId())
+                                                                    .firstName(user.getFirstName())
+                                                                    .lastName(user.getLastName())
+                                                                    .build()
+                                                            )
+                                                            .updatedAt(LocalDate.now())
+                                                            .updatedBy(
+                                                                User
+                                                                    .builder()
+                                                                    .id(user.getId())
+                                                                    .firstName(user.getFirstName())
+                                                                    .lastName(user.getLastName())
+                                                                    .build()
+                                                            )
+                                                            .format(
+                                                                diagnosticReportFormatMapper.DiagnosticReportFormatRequestDTOToDiagnosticReportFormat(
+                                                                    format
+                                                                )
+                                                            )
+                                                            .subject(serviceRequest.getSubject())
+                                                            .build();
+                                                        DiagnosticReport saved = diagnosticReportRepository.save(diagnosticReport);
+                                                        return saved.getId();
+                                                    })
+                                                    .collect(Collectors.toSet())
+                                            )
+                                            .doNotPerform(false)
+                                            .subject(serviceRequest.getSubject())
+                                            .serviceId(TESTING_SERVICE_ID)
+                                            .createdAt(LocalDate.now())
+                                            .createdBy(
+                                                User
+                                                    .builder()
+                                                    .id(user.getId())
+                                                    .firstName(user.getFirstName())
+                                                    .lastName(user.getLastName())
+                                                    .build()
+                                            )
+                                            .updatedAt(LocalDate.now())
+                                            .updatedBy(
+                                                User
+                                                    .builder()
+                                                    .id(user.getId())
+                                                    .firstName(user.getFirstName())
+                                                    .lastName(user.getLastName())
+                                                    .build()
+                                            )
+                                            .build();
+                                        return serviceRequestRepository
+                                            .save(serviceRequestToSave)
+                                            .handle((result, sink) -> {
+                                                try {
+                                                    sink.next(
+                                                        ResponseEntity
+                                                            .created(new URI("/api/service-requests/" + result.getId()))
+                                                            .headers(
+                                                                HeaderUtil.createEntityCreationAlert(
+                                                                    applicationName,
+                                                                    true,
+                                                                    ENTITY_NAME,
+                                                                    result.getId()
+                                                                )
+                                                            )
+                                                            .body(
+                                                                ServiceRequestResponseLightDTO
+                                                                    .builder()
+                                                                    .id(result.getId())
+                                                                    .status(result.getStatus())
+                                                                    .category(result.getCategory())
+                                                                    .priority(result.getPriority())
+                                                                    .diagnosticReportsFormats(result.getDiagnosticReportsIds())
+                                                                    .doNotPerform(result.getDoNotPerform())
+                                                                    //Create a correct subject
+                                                                    .subject(
+                                                                        patientMapper.PatientServiceToPatient(patientServiceResponse.get(0))
+                                                                    )
+                                                                    .serviceId(result.getServiceId())
+                                                                    .createdAt(result.getCreatedAt())
+                                                                    .createdBy(result.getCreatedBy())
+                                                                    .updatedAt(result.getUpdatedAt())
+                                                                    .updatedBy(result.getUpdatedBy())
+                                                                    .build()
+                                                            )
+                                                    );
+                                                } catch (URISyntaxException e) {
+                                                    sink.error(new RuntimeException(e));
+                                                }
+                                            });
+                                    });
+                            })
+                    );
+            });
     }
 
     /**
@@ -263,24 +334,31 @@ public class ServiceRequestResource {
     @GetMapping("/service-requests")
     public Mono<List<ServiceRequestResponseLightDTO>> getAllServiceRequests() {
         log.debug("REST request to get all ServiceRequests");
+
         return serviceRequestRepository
             .findAll()
-            .map(serviceRequest ->
-                ServiceRequestResponseLightDTO
-                    .builder()
-                    .id(serviceRequest.getId())
-                    .status(serviceRequest.getStatus())
-                    .category(serviceRequest.getCategory())
-                    .priority(serviceRequest.getPriority())
-                    .doNotPerform(serviceRequest.getDoNotPerform())
-                    .subject(Patient.builder().id(serviceRequest.getSubject()).build())
-                    .diagnosticReportsFormats(serviceRequest.getDiagnosticReportsIds())
-                    .serviceId(serviceRequest.getServiceId())
-                    .createdAt(serviceRequest.getCreatedAt())
-                    .createdBy(serviceRequest.getCreatedBy())
-                    .updatedAt(serviceRequest.getUpdatedAt())
-                    .updatedBy(serviceRequest.getUpdatedBy())
-                    .build()
+            .flatMap(serviceRequest ->
+                patientResource
+                    .getPatientById(serviceRequest.getSubject())
+                    .flatMap(patient ->
+                        Mono.just(
+                            ServiceRequestResponseLightDTO
+                                .builder()
+                                .id(serviceRequest.getId())
+                                .status(serviceRequest.getStatus())
+                                .category(serviceRequest.getCategory())
+                                .priority(serviceRequest.getPriority())
+                                .doNotPerform(serviceRequest.getDoNotPerform())
+                                .subject(patient)
+                                .diagnosticReportsFormats(serviceRequest.getDiagnosticReportsIds())
+                                .serviceId(serviceRequest.getServiceId())
+                                .createdAt(serviceRequest.getCreatedAt())
+                                .createdBy(serviceRequest.getCreatedBy())
+                                .updatedAt(serviceRequest.getUpdatedAt())
+                                .updatedBy(serviceRequest.getUpdatedBy())
+                                .build()
+                        )
+                    )
             )
             .collectList();
     }
@@ -308,43 +386,47 @@ public class ServiceRequestResource {
         Mono<ServiceRequest> serviceRequest = serviceRequestRepository.findById(id);
         return ResponseUtil.wrapOrNotFound(
             serviceRequest.flatMap(result ->
-                Mono.just(
-                    ServiceRequestResponseDTO
-                        .builder()
-                        .id(result.getId())
-                        .status(result.getStatus())
-                        .category(result.getCategory())
-                        .priority(result.getPriority())
-                        .diagnosticReports(
-                            result
-                                .getDiagnosticReportsIds()
-                                .stream()
-                                .map(reportId -> {
-                                    DiagnosticReport diagnosticReport = diagnosticReportRepository
-                                        .findById(reportId)
-                                        .orElse(DiagnosticReport.builder().build());
-                                    return DiagnosticReportResponseLightDTO
-                                        .builder()
-                                        .id(diagnosticReport.getId())
-                                        .status(diagnosticReport.getStatus())
-                                        .createdAt(diagnosticReport.getCreatedAt())
-                                        .createdBy(diagnosticReport.getCreatedBy())
-                                        .updatedAt(diagnosticReport.getUpdatedAt())
-                                        .updatedBy(diagnosticReport.getUpdatedBy())
-                                        .format(diagnosticReport.getFormat().getName())
-                                        .build();
-                                })
-                                .collect(Collectors.toSet())
+                patientResource
+                    .getPatientById(result.getSubject())
+                    .flatMap(patient ->
+                        Mono.just(
+                            ServiceRequestResponseDTO
+                                .builder()
+                                .id(result.getId())
+                                .status(result.getStatus())
+                                .category(result.getCategory())
+                                .priority(result.getPriority())
+                                .diagnosticReports(
+                                    result
+                                        .getDiagnosticReportsIds()
+                                        .stream()
+                                        .map(reportId -> {
+                                            DiagnosticReport diagnosticReport = diagnosticReportRepository
+                                                .findById(reportId)
+                                                .orElse(DiagnosticReport.builder().build());
+                                            return DiagnosticReportResponseLightDTO
+                                                .builder()
+                                                .id(diagnosticReport.getId())
+                                                .status(diagnosticReport.getStatus())
+                                                .createdAt(diagnosticReport.getCreatedAt())
+                                                .createdBy(diagnosticReport.getCreatedBy())
+                                                .updatedAt(diagnosticReport.getUpdatedAt())
+                                                .updatedBy(diagnosticReport.getUpdatedBy())
+                                                .format(diagnosticReport.getFormat().getName())
+                                                .build();
+                                        })
+                                        .collect(Collectors.toSet())
+                                )
+                                .doNotPerform(result.getDoNotPerform())
+                                .subject(patient)
+                                .serviceId(result.getServiceId())
+                                .createdAt(result.getCreatedAt())
+                                .createdBy(result.getCreatedBy())
+                                .updatedAt(result.getUpdatedAt())
+                                .updatedBy(result.getUpdatedBy())
+                                .build()
                         )
-                        .doNotPerform(result.getDoNotPerform())
-                        .subject(Patient.builder().id(result.getSubject()).build())
-                        .serviceId(result.getServiceId())
-                        .createdAt(result.getCreatedAt())
-                        .createdBy(result.getCreatedBy())
-                        .updatedAt(result.getUpdatedAt())
-                        .updatedBy(result.getUpdatedBy())
-                        .build()
-                )
+                    )
             )
         );
     }
