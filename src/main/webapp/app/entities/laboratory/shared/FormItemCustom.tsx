@@ -1,13 +1,13 @@
-import { DatePicker, Form, Input, InputNumber, Switch, Upload } from 'antd';
+import { DatePicker, Form, Input, InputNumber, Switch } from 'antd';
 import { DataType } from 'app/shared/model/enumerations/data-type.model';
 import React, { useEffect } from 'react';
 import { translate } from 'react-jhipster';
 
 const dateFormat = 'YYYY/MM/DD';
 export const FormItemCustom = ({ form, name, dataType, isRequired = true, ...restProps }) => {
-  // useEffect(() => {
-  //   form.resetFields(name);
-  // }, [dataType]);
+  useEffect(() => {
+    form.resetFields([['constants', ...name]]);
+  }, [dataType]);
 
   const addValueField = () => {
     switch (dataType) {

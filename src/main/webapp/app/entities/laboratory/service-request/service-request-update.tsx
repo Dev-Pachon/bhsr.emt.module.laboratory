@@ -10,6 +10,8 @@ import { IPatient } from 'app/shared/model/laboratory/patient.model';
 import { IServiceRequest } from 'app/shared/model/laboratory/service-request.model';
 import { ServiceRequestPriority } from 'app/shared/model/enumerations/service-request-priority.model';
 import { IDiagnosticReportFormat } from 'app/shared/model/laboratory/diagnostic-report-format.model';
+import SignatureCanvas from 'react-signature-canvas';
+import '../shared/signatureComponent/signature.style.css';
 
 const { Title } = Typography;
 
@@ -61,6 +63,7 @@ const ServiceRequestModal: React.FC<ServiceRequestModalProps> = ({ patient, ...p
     if (updateSuccess) {
       setConfirmLoading(false);
       handleCancel();
+      navigate('/laboratory/service-request');
     } else if (!confirmLoading) {
       console.log('error');
     }
@@ -126,7 +129,7 @@ const ServiceRequestModal: React.FC<ServiceRequestModalProps> = ({ patient, ...p
       {!patient ? null : (
         <>
           <Button type="primary" onClick={showModal}>
-            Request a Service
+            Solicitar un servicio de diagnóstico
           </Button>
           <Modal
             title={translate('laboratoryApp.laboratoryServiceRequest.home.createLabel')}
@@ -138,12 +141,12 @@ const ServiceRequestModal: React.FC<ServiceRequestModalProps> = ({ patient, ...p
                 Cancel
               </Button>,
               <Button key="submit" type="primary" loading={confirmLoading} onClick={handleOk}>
-                Request Service
+                Solicitar
               </Button>,
             ]}
           >
             <Form form={form} initialValues={defaultValues} onFinish={saveEntity} layout={'vertical'} disabled={confirmLoading}>
-              <Title level={4}>Patient: {patient.name.text}</Title>
+              <Title level={4}>Paciente: {patient.name.text}</Title>
 
               <Form.Item<IServiceRequest>
                 label={translate('laboratoryApp.laboratoryServiceRequest.patient')}
@@ -182,7 +185,7 @@ const ServiceRequestModal: React.FC<ServiceRequestModalProps> = ({ patient, ...p
               >
                 <Select
                   showSearch
-                  placeholder="Select a priority"
+                  placeholder="Seleccione una prioridad"
                   optionFilterProp="children"
                   filterOption={filterOption}
                   options={Object.keys(ServiceRequestPriority).map((key: string) => {
@@ -196,18 +199,28 @@ const ServiceRequestModal: React.FC<ServiceRequestModalProps> = ({ patient, ...p
 
               <Form.Item<IServiceRequest>
                 name="diagnosticReportsFormats"
-                label={translate('laboratoryApp.laboratoryServiceRequest.create.diagnosticReportIds')}
+                label={'Informes de diagnóstico'}
                 valuePropName={'targetKeys'}
                 rules={[{ required: true }]}
               >
                 <Transfer
-                  titles={['Available', 'To be Requested']}
+                  titles={['Disponibles', 'Seleccionados']}
                   dataSource={diagnosticReportFormatOptions}
+                  listStyle={{
+                    width: '100%',
+                  }}
                   showSearch
                   oneWay
                   render={item => item.title}
+                  locale={{
+                    itemUnit: 'Elemento',
+                    itemsUnit: 'Elementos',
+                    notFoundContent: 'Sin elementos',
+                    searchPlaceholder: 'Buscar informe',
+                  }}
                 />
               </Form.Item>
+              {/*<SignatureCanvas penColor="black" canvasProps={{ className: 'signatureCanvas', width: 2, height: 1 }} />*/}
             </Form>
           </Modal>
         </>

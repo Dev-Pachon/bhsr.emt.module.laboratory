@@ -48,12 +48,11 @@ import tech.jhipster.config.JHipsterProperties;
 public class SecurityConfiguration {
 
     private final JHipsterProperties jHipsterProperties;
-
-    @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
-    private String issuerUri;
-
     private final SecurityProblemSupport problemSupport;
     private final CorsWebFilter corsWebFilter;
+
+    @Value("${webclient.security.oauth2.client.provider.oidc.issuer-uri}")
+    private String issuerUri;
 
     public SecurityConfiguration(
         JHipsterProperties jHipsterProperties,

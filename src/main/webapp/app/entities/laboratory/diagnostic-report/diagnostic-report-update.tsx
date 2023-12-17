@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { translate, Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
-import { getEntity, reset, updateEntity } from './diagnostic-report.reducer';
+import { getEntity, updateEntity } from './diagnostic-report.reducer';
 import { IDiagnosticReport } from 'app/shared/model/laboratory/diagnostic-report.model';
 import { Button, Divider, Form, Space, Typography } from 'antd';
 import DiagnosticReportUpdateField from 'app/entities/laboratory/diagnostic-report/diagnostic-report-update-field';
@@ -11,6 +11,7 @@ import DiagnosticReportPatientDescriptions from 'app/entities/laboratory/diagnos
 import PageHeader from 'app/entities/laboratory/shared/page-header';
 import { LeftOutlined } from '@ant-design/icons';
 import { useForm } from 'antd/es/form/Form';
+import { DiagnosticReportStatus } from 'app/shared/model/enumerations/diagnostic-report-status.model';
 
 export const DiagnosticReportUpdate = () => {
   const dispatch = useAppDispatch();
@@ -33,7 +34,7 @@ export const DiagnosticReportUpdate = () => {
 
   useEffect(() => {
     if (isNew) {
-      dispatch(reset());
+      navigate(`/laboratory/service-request/${id}`);
     } else {
       dispatch(getEntity(diagnosticReportId));
     }
@@ -64,6 +65,10 @@ export const DiagnosticReportUpdate = () => {
           format: diagnosticReportEntity?.format?.id,
           basedOn: diagnosticReportEntity?.basedOn?.id,
         };
+
+  if (diagnosticReportEntity && DiagnosticReportStatus[diagnosticReportEntity.status] !== DiagnosticReportStatus.REGISTERED) {
+    navigate(`/laboratory/service-request/${id}`);
+  }
 
   return (
     <>

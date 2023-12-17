@@ -1,12 +1,9 @@
 package com.bhsr.emt.laboratory.web.rest;
 
-import com.bhsr.emt.laboratory.config.Constants;
 import com.bhsr.emt.laboratory.domain.DiagnosticReportFormat;
 import com.bhsr.emt.laboratory.domain.FieldFormat;
 import com.bhsr.emt.laboratory.domain.User;
 import com.bhsr.emt.laboratory.repository.DiagnosticReportFormatRepository;
-import com.bhsr.emt.laboratory.repository.UserRepository;
-import com.bhsr.emt.laboratory.security.SecurityUtils;
 import com.bhsr.emt.laboratory.service.UserService;
 import com.bhsr.emt.laboratory.service.dto.AdminUserDTO;
 import com.bhsr.emt.laboratory.service.dto.DiagnosticReportFormat.DiagnosticReportFormatRequestDTO;
@@ -46,18 +43,14 @@ import tech.jhipster.web.util.reactive.ResponseUtil;
 @RequiredArgsConstructor
 public class DiagnosticReportFormatResource {
 
-    private final Logger log = LoggerFactory.getLogger(DiagnosticReportFormatResource.class);
-
     private static final String ENTITY_NAME = "laboratoryDiagnosticReportFormat";
+    private final Logger log = LoggerFactory.getLogger(DiagnosticReportFormatResource.class);
+    private final UserService userService;
+    private final DiagnosticReportFormatRepository diagnosticReportFormatRepository;
+    private final DiagnosticReportFormatMapper diagnosticReportFormatMapper;
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
-
-    private final UserService userService;
-
-    private final DiagnosticReportFormatRepository diagnosticReportFormatRepository;
-
-    private final DiagnosticReportFormatMapper diagnosticReportFormatMapper;
 
     /**
      * {@code POST  /diagnostic-report-formats} : Create a new diagnosticReportFormat.
@@ -271,7 +264,8 @@ public class DiagnosticReportFormatResource {
     @PatchMapping(value = "/diagnostic-report-formats/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public Mono<ResponseEntity<DiagnosticReportFormat>> partialUpdateDiagnosticReportFormat(
         @PathVariable(value = "id", required = false) final String id,
-        @NotNull @RequestBody DiagnosticReportFormat diagnosticReportFormat
+        @NotNull @RequestBody DiagnosticReportFormat diagnosticReportFormat,
+        Principal principal
     ) throws URISyntaxException {
         log.debug("REST request to partial update DiagnosticReportFormat partially : {}, {}", id, diagnosticReportFormat);
         if (diagnosticReportFormat.getId() == null) {
@@ -280,46 +274,45 @@ public class DiagnosticReportFormatResource {
         if (!Objects.equals(id, diagnosticReportFormat.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
+        if (principal instanceof AbstractAuthenticationToken) {
+            return userService
+                .getUserFromAuthentication((AbstractAuthenticationToken) principal)
+                .flatMap(user ->
+                    diagnosticReportFormatRepository
+                        .existsById(id)
+                        .flatMap(exists -> {
+                            if (!exists) {
+                                return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+                            }
 
-        return diagnosticReportFormatRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
+                            Mono<DiagnosticReportFormat> result = diagnosticReportFormatRepository
+                                .findById(diagnosticReportFormat.getId())
+                                .map(existingDiagnosticReportFormat -> {
+                                    diagnosticReportFormat.setUpdatedAt(LocalDate.now());
+                                    diagnosticReportFormat.setUpdatedBy(
+                                        User.builder().id(user.getId()).firstName(user.getFirstName()).lastName(user.getLastName()).build()
+                                    );
+                                    if (diagnosticReportFormat.getDeletedAt() != null) {
+                                        existingDiagnosticReportFormat.setDeletedAt(diagnosticReportFormat.getDeletedAt());
+                                    }
 
-                Mono<DiagnosticReportFormat> result = diagnosticReportFormatRepository
-                    .findById(diagnosticReportFormat.getId())
-                    .map(existingDiagnosticReportFormat -> {
-                        if (diagnosticReportFormat.getCreatedAt() != null) {
-                            existingDiagnosticReportFormat.setCreatedAt(diagnosticReportFormat.getCreatedAt());
-                        }
-                        if (diagnosticReportFormat.getCreatedBy() != null) {
-                            existingDiagnosticReportFormat.setCreatedBy(diagnosticReportFormat.getCreatedBy());
-                        }
-                        if (diagnosticReportFormat.getUpdatedAt() != null) {
-                            existingDiagnosticReportFormat.setUpdatedAt(diagnosticReportFormat.getUpdatedAt());
-                        }
-                        if (diagnosticReportFormat.getUpdatedBy() != null) {
-                            existingDiagnosticReportFormat.setUpdatedBy(diagnosticReportFormat.getUpdatedBy());
-                        }
-                        if (diagnosticReportFormat.getDeletedAt() != null) {
-                            existingDiagnosticReportFormat.setDeletedAt(diagnosticReportFormat.getDeletedAt());
-                        }
+                                    return existingDiagnosticReportFormat;
+                                })
+                                .flatMap(diagnosticReportFormatRepository::save);
 
-                        return existingDiagnosticReportFormat;
-                    })
-                    .flatMap(diagnosticReportFormatRepository::save);
-
-                return result
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(res ->
-                        ResponseEntity
-                            .ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, res.getId()))
-                            .body(res)
-                    );
-            });
+                            return result
+                                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
+                                .map(res ->
+                                    ResponseEntity
+                                        .ok()
+                                        .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, res.getId()))
+                                        .body(res)
+                                );
+                        })
+                );
+        } else {
+            throw new BadRequestAlertException("Invalid authToken", ENTITY_NAME, "unauthenticated");
+        }
     }
 
     /**

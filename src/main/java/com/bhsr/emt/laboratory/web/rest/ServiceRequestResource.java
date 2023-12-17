@@ -7,6 +7,7 @@ import com.bhsr.emt.laboratory.domain.enumeration.DiagnosticReportStatus;
 import com.bhsr.emt.laboratory.repository.DiagnosticReportFormatRepository;
 import com.bhsr.emt.laboratory.repository.DiagnosticReportRepositoryAlternative;
 import com.bhsr.emt.laboratory.repository.ServiceRequestRepository;
+import com.bhsr.emt.laboratory.security.AuthoritiesConstants;
 import com.bhsr.emt.laboratory.security.oauth2.OAuthIdpTokenResponseDTO;
 import com.bhsr.emt.laboratory.service.UserService;
 import com.bhsr.emt.laboratory.service.dto.DiagnosticReport.DiagnosticReportResponseLightDTO;
@@ -65,6 +66,27 @@ public class ServiceRequestResource {
     private final DiagnosticReportFormatMapper diagnosticReportFormatMapper;
     private final PatientMapper patientMapper;
 
+    @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
+    private String issuerUri;
+
+    @Value("${webclient.module.ehr.uri}")
+    private String ehrUri;
+
+    @Value("${webclient.security.oauth2.client.registration.oidc.client-id}")
+    private String clientId;
+
+    @Value("${webclient.security.oauth2.client.registration.oidc.client-secret}")
+    private String clientSecret;
+
+    @Value("${webclient.security.oauth2.client.registration.oidc.username}")
+    private String clientUsername;
+
+    @Value("${webclient.security.oauth2.client.registration.oidc.password}")
+    private String clientPassword;
+
+    @Value("${webclient.security.oauth2.client.registration.oidc.grant-type}")
+    private String clientGrantType;
+
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
@@ -86,15 +108,15 @@ public class ServiceRequestResource {
         log.debug("REST request to save ServiceRequest : {}", serviceRequest);
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("username", "admin");
-        formData.add("password", "admin");
-        formData.add("grant_type", "password");
-        formData.add("client_id", "web_app");
-        formData.add("client_secret", "web_app");
+        formData.add("username", clientUsername);
+        formData.add("password", clientPassword);
+        formData.add("grant_type", clientGrantType);
+        formData.add("client_id", clientId);
+        formData.add("client_secret", clientSecret);
 
         return webClient
             .post()
-            .uri("http://localhost:9080/auth/realms/EMT/protocol/openid-connect/token")
+            .uri(issuerUri + "/protocol/openid-connect/token")
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .body(BodyInserters.fromFormData(formData))
             .exchangeToMono(clientResponse -> {
@@ -109,7 +131,7 @@ public class ServiceRequestResource {
                     .flatMap(responseTokenAsList ->
                         webClient
                             .get()
-                            .uri("http://localhost:5161/api/Pacient/" + serviceRequest.getSubject())
+                            .uri(ehrUri + "/Pacient/" + serviceRequest.getSubject())
                             .header("Authorization", "Bearer " + responseTokenAsList.get(0).getAccessToken())
                             .retrieve()
                             .onStatus(
@@ -222,7 +244,6 @@ public class ServiceRequestResource {
                                                                     .priority(result.getPriority())
                                                                     .diagnosticReportsFormats(result.getDiagnosticReportsIds())
                                                                     .doNotPerform(result.getDoNotPerform())
-                                                                    //Create a correct subject
                                                                     .subject(
                                                                         patientMapper.PatientServiceToPatient(patientServiceResponse.get(0))
                                                                     )
@@ -332,35 +353,47 @@ public class ServiceRequestResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of serviceRequests in body.
      */
     @GetMapping("/service-requests")
-    public Mono<List<ServiceRequestResponseLightDTO>> getAllServiceRequests() {
+    public Mono<List<ServiceRequestResponseLightDTO>> getAllServiceRequests(Principal principal) {
         log.debug("REST request to get all ServiceRequests");
 
-        return serviceRequestRepository
-            .findAll()
-            .flatMap(serviceRequest ->
-                patientResource
-                    .getPatientById(serviceRequest.getSubject())
-                    .flatMap(patient ->
-                        Mono.just(
-                            ServiceRequestResponseLightDTO
-                                .builder()
-                                .id(serviceRequest.getId())
-                                .status(serviceRequest.getStatus())
-                                .category(serviceRequest.getCategory())
-                                .priority(serviceRequest.getPriority())
-                                .doNotPerform(serviceRequest.getDoNotPerform())
-                                .subject(patient)
-                                .diagnosticReportsFormats(serviceRequest.getDiagnosticReportsIds())
-                                .serviceId(serviceRequest.getServiceId())
-                                .createdAt(serviceRequest.getCreatedAt())
-                                .createdBy(serviceRequest.getCreatedBy())
-                                .updatedAt(serviceRequest.getUpdatedAt())
-                                .updatedBy(serviceRequest.getUpdatedBy())
-                                .build()
+        if (principal instanceof AbstractAuthenticationToken) {
+            return userService
+                .getUserFromAuthentication((AbstractAuthenticationToken) principal)
+                .flatMap(user ->
+                    serviceRequestRepository
+                        .findAll()
+                        .filter(serviceRequest ->
+                            serviceRequest.getCreatedBy().getId().equals(user.getId()) ||
+                            user.getAuthorities().contains(AuthoritiesConstants.LAB)
                         )
-                    )
-            )
-            .collectList();
+                        .flatMap(serviceRequest ->
+                            patientResource
+                                .getPatientById(serviceRequest.getSubject())
+                                .flatMap(patient ->
+                                    Mono.just(
+                                        ServiceRequestResponseLightDTO
+                                            .builder()
+                                            .id(serviceRequest.getId())
+                                            .status(serviceRequest.getStatus())
+                                            .category(serviceRequest.getCategory())
+                                            .priority(serviceRequest.getPriority())
+                                            .doNotPerform(serviceRequest.getDoNotPerform())
+                                            .subject(patient)
+                                            .diagnosticReportsFormats(serviceRequest.getDiagnosticReportsIds())
+                                            .serviceId(serviceRequest.getServiceId())
+                                            .createdAt(serviceRequest.getCreatedAt())
+                                            .createdBy(serviceRequest.getCreatedBy())
+                                            .updatedAt(serviceRequest.getUpdatedAt())
+                                            .updatedBy(serviceRequest.getUpdatedBy())
+                                            .build()
+                                    )
+                                )
+                        )
+                        .collectList()
+                );
+        } else {
+            throw new BadRequestAlertException("Invalid authToken", ENTITY_NAME, "unauthenticated");
+        }
     }
 
     /**

@@ -6,14 +6,15 @@ import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { IValueSet } from 'app/shared/model/laboratory/value-set.model';
 import { createEntity, getEntity, reset, updateEntity } from './value-set.reducer';
-import { Button, Card, Col, Flex, Form, Input, Row, Select } from 'antd';
+import { Button, Card, Col, Flex, Form, Input, Row, Select, Space } from 'antd';
 import { useForm, useWatch } from 'antd/es/form/Form';
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, LeftOutlined, PlusOutlined } from '@ant-design/icons';
 
 import { DataType } from 'app/shared/model/enumerations/data-type.model';
 import FormItemCustom from 'app/entities/laboratory/shared/FormItemCustom';
 import PageHeader from 'app/entities/laboratory/shared/page-header';
-import { LeftOutlined } from '@ant-design/icons';
+import { IDiagnosticReportFormat } from 'app/shared/model/laboratory/diagnostic-report-format.model';
+import Swal from 'sweetalert2';
 
 export const ValueSetUpdate = () => {
   const dispatch = useAppDispatch();
@@ -59,7 +60,6 @@ export const ValueSetUpdate = () => {
   }, [updateSuccess]);
 
   const saveEntity = (values: IValueSet) => {
-    console.log(values);
     const entity = {
       ...valueSetEntity,
       ...values,
@@ -70,6 +70,22 @@ export const ValueSetUpdate = () => {
     } else {
       dispatch(updateEntity(entity));
     }
+  };
+
+  const handleOpenSave = (values: IDiagnosticReportFormat) => {
+    Swal.fire({
+      title: 'Guardar',
+      text: '¿Deseas guardar el  conjunto de constantes?',
+      icon: 'info',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: '¡Si, quiero guardarlo!',
+    }).then(result => {
+      if (result.isConfirmed) {
+        saveEntity(values);
+      }
+    });
   };
 
   const defaultValues = () =>
@@ -101,7 +117,7 @@ export const ValueSetUpdate = () => {
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <Form form={form} initialValues={defaultValues()} onFinish={saveEntity}>
+            <Form form={form} initialValues={defaultValues()} onFinish={handleOpenSave}>
               {!isNew ? (
                 <Form.Item<IValueSet>
                   name="id"
@@ -112,11 +128,12 @@ export const ValueSetUpdate = () => {
                   <Input readOnly hidden />
                 </Form.Item>
               ) : null}
-              <Flex justify={'space-evenly'} align={'center'}>
+              <Space style={{ width: '100%' }} size={'middle'}>
                 <Form.Item<IValueSet>
                   name="name"
                   label={translate('laboratoryApp.laboratoryValueSet.create.name')}
                   rules={[{ required: true, message: 'Please fill this field.' }]}
+                  style={{ width: '100%' }}
                 >
                   <Input placeholder={translate('laboratoryApp.laboratoryValueSet.create.name')} />
                 </Form.Item>
@@ -124,6 +141,7 @@ export const ValueSetUpdate = () => {
                   name="description"
                   label={translate('laboratoryApp.laboratoryValueSet.create.description')}
                   rules={[{ required: true }]}
+                  style={{ width: '100%' }}
                 >
                   <Input placeholder={translate('laboratoryApp.laboratoryValueSet.create.description')} />
                 </Form.Item>
@@ -131,6 +149,7 @@ export const ValueSetUpdate = () => {
                   name="dataType"
                   label={translate('laboratoryApp.laboratoryValueSet.create.dataType')}
                   rules={[{ required: true }]}
+                  style={{ width: '100%' }}
                 >
                   <Select
                     showSearch
@@ -142,7 +161,7 @@ export const ValueSetUpdate = () => {
                     })}
                   />
                 </Form.Item>
-              </Flex>
+              </Space>
               <Form.List name={'constants'} initialValue={isNew ? [{ name: '', description: '', value: '' }] : constantsWatcher}>
                 {(constants, { add, remove }) => (
                   <div style={{ display: 'flex', rowGap: 16, flexDirection: 'column' }}>
@@ -150,7 +169,7 @@ export const ValueSetUpdate = () => {
                       <Card
                         className={'my-3'}
                         key={key}
-                        title={`Constant ${name + 1}`}
+                        title={`Constante ${name + 1}`}
                         extra={
                           name > 0 ? (
                             <DeleteOutlined
@@ -200,7 +219,7 @@ export const ValueSetUpdate = () => {
                       icon={<PlusOutlined rev={undefined} />}
                       className={'mb-4'}
                     >
-                      Add field
+                      Añadir constante
                     </Button>
                   </div>
                 )}

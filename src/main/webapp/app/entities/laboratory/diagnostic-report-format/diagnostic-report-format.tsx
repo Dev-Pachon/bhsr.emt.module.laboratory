@@ -1,17 +1,19 @@
 import React, { useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Button, Table } from 'reactstrap';
-import { TextFormat, Translate, translate } from 'react-jhipster';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Table } from 'reactstrap';
+import { TextFormat, translate } from 'react-jhipster';
 
 import { APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
-import { getEntities } from './diagnostic-report-format.reducer';
+import { deleteEntity, getEntities } from './diagnostic-report-format.reducer';
 import { Empty, Typography } from 'antd';
 import PageHeader from 'app/entities/laboratory/shared/page-header';
+import { PlusOutlined } from '@ant-design/icons';
+import { Button } from '@mui/material';
+import CssBaseline from '@mui/material/CssBaseline';
+import Swal from 'sweetalert2';
 
 const { Title } = Typography;
-import { PlusOutlined } from '@ant-design/icons';
 
 export const DiagnosticReportFormat = () => {
   const dispatch = useAppDispatch();
@@ -26,8 +28,25 @@ export const DiagnosticReportFormat = () => {
     dispatch(getEntities({}));
   }, []);
 
+  const handleOpenDelete = (id: string) => {
+    Swal.fire({
+      title: '¿Deseas continuar?',
+      text: '¡No podrás deshacer esta acción!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: '¡Si, quiero eliminarlo!',
+    }).then(result => {
+      if (result.isConfirmed) {
+        dispatch(deleteEntity(id));
+      }
+    });
+  };
+
   return (
     <>
+      <CssBaseline />
       <PageHeader
         title={translate('laboratoryApp.laboratoryDiagnosticReportFormat.home.title')}
         rightAction={
@@ -41,21 +60,11 @@ export const DiagnosticReportFormat = () => {
           <Table responsive>
             <thead>
               <tr>
-                <th>
-                  <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.name">Name</Translate>
-                </th>
-                <th>
-                  <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.createdAt">Created At</Translate>
-                </th>
-                <th>
-                  <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.createdBy">Created By</Translate>
-                </th>
-                <th>
-                  <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.updatedAt">Updated At</Translate>
-                </th>
-                <th>
-                  <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.updatedBy">Updated By</Translate>
-                </th>
+                <th>Nombre del formato</th>
+                <th>Creado en</th>
+                <th>Creado por</th>
+                <th>Última actualización en</th>
+                <th>Última actualización por</th>
 
                 <th />
               </tr>
@@ -79,42 +88,24 @@ export const DiagnosticReportFormat = () => {
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
                       <Button
-                        tag={Link}
+                        component={Link}
                         to={`/laboratory/diagnostic-report-format/${diagnosticReportFormat?.id}`}
-                        color="info"
-                        size="sm"
-                        data-cy="entityDetailsButton"
+                        variant="contained"
+                        color={'info'}
                       >
-                        <FontAwesomeIcon icon="eye" />{' '}
-                        <span className="d-none d-md-inline">
-                          <Translate contentKey="entity.action.view">View</Translate>
-                        </span>
+                        Ver
                       </Button>
                       <Button
-                        tag={Link}
+                        component={Link}
                         to={`/laboratory/diagnostic-report-format/${diagnosticReportFormat?.id}/edit`}
-                        color="primary"
-                        size="sm"
-                        data-cy="entityEditButton"
+                        variant="contained"
+                        color={'info'}
                       >
-                        <FontAwesomeIcon icon="pencil-alt" />{' '}
-                        <span className="d-none d-md-inline">
-                          <Translate contentKey="entity.action.edit">Edit</Translate>
-                        </span>
+                        Editar
                       </Button>
-                      <Button
-                        tag={Link}
-                        to={`/laboratory/diagnostic-report-format/${diagnosticReportFormat?.id}/delete`}
-                        color="danger"
-                        size="sm"
-                        data-cy="entityDeleteButton"
-                      >
-                        <FontAwesomeIcon icon="trash" />{' '}
-                        <span className="d-none d-md-inline">
-                          <Translate contentKey="entity.action.delete" interpolate={'Diagnostico'}>
-                            Delete
-                          </Translate>
-                        </span>
+
+                      <Button onClick={() => handleOpenDelete(diagnosticReportFormat?.id)} variant="contained" color={'error'}>
+                        Eliminar
                       </Button>
                     </div>
                   </td>
@@ -123,7 +114,7 @@ export const DiagnosticReportFormat = () => {
             </tbody>
           </Table>
         ) : (
-          !loading && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          !loading && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={'No hay formatos de reporte de diagnóstico...'} />
         )}
       </div>
     </>

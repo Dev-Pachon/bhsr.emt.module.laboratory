@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Button, Table } from 'reactstrap';
+import { Table } from 'reactstrap';
 import { TextFormat, Translate, translate } from 'react-jhipster';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { APP_LOCAL_DATE_FORMAT, AUTHORITIES } from 'app/config/constants';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
@@ -13,6 +12,8 @@ import { ServiceRequestStatus } from 'app/shared/model/enumerations/service-requ
 import { ServiceRequestPriority } from 'app/shared/model/enumerations/service-request-priority.model';
 import PageHeader from 'app/entities/laboratory/shared/page-header';
 import { PlusOutlined } from '@ant-design/icons';
+import Swal from 'sweetalert2';
+import { Button } from '@mui/material';
 
 export const ServiceRequest = () => {
   const dispatch = useAppDispatch();
@@ -34,7 +35,9 @@ export const ServiceRequest = () => {
       id: serviceRequest.id,
       status: ServiceRequestStatus.REVOKED,
     };
-    dispatch(partialUpdateEntity(newServiceRequest));
+    dispatch(partialUpdateEntity(newServiceRequest)).then(() => {
+      dispatch(getEntities({}));
+    });
   };
 
   const onStartRequest = serviceRequest => {
@@ -42,12 +45,25 @@ export const ServiceRequest = () => {
       id: serviceRequest.id,
       status: ServiceRequestStatus.ACTIVE,
     };
-    dispatch(partialUpdateEntity(newServiceRequest));
-    navigate(`${serviceRequest.id}`);
+    dispatch(partialUpdateEntity(newServiceRequest)).then(() => {
+      navigate(`${serviceRequest.id}`);
+    });
   };
 
-  const handleSyncList = () => {
-    dispatch(getEntities({}));
+  const handleOpenCancel = serviceRequest => {
+    Swal.fire({
+      title: '¿Deseas continuar?',
+      text: '¡No podrás deshacer esta acción!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: '¡Si, quiero eliminarlo!',
+    }).then(result => {
+      if (result.isConfirmed) {
+        onCancel(serviceRequest);
+      }
+    });
   };
 
   const getTagColor = serviceRequestResponse => {
@@ -68,11 +84,14 @@ export const ServiceRequest = () => {
       <PageHeader
         title={translate('laboratoryApp.laboratoryServiceRequest.home.title')}
         rightAction={
-          <Link to={`new`}>
-            <PlusOutlined style={{ fontSize: '24px', color: 'white' }} rev={undefined} />
-          </Link>
+          isMedUser && (
+            <Link to={`new`}>
+              <PlusOutlined style={{ fontSize: '24px', color: 'white' }} rev={undefined} />
+            </Link>
+          )
         }
       />
+      {!serviceRequestList && loading && <p>Loading...</p>}
       <div className="table-responsive">
         {serviceRequestList && serviceRequestList.length > 0 ? (
           <Table responsive>
@@ -102,12 +121,12 @@ export const ServiceRequest = () => {
                 <th>
                   <Translate contentKey="laboratoryApp.laboratoryServiceRequest.updatedBy">Updated By</Translate>
                 </th>
-                <th />
+                <th>Acción</th>
               </tr>
             </thead>
             <tbody>
               {[...serviceRequestList]
-                .sort((actual: any, previous: any) => actual?.id?.localeCompare(previous?.id))
+                .sort((actual: any, previous: any) => previous?.id?.localeCompare(actual?.id))
                 .map((serviceRequest: any, i: number) => (
                   <tr key={`entity-${i}`} data-cy="entityTable">
                     <td>
@@ -134,36 +153,17 @@ export const ServiceRequest = () => {
                     <td>{`${serviceRequest.updatedBy.firstName} ${serviceRequest.updatedBy.lastName}`}</td>
                     <td className="text-end">
                       <div className="btn-group flex-btn-group-container">
-                        <Button
-                          tag={Link}
-                          to={`/laboratory/service-request/${serviceRequest.id}`}
-                          color="info"
-                          size="sm"
-                          data-cy="entityDetailsButton"
-                        >
-                          <FontAwesomeIcon icon="eye" />{' '}
-                          <span className="d-none d-md-inline">
-                            <Translate contentKey="entity.action.view">View</Translate>
-                          </span>
+                        <Button component={Link} to={`/laboratory/service-request/${serviceRequest.id}`} variant="contained" color={'info'}>
+                          Ver
                         </Button>
                         {isLabUser && serviceRequest.status === ServiceRequestStatus.DRAFT && (
-                          <Button color="primary" size="sm" onClick={() => onStartRequest(serviceRequest)}>
-                            <FontAwesomeIcon icon="eye" />{' '}
-                            <span className="d-none d-md-inline">
-                              <Translate contentKey="entity.action.start" interpolate={{ entity: 'Request' }}>
-                                Start Request
-                              </Translate>
-                            </span>
+                          <Button onClick={() => onStartRequest(serviceRequest)} variant="contained" color={'primary'}>
+                            Iniciar solicitud
                           </Button>
                         )}
                         {isMedUser && serviceRequest.status === ServiceRequestStatus.DRAFT && (
-                          <Button color="danger" size="sm" onClick={() => onCancel(serviceRequest)}>
-                            <FontAwesomeIcon icon="cancel" />{' '}
-                            <span className="d-none d-md-inline">
-                              <Translate contentKey="entity.action.cancel" interpolate={{ entity: 'Request' }}>
-                                Cancel Request
-                              </Translate>
-                            </span>
+                          <Button onClick={() => handleOpenCancel(serviceRequest)} variant="contained" color={'error'}>
+                            Cancelar
                           </Button>
                         )}
                       </div>
@@ -173,7 +173,7 @@ export const ServiceRequest = () => {
             </tbody>
           </Table>
         ) : (
-          !loading && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          !loading && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={'No hay solicitudes de servicios de diagnóstico'} />
         )}
       </div>
     </>

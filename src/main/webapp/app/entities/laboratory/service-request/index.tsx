@@ -5,11 +5,12 @@ import ErrorBoundaryRoutes from 'app/shared/error/error-boundary-routes';
 
 import ServiceRequest from './service-request';
 import ServiceRequestDetail from './service-request-detail';
-import ServiceRequestUpdate from './service-request-update';
 import { IPatient } from 'app/shared/model/laboratory/patient.model';
 import { AdministrativeGender } from 'app/shared/model/enumerations/administrative-gender.model';
 import DiagnosticReport from 'app/entities/laboratory/diagnostic-report';
 import PatientListToRequestService from 'app/entities/laboratory/service-request/patient-list-to-request-service';
+import PrivateRoute from 'app/shared/auth/private-route';
+import { AUTHORITIES } from 'app/config/constants';
 
 const ServiceRequestRoutes = () => {
   const samplePatient: IPatient = {
@@ -52,7 +53,16 @@ const ServiceRequestRoutes = () => {
     <ErrorBoundaryRoutes>
       <Route index element={<ServiceRequest />} />
       {/*<Route path="new" element={<ServiceRequestUpdate patient={samplePatient} />} />*/}
-      <Route path="new" element={<PatientListToRequestService />} />
+
+      <Route
+        path="new"
+        element={
+          <PrivateRoute hasAnyAuthorities={[AUTHORITIES.MED]}>
+            <PatientListToRequestService />
+          </PrivateRoute>
+        }
+      />
+
       <Route path=":id">
         <Route index element={<ServiceRequestDetail />} />
         <Route path="diagnostic-report/*" element={<DiagnosticReport />} />

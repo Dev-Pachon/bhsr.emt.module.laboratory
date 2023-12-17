@@ -12,17 +12,17 @@ const { Title } = Typography;
 
 const columns = [
   {
-    title: 'Name',
+    title: 'Nombre',
     dataIndex: 'name',
     key: 'name',
   },
   {
-    title: 'Description',
+    title: 'Descripción',
     dataIndex: 'description',
     key: 'description',
   },
   {
-    title: 'Value',
+    title: 'Valor',
     dataIndex: 'value',
     key: 'value',
   },

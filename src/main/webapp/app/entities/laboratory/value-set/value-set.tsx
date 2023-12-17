@@ -1,15 +1,16 @@
 import React, { useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Button, Table } from 'reactstrap';
+import { Table } from 'reactstrap';
+import { Button } from '@mui/material';
 import { translate, Translate } from 'react-jhipster';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { IValueSet } from 'app/shared/model/laboratory/value-set.model';
-import { getEntities } from './value-set.reducer';
+import { deleteEntity, getEntities } from './value-set.reducer';
 import { Empty } from 'antd';
 import PageHeader from 'app/entities/laboratory/shared/page-header';
 import { PlusOutlined } from '@ant-design/icons';
+import Swal from 'sweetalert2';
 
 export const ValueSet = () => {
   const dispatch = useAppDispatch();
@@ -26,6 +27,22 @@ export const ValueSet = () => {
 
   const handleSyncList = () => {
     dispatch(getEntities({}));
+  };
+
+  const handleOpenDelete = (id: string) => {
+    Swal.fire({
+      title: '¿Deseas continuar?',
+      text: '¡No podrás deshacer esta acción!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: '¡Si, quiero eliminarlo!',
+    }).then(result => {
+      if (result.isConfirmed) {
+        dispatch(deleteEntity(id));
+      }
+    });
   };
 
   return (
@@ -67,35 +84,15 @@ export const ValueSet = () => {
                   <td>{valueSet.description}</td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
-                      <Button tag={Link} to={`/laboratory/value-set/${valueSet.id}`} color="info" size="sm" data-cy="entityDetailsButton">
-                        <FontAwesomeIcon icon="eye" />{' '}
-                        <span className="d-none d-md-inline">
-                          <Translate contentKey="entity.action.view">View</Translate>
-                        </span>
+                      <Button component={Link} to={`/laboratory/value-set/${valueSet.id}`} variant="contained" color={'info'}>
+                        Ver
                       </Button>
-                      <Button
-                        tag={Link}
-                        to={`/laboratory/value-set/${valueSet.id}/edit`}
-                        color="primary"
-                        size="sm"
-                        data-cy="entityEditButton"
-                      >
-                        <FontAwesomeIcon icon="pencil-alt" />{' '}
-                        <span className="d-none d-md-inline">
-                          <Translate contentKey="entity.action.edit">Edit</Translate>
-                        </span>
+                      <Button component={Link} to={`/laboratory/value-set/${valueSet.id}/edit`} variant="contained" color={'info'}>
+                        Editar
                       </Button>
-                      <Button
-                        tag={Link}
-                        to={`/laboratory/value-set/${valueSet.id}/delete`}
-                        color="danger"
-                        size="sm"
-                        data-cy="entityDeleteButton"
-                      >
-                        <FontAwesomeIcon icon="trash" />{' '}
-                        <span className="d-none d-md-inline">
-                          <Translate contentKey="entity.action.delete">Delete</Translate>
-                        </span>
+
+                      <Button onClick={() => handleOpenDelete(valueSet?.id)} variant="contained" color={'error'}>
+                        Eliminar
                       </Button>
                     </div>
                   </td>

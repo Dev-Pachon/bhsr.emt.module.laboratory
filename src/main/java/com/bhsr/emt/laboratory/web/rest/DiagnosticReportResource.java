@@ -1,13 +1,18 @@
 package com.bhsr.emt.laboratory.web.rest;
 
 import com.bhsr.emt.laboratory.domain.DiagnosticReport;
+import com.bhsr.emt.laboratory.domain.User;
 import com.bhsr.emt.laboratory.domain.enumeration.DiagnosticReportStatus;
 import com.bhsr.emt.laboratory.repository.DiagnosticReportRepository;
+import com.bhsr.emt.laboratory.repository.ServiceRequestRepository;
+import com.bhsr.emt.laboratory.service.UserService;
 import com.bhsr.emt.laboratory.service.dto.DiagnosticReport.DiagnosticReportResponseDTO;
 import com.bhsr.emt.laboratory.service.mapper.DiagnosticReportMapper;
 import com.bhsr.emt.laboratory.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.Principal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import javax.validation.Valid;
@@ -19,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
@@ -39,6 +45,8 @@ public class DiagnosticReportResource {
     private final DiagnosticReportRepository diagnosticReportRepository;
     private final DiagnosticReportMapper diagnosticReportMapper;
     private final PatientResource patientResource;
+    private final UserService userService;
+    private final ServiceRequestRepository serviceRequestRepository;
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
@@ -84,7 +92,8 @@ public class DiagnosticReportResource {
     @PutMapping("/diagnostic-reports/{id}")
     public Mono<ResponseEntity<DiagnosticReportResponseDTO>> updateDiagnosticReport(
         @PathVariable(value = "id", required = false) final String id,
-        @Valid @RequestBody DiagnosticReportResponseDTO diagnosticReport
+        @Valid @RequestBody DiagnosticReportResponseDTO diagnosticReport,
+        Principal principal
     ) throws URISyntaxException {
         log.debug("REST request to update DiagnosticReport : {}, {}", id, diagnosticReport);
         if (diagnosticReport.getId() == null) {
@@ -94,27 +103,40 @@ public class DiagnosticReportResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        return diagnosticReportRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
+        if (principal instanceof AbstractAuthenticationToken) {
+            return userService
+                .getUserFromAuthentication((AbstractAuthenticationToken) principal)
+                .flatMap(user ->
+                    diagnosticReportRepository
+                        .existsById(id)
+                        .flatMap(exists -> {
+                            if (!exists) {
+                                return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+                            }
 
-                if (diagnosticReport.getStatus() == DiagnosticReportStatus.REGISTERED) {
-                    diagnosticReport.setStatus(DiagnosticReportStatus.FINAL);
-                }
+                            if (diagnosticReport.getStatus() == DiagnosticReportStatus.REGISTERED) {
+                                diagnosticReport.setStatus(DiagnosticReportStatus.FINAL);
+                            }
 
-                return diagnosticReportRepository
-                    .save(diagnosticReportMapper.DiagnosticReportResponseDTOToDiagnosticReport(diagnosticReport))
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(result ->
-                        ResponseEntity
-                            .ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, result.getId()))
-                            .body(diagnosticReportMapper.DiagnosticReporToResponseDTO(result))
-                    );
-            });
+                            diagnosticReport.setUpdatedAt(LocalDate.now());
+                            diagnosticReport.setUpdatedBy(
+                                User.builder().id(user.getId()).firstName(user.getFirstName()).lastName(user.getLastName()).build()
+                            );
+
+                            return diagnosticReportRepository
+                                .save(diagnosticReportMapper.DiagnosticReportResponseDTOToDiagnosticReport(diagnosticReport))
+                                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
+                                .map(result ->
+                                    ResponseEntity
+                                        .ok()
+                                        .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, result.getId()))
+                                        .body(diagnosticReportMapper.DiagnosticReporToResponseDTO(result))
+                                );
+                        })
+                );
+        } else {
+            throw new BadRequestAlertException("Invalid authToken", ENTITY_NAME, "unauthenticated");
+        }
     }
 
     /**
@@ -131,7 +153,8 @@ public class DiagnosticReportResource {
     @PatchMapping(value = "/diagnostic-reports/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public Mono<ResponseEntity<DiagnosticReport>> partialUpdateDiagnosticReport(
         @PathVariable(value = "id", required = false) final String id,
-        @NotNull @RequestBody DiagnosticReport diagnosticReport
+        @NotNull @RequestBody DiagnosticReport diagnosticReport,
+        Principal principal
     ) throws URISyntaxException {
         log.debug("REST request to partial update DiagnosticReport partially : {}, {}", id, diagnosticReport);
         if (diagnosticReport.getId() == null) {
@@ -141,48 +164,81 @@ public class DiagnosticReportResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        return diagnosticReportRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
+        if (principal instanceof AbstractAuthenticationToken) {
+            return userService
+                .getUserFromAuthentication((AbstractAuthenticationToken) principal)
+                .flatMap(user ->
+                    diagnosticReportRepository
+                        .existsById(id)
+                        .flatMap(exists -> {
+                            if (!exists) {
+                                return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+                            }
 
-                Mono<DiagnosticReport> result = diagnosticReportRepository
-                    .findById(diagnosticReport.getId())
-                    .map(existingDiagnosticReport -> {
-                        if (diagnosticReport.getStatus() != null) {
-                            existingDiagnosticReport.setStatus(diagnosticReport.getStatus());
-                        }
-                        if (diagnosticReport.getCreatedAt() != null) {
-                            existingDiagnosticReport.setCreatedAt(diagnosticReport.getCreatedAt());
-                        }
-                        if (diagnosticReport.getCreatedBy() != null) {
-                            existingDiagnosticReport.setCreatedBy(diagnosticReport.getCreatedBy());
-                        }
-                        if (diagnosticReport.getUpdatedAt() != null) {
-                            existingDiagnosticReport.setUpdatedAt(diagnosticReport.getUpdatedAt());
-                        }
-                        if (diagnosticReport.getUpdatedBy() != null) {
-                            existingDiagnosticReport.setUpdatedBy(diagnosticReport.getUpdatedBy());
-                        }
-                        if (diagnosticReport.getDeletedAt() != null) {
-                            existingDiagnosticReport.setDeletedAt(diagnosticReport.getDeletedAt());
-                        }
+                            Mono<DiagnosticReport> result = diagnosticReportRepository
+                                .findById(diagnosticReport.getId())
+                                .map(existingDiagnosticReport -> {
+                                    if (diagnosticReport.getStatus() != null) {
+                                        existingDiagnosticReport.setStatus(diagnosticReport.getStatus());
+                                    }
+                                    if (diagnosticReport.getCreatedAt() != null) {
+                                        existingDiagnosticReport.setCreatedAt(diagnosticReport.getCreatedAt());
+                                    }
+                                    if (diagnosticReport.getCreatedBy() != null) {
+                                        existingDiagnosticReport.setCreatedBy(diagnosticReport.getCreatedBy());
+                                    }
+                                    diagnosticReport.setUpdatedAt(LocalDate.now());
+                                    diagnosticReport.setUpdatedBy(
+                                        User.builder().id(user.getId()).firstName(user.getFirstName()).lastName(user.getLastName()).build()
+                                    );
 
-                        return existingDiagnosticReport;
-                    })
-                    .flatMap(diagnosticReportRepository::save);
+                                    if (diagnosticReport.getDeletedAt() != null) {
+                                        existingDiagnosticReport.setDeletedAt(diagnosticReport.getDeletedAt());
+                                    }
 
-                return result
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(res ->
-                        ResponseEntity
-                            .ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, res.getId()))
-                            .body(res)
-                    );
-            });
+                                    // UPDATE SERVICE REQUEST STATUS
+                                    //                                             diagnosticReportRepository.findAll(
+                                    //                                                                           Example.of(DiagnosticReport.builder().basedOn(
+                                    //                                                                               ServiceRequest.builder().id(
+                                    //                                                                                   diagnosticReport.getBasedOn().getId()).build()).build()))
+                                    //                                                                       .filter(
+                                    //                                                                           relatedDiagnostic -> relatedDiagnostic.getStatus() != DiagnosticReportStatus.PARTIAL || relatedDiagnostic.getStatus() != DiagnosticReportStatus.REGISTERED || relatedDiagnostic.getStatus() != DiagnosticReportStatus.PRELIMINARY
+                                    //                                                                       ).count().doOnNext(
+                                    //                                                                           count -> {
+                                    //                                                                               if (count == 0) {
+                                    //                                                                                   serviceRequestRepository.findById(
+                                    //                                                                                                               diagnosticReport.getBasedOn().getId())
+                                    //                                                                                                           .map(
+                                    //                                                                                                               serviceRequest -> {
+                                    //                                                                                                                   serviceRequest.setStatus(
+                                    //                                                                                                                       ServiceRequestStatus.COMPLETED
+                                    //                                                                                                                   );
+                                    //                                                                                                                   return serviceRequest;
+                                    //                                                                                                               }
+                                    //                                                                                                           ).flatMap(
+                                    //                                                                                                               serviceRequestRepository::save
+                                    //                                                                                                           );
+                                    //                                                                               }
+                                    //                                                                           }
+                                    //                                                                       );
+
+                                    return existingDiagnosticReport;
+                                })
+                                .flatMap(diagnosticReportRepository::save);
+
+                            return result
+                                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
+                                .map(res ->
+                                    ResponseEntity
+                                        .ok()
+                                        .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, res.getId()))
+                                        .body(res)
+                                );
+                        })
+                );
+        } else {
+            throw new BadRequestAlertException("Invalid authToken", ENTITY_NAME, "unauthenticated");
+        }
     }
 
     /**

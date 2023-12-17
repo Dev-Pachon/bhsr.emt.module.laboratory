@@ -3,19 +3,19 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Translate, translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Form, Input, Row } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { LeftOutlined, PlusOutlined } from '@ant-design/icons';
 
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { IDiagnosticReportFormat } from 'app/shared/model/laboratory/diagnostic-report-format.model';
-import { createEntity, getEntity, reset, updateEntity } from './diagnostic-report-format.reducer';
+import { createEntity, deleteEntity, getEntity, reset, updateEntity } from './diagnostic-report-format.reducer';
 import { IFieldFormat } from 'app/shared/model/laboratory/field-format.model';
 import { DataType } from 'app/shared/model/enumerations/data-type.model';
 import { DiagnosticReportFormatField } from 'app/entities/laboratory/diagnostic-report-format/components/field-component';
 import { getEntities as getValueSetEntities } from 'app/entities/laboratory/value-set/value-set.reducer';
 import { useForm } from 'antd/es/form/Form';
 import PageHeader from 'app/entities/laboratory/shared/page-header';
-import { LeftOutlined } from '@ant-design/icons';
+import Swal from 'sweetalert2';
 
 export const DiagnosticReportFormatUpdate = () => {
   const dispatch = useAppDispatch();
@@ -74,6 +74,22 @@ export const DiagnosticReportFormatUpdate = () => {
     }
   };
 
+  const handleOpenSave = (values: IDiagnosticReportFormat) => {
+    Swal.fire({
+      title: 'Guardar formato de reporte',
+      text: '¿Deseas guardar el formato?',
+      icon: 'info',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: '¡Si, quiero guardarlo!',
+    }).then(result => {
+      if (result.isConfirmed) {
+        saveEntity(values);
+      }
+    });
+  };
+
   const addField = () => {
     const newField: IFieldFormat = {
       name: '',
@@ -122,11 +138,9 @@ export const DiagnosticReportFormatUpdate = () => {
             form={form}
             layout="horizontal"
             initialValues={defaultValues()}
-            onFinish={saveEntity}
+            onFinish={handleOpenSave}
             scrollToFirstError
             style={{ width: '100%' }}
-            wrapperCol={{ span: 16 }}
-            labelCol={{ span: 8 }}
           >
             {!isNew ? (
               <Form.Item<IDiagnosticReportFormat> name="id" hidden label={translate('laboratoryApp.laboratoryDiagnosticReportFormat.id')}>
@@ -150,7 +164,7 @@ export const DiagnosticReportFormatUpdate = () => {
                   <DiagnosticReportFormatField key={i} idx={i} onDelete={removeField} valueSet={valueSetList} />
                 ))}
             <Button type="dashed" onClick={addField} block icon={<PlusOutlined rev={undefined} />} className={'mb-3'}>
-              Add field
+              Agregar campo
             </Button>
             <Button id="save-entity" data-cy="entityCreateSaveButton" type="primary" htmlType={'submit'} disabled={updating}>
               <FontAwesomeIcon icon="save" />
