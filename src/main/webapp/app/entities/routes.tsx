@@ -36,7 +36,7 @@ export default () => {
         </ErrorBoundaryRoutes>
       </PrivateRoute>
 
-      <PrivateRoute hasAnyAuthorities={[AUTHORITIES.USER]}>
+      <PrivateRoute>
         <ErrorBoundaryRoutes>
           <Route>
             <Route path="/" element={<Navigate to="/404" />} />

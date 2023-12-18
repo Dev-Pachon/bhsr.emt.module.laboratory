@@ -10,10 +10,11 @@
       "jhipster-needle-menu-add-element": "JHipster agregará entradas adicionales de menú aquí (¡no traduzcas!)",
       "entities": {
         "main": "Entidades",
+        "home": "Inicio",
         "laboratoryPatient": "Paciente",
         "laboratoryIdentifierType": "Tipo de Identificador",
         "laboratoryDiagnosticReport": "Informe Diagnóstico",
-        "laboratoryDiagnosticReportFormat": "Formatos de Informe Diagnóstico",
+        "laboratoryDiagnosticReportFormat": "Formatos de Diagnóstico",
         "laboratoryServiceRequest": "Solicitudes de Laboratorio",
         "laboratoryValueSet": "Conjuntos de Valores",
         "jhipster-needle-menu-add-entry": "JHipster agregará entidades adicionales aquí (¡no traduzcas!)"
