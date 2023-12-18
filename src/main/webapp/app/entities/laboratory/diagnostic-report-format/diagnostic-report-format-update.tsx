@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Translate, translate } from 'react-jhipster';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { translate } from 'react-jhipster';
 import { Button, Form, Input, Row } from 'antd';
 import { LeftOutlined, PlusOutlined } from '@ant-design/icons';
 
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { IDiagnosticReportFormat } from 'app/shared/model/laboratory/diagnostic-report-format.model';
-import { createEntity, deleteEntity, getEntity, reset, updateEntity } from './diagnostic-report-format.reducer';
+import { createEntity, getEntity, reset, updateEntity } from './diagnostic-report-format.reducer';
 import { IFieldFormat } from 'app/shared/model/laboratory/field-format.model';
 import { DataType } from 'app/shared/model/enumerations/data-type.model';
 import { DiagnosticReportFormatField } from 'app/entities/laboratory/diagnostic-report-format/components/field-component';
@@ -16,6 +15,9 @@ import { getEntities as getValueSetEntities } from 'app/entities/laboratory/valu
 import { useForm } from 'antd/es/form/Form';
 import PageHeader from 'app/entities/laboratory/shared/page-header';
 import Swal from 'sweetalert2';
+import { Save } from '@mui/icons-material';
+import { Box, Fab } from '@mui/material';
+import { FabButton } from 'app/entities/laboratory/shared/fab-button';
 
 export const DiagnosticReportFormatUpdate = () => {
   const dispatch = useAppDispatch();
@@ -83,6 +85,7 @@ export const DiagnosticReportFormatUpdate = () => {
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
       confirmButtonText: '¡Si, quiero guardarlo!',
+      cancelButtonText: 'Cancelar',
     }).then(result => {
       if (result.isConfirmed) {
         saveEntity(values);
@@ -166,11 +169,7 @@ export const DiagnosticReportFormatUpdate = () => {
             <Button type="dashed" onClick={addField} block icon={<PlusOutlined rev={undefined} />} className={'mb-3'}>
               Agregar campo
             </Button>
-            <Button id="save-entity" data-cy="entityCreateSaveButton" type="primary" htmlType={'submit'} disabled={updating}>
-              <FontAwesomeIcon icon="save" />
-              &nbsp;
-              <Translate contentKey="entity.action.save">Save</Translate>
-            </Button>
+            <FabButton Icon={Save} onClick={e => e} color={'info'} component={'button'} type={'submit'} />
           </Form>
         )}
       </Row>

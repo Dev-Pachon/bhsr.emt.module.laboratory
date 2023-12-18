@@ -8,10 +8,11 @@ import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { deleteEntity, getEntities } from './diagnostic-report-format.reducer';
 import { Empty, Typography } from 'antd';
 import PageHeader from 'app/entities/laboratory/shared/page-header';
-import { PlusOutlined } from '@ant-design/icons';
-import { Button } from '@mui/material';
+import { Link as MUILink } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import Swal from 'sweetalert2';
+import { Add, Delete, Edit } from '@mui/icons-material';
+import { FabButton } from 'app/entities/laboratory/shared/fab-button';
 
 const { Title } = Typography;
 
@@ -44,17 +45,25 @@ export const DiagnosticReportFormat = () => {
     });
   };
 
+  const handleAdd = () => {
+    navigate('new');
+  };
+  const handleEdit = (id: string) => {
+    navigate(id + '/edit');
+  };
+
   return (
     <>
       <CssBaseline />
       <PageHeader
         title={translate('laboratoryApp.laboratoryDiagnosticReportFormat.home.title')}
-        rightAction={
-          <Link to={`new`}>
-            <PlusOutlined style={{ fontSize: '24px', color: 'white' }} rev={undefined} />
-          </Link>
-        }
+        // rightAction={
+        //   <Link to={`new`}>
+        //     <PlusOutlined style={{ fontSize: '24px', color: 'white' }} rev={undefined} />
+        //   </Link>
+        // }
       />
+      <FabButton Icon={Add} onClick={handleAdd} color={'secondary'} sx={{ color: 'white' }} />
       <div className="table-responsive">
         {diagnosticReportFormatList && diagnosticReportFormatList.length > 0 ? (
           <Table responsive>
@@ -72,7 +81,11 @@ export const DiagnosticReportFormat = () => {
             <tbody>
               {diagnosticReportFormatList.map((diagnosticReportFormat, i) => (
                 <tr key={`entity-${i}`} data-cy="entityTable">
-                  <td>{diagnosticReportFormat?.name}</td>
+                  <td>
+                    <MUILink component={Link} to={`${diagnosticReportFormat?.id}`} color={'#00f'}>
+                      {diagnosticReportFormat?.name}
+                    </MUILink>
+                  </td>
                   <td>
                     {diagnosticReportFormat?.createdAt ? (
                       <TextFormat type="date" value={diagnosticReportFormat?.createdAt} format={APP_LOCAL_DATE_FORMAT} />
@@ -87,26 +100,9 @@ export const DiagnosticReportFormat = () => {
                   <td>{`${diagnosticReportFormat?.updatedBy?.firstName} ${diagnosticReportFormat?.updatedBy?.lastName}`}</td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
-                      <Button
-                        component={Link}
-                        to={`/laboratory/diagnostic-report-format/${diagnosticReportFormat?.id}`}
-                        variant="contained"
-                        color={'info'}
-                      >
-                        Ver
-                      </Button>
-                      <Button
-                        component={Link}
-                        to={`/laboratory/diagnostic-report-format/${diagnosticReportFormat?.id}/edit`}
-                        variant="contained"
-                        color={'info'}
-                      >
-                        Editar
-                      </Button>
+                      <FabButton Icon={Edit} onClick={() => handleEdit(diagnosticReportFormat?.id)} color={'info'} />
 
-                      <Button onClick={() => handleOpenDelete(diagnosticReportFormat?.id)} variant="contained" color={'error'}>
-                        Eliminar
-                      </Button>
+                      <FabButton Icon={Delete} onClick={() => handleOpenDelete(diagnosticReportFormat?.id)} color={'error'} />
                     </div>
                   </td>
                 </tr>

@@ -1,12 +1,11 @@
 import React, { useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Translate, translate } from 'react-jhipster';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { translate } from 'react-jhipster';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { IValueSet } from 'app/shared/model/laboratory/value-set.model';
 import { createEntity, getEntity, reset, updateEntity } from './value-set.reducer';
-import { Button, Card, Col, Flex, Form, Input, Row, Select, Space } from 'antd';
+import { Button, Card, Col, Flex, Form, Input, Row, Select } from 'antd';
 import { useForm, useWatch } from 'antd/es/form/Form';
 import { DeleteOutlined, LeftOutlined, PlusOutlined } from '@ant-design/icons';
 
@@ -15,6 +14,8 @@ import FormItemCustom from 'app/entities/laboratory/shared/FormItemCustom';
 import PageHeader from 'app/entities/laboratory/shared/page-header';
 import { IDiagnosticReportFormat } from 'app/shared/model/laboratory/diagnostic-report-format.model';
 import Swal from 'sweetalert2';
+import { FabButton } from 'app/entities/laboratory/shared/fab-button';
+import { Save } from '@mui/icons-material';
 
 export const ValueSetUpdate = () => {
   const dispatch = useAppDispatch();
@@ -124,11 +125,12 @@ export const ValueSetUpdate = () => {
                   hidden
                   label={translate('laboratoryApp.laboratoryValueSet.id')}
                   rules={[{ required: true }]}
+                  style={{ width: '100%' }}
                 >
                   <Input readOnly hidden />
                 </Form.Item>
               ) : null}
-              <Space style={{ width: '100%' }} size={'middle'}>
+              <Flex gap={'medium'}>
                 <Form.Item<IValueSet>
                   name="name"
                   label={translate('laboratoryApp.laboratoryValueSet.create.name')}
@@ -161,7 +163,7 @@ export const ValueSetUpdate = () => {
                     })}
                   />
                 </Form.Item>
-              </Space>
+              </Flex>
               <Form.List name={'constants'} initialValue={isNew ? [{ name: '', description: '', value: '' }] : constantsWatcher}>
                 {(constants, { add, remove }) => (
                   <div style={{ display: 'flex', rowGap: 16, flexDirection: 'column' }}>
@@ -224,11 +226,7 @@ export const ValueSetUpdate = () => {
                   </div>
                 )}
               </Form.List>
-              <Button type="primary" id="save-entity" data-cy="entityCreateSaveButton" htmlType="submit" disabled={updating}>
-                <FontAwesomeIcon icon="save" />
-                &nbsp;
-                <Translate contentKey="entity.action.save">Save</Translate>
-              </Button>
+              <FabButton Icon={Save} onClick={e => e} color={'info'} component={'button'} type={'submit'} />
             </Form>
           )}
         </Col>

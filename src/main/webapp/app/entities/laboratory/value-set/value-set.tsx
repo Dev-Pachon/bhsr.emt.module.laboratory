@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Table } from 'reactstrap';
-import { Button } from '@mui/material';
+import { Link as MUILink } from '@mui/material';
 import { translate, Translate } from 'react-jhipster';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
@@ -11,6 +11,8 @@ import { Empty } from 'antd';
 import PageHeader from 'app/entities/laboratory/shared/page-header';
 import { PlusOutlined } from '@ant-design/icons';
 import Swal from 'sweetalert2';
+import { FabButton } from 'app/entities/laboratory/shared/fab-button';
+import { Add, Delete, Edit } from '@mui/icons-material';
 
 export const ValueSet = () => {
   const dispatch = useAppDispatch();
@@ -45,16 +47,18 @@ export const ValueSet = () => {
     });
   };
 
+  const handleEdit = (id: string) => {
+    navigate(id + '/edit');
+  };
+
+  const handleAdd = () => {
+    navigate('new');
+  };
+
   return (
     <div>
-      <PageHeader
-        title={translate('laboratoryApp.laboratoryValueSet.home.title')}
-        rightAction={
-          <Link to={`new`}>
-            <PlusOutlined style={{ fontSize: '24px', color: 'white' }} rev={undefined} />
-          </Link>
-        }
-      />
+      <PageHeader title={translate('laboratoryApp.laboratoryValueSet.home.title')} />
+      <FabButton Icon={Add} onClick={handleAdd} color={'secondary'} sx={{ color: 'white' }} />
       <div className="table-responsive">
         {valueSetList && valueSetList.length > 0 ? (
           <Table responsive>
@@ -78,22 +82,17 @@ export const ValueSet = () => {
             <tbody>
               {valueSetList.map((valueSet: IValueSet, i: number) => (
                 <tr key={`entity-${i}`} data-cy="entityTable">
-                  <td>{valueSet.name}</td>
+                  <MUILink component={Link} to={`${valueSet?.id}`} color={'#00f'}>
+                    {valueSet.name}
+                  </MUILink>
                   <td>{valueSet.constants.length}</td>
                   <td>{translate(`laboratoryApp.fieldFormatType.${valueSet.dataType}`)}</td>
                   <td>{valueSet.description}</td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
-                      <Button component={Link} to={`/laboratory/value-set/${valueSet.id}`} variant="contained" color={'info'}>
-                        Ver
-                      </Button>
-                      <Button component={Link} to={`/laboratory/value-set/${valueSet.id}/edit`} variant="contained" color={'info'}>
-                        Editar
-                      </Button>
+                      <FabButton Icon={Edit} onClick={() => handleEdit(valueSet?.id)} color={'info'} />
 
-                      <Button onClick={() => handleOpenDelete(valueSet?.id)} variant="contained" color={'error'}>
-                        Eliminar
-                      </Button>
+                      <FabButton Icon={Delete} onClick={() => handleOpenDelete(valueSet?.id)} color={'error'} />
                     </div>
                   </td>
                 </tr>
@@ -101,7 +100,7 @@ export const ValueSet = () => {
             </tbody>
           </Table>
         ) : (
-          !loading && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          !loading && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={'Sin conjuntos de constantes'} />
         )}
       </div>
     </div>
