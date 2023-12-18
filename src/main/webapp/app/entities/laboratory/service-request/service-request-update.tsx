@@ -12,6 +12,8 @@ import { ServiceRequestPriority } from 'app/shared/model/enumerations/service-re
 import { IDiagnosticReportFormat } from 'app/shared/model/laboratory/diagnostic-report-format.model';
 import SignatureCanvas from 'react-signature-canvas';
 import '../shared/signatureComponent/signature.style.css';
+import { FabButton } from 'app/entities/laboratory/shared/fab-button';
+import { Start } from '@mui/icons-material';
 
 const { Title } = Typography;
 
@@ -128,9 +130,7 @@ const ServiceRequestModal: React.FC<ServiceRequestModalProps> = ({ patient, ...p
     <>
       {!patient ? null : (
         <>
-          <Button type="primary" onClick={showModal}>
-            Solicitar un servicio de diagnóstico
-          </Button>
+          <FabButton Icon={Start} onClick={showModal} color={'info'} />
           <Modal
             title={translate('laboratoryApp.laboratoryServiceRequest.home.createLabel')}
             open={open}
