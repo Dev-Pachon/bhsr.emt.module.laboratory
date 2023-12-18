@@ -12,6 +12,8 @@ import PageHeader from 'app/entities/laboratory/shared/page-header';
 import { LeftOutlined } from '@ant-design/icons';
 import { useForm } from 'antd/es/form/Form';
 import { DiagnosticReportStatus } from 'app/shared/model/enumerations/diagnostic-report-status.model';
+import { FabButton } from 'app/entities/laboratory/shared/fab-button';
+import { Save } from '@mui/icons-material';
 
 export const DiagnosticReportUpdate = () => {
   const dispatch = useAppDispatch();
@@ -93,11 +95,8 @@ export const DiagnosticReportUpdate = () => {
             {diagnosticReportEntity?.format?.fieldFormats?.map((el, index) => (
               <DiagnosticReportUpdateField key={index} el={el} index={index} form={form} />
             ))}
-            <Button type="primary" id="save-entity" data-cy="entityCreateSaveButton" htmlType="submit" disabled={updating}>
-              <FontAwesomeIcon icon="save" />
-              &nbsp;
-              <Translate contentKey="entity.action.save">Save</Translate>
-            </Button>
+
+            <FabButton Icon={Save} onClick={e => e} color={'info'} component={'button'} type={'submit'} />
           </Form>
         </Space>
       )}
