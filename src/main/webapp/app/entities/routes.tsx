@@ -8,7 +8,6 @@ import { combineReducers, ReducersMapObject } from '@reduxjs/toolkit';
 import getStore from 'app/config/store';
 
 import entitiesReducers from './reducers';
-import IdentifierType from './laboratory/identifier-type';
 import DiagnosticReportFormat from './laboratory/diagnostic-report-format';
 import ServiceRequest from './laboratory/service-request';
 import ValueSet from './laboratory/value-set';
@@ -22,7 +21,7 @@ export default () => {
 
   return (
     <div>
-      <PrivateRoute hasAnyAuthorities={[AUTHORITIES.MED, AUTHORITIES.LAB]}>
+      <PrivateRoute hasAnyAuthorities={[AUTHORITIES.MEDICAL_USER, AUTHORITIES.LAB_USER]}>
         <ErrorBoundaryRoutes>
           <Route path="/service-request/*" element={<ServiceRequest />} />
         </ErrorBoundaryRoutes>
@@ -30,7 +29,6 @@ export default () => {
 
       <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
         <ErrorBoundaryRoutes>
-          <Route path="/identifier-type/*" element={<IdentifierType />} />
           <Route path="/diagnostic-report-format/*" element={<DiagnosticReportFormat />} />
           <Route path="/value-set/*" element={<ValueSet />} />
         </ErrorBoundaryRoutes>

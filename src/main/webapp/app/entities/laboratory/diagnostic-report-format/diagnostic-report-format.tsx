@@ -59,7 +59,7 @@ export const DiagnosticReportFormat = () => {
       dataIndex: 'name',
       key: 'format',
       render: (text, record) => (
-        <MUILink component={Link} to={`${record?.id}`} color={'#00f'}>
+        <MUILink component={Link} to={`${record?.id}`}>
           {record?.name}
         </MUILink>
       ),
@@ -109,7 +109,11 @@ export const DiagnosticReportFormat = () => {
       <FabButton Icon={Add} onClick={handleAdd} color={'secondary'} sx={{ color: 'white' }} />
       <div className="table-responsive">
         {diagnosticReportFormatList && diagnosticReportFormatList.length > 0 ? (
-          <Table columns={columns} dataSource={diagnosticReportFormatList} rowKey={r => r.id} />
+          <Table
+            columns={columns}
+            dataSource={[...diagnosticReportFormatList].sort((a, b) => a?.id?.localeCompare(b?.id))}
+            rowKey={r => r.id}
+          />
         ) : (
           !loading && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={'No hay formatos de reporte de diagnóstico...'} />
         )}

@@ -37,9 +37,30 @@ export interface IServiceRequestResponse {
   deletedAt?: string | null;
 }
 
+export interface IServiceRequestResponseLight {
+  id?: string;
+  status?: ServiceRequestStatus;
+  category?: string;
+  priority?: string;
+  diagnosticReportsFormats?: string[];
+  doNotPerform?: boolean | null;
+  serviceId?: number;
+  subject?: IPatient;
+  createdAt?: string;
+  createdBy?: IUser;
+  updatedAt?: string;
+  updatedBy?: IUser;
+  deletedAt?: string | null;
+}
+
 export const defaultValueResponse: Readonly<IServiceRequestResponse> = {
   doNotPerform: false,
   diagnosticReports: [],
+};
+
+export const defaultValueResponseLight: Readonly<IServiceRequestResponseLight> = {
+  doNotPerform: false,
+  diagnosticReportsFormats: [],
 };
 
 export const defaultValue: Readonly<IServiceRequest> = {

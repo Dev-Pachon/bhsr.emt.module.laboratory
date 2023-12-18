@@ -1,20 +1,21 @@
 import React, { useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Table } from 'reactstrap';
-import { TextFormat, Translate, translate } from 'react-jhipster';
+import { TextFormat, translate } from 'react-jhipster';
 
 import { APP_LOCAL_DATE_FORMAT, AUTHORITIES } from 'app/config/constants';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntities, partialUpdateEntity } from './service-request.reducer';
-import { Empty, Tag } from 'antd';
+import { Empty, Space, Table, Tag } from 'antd';
 import { hasAnyAuthority } from 'app/shared/auth/private-route';
 import { ServiceRequestStatus } from 'app/shared/model/enumerations/service-request-status.model';
 import { ServiceRequestPriority } from 'app/shared/model/enumerations/service-request-priority.model';
 import PageHeader from 'app/entities/laboratory/shared/page-header';
 import Swal from 'sweetalert2';
-import { Button } from '@mui/material';
+import { Link as MUILink } from '@mui/material';
 import { FabButton } from 'app/entities/laboratory/shared/fab-button';
-import { Add } from '@mui/icons-material';
+import { Add, Block, Start } from '@mui/icons-material';
+import { IServiceRequestResponseLight } from 'app/shared/model/laboratory/service-request.model';
+import { ColumnsType } from 'antd/es/table';
 
 export const ServiceRequest = () => {
   const dispatch = useAppDispatch();
@@ -22,8 +23,8 @@ export const ServiceRequest = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const isLabUser = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.LAB]));
-  const isMedUser = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.MED]));
+  const isLabUser = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.LAB_USER]));
+  const isMedUser = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.MEDICAL_USER]));
   const serviceRequestList: [] = useAppSelector(state => state.laboratory.serviceRequest.entities);
   const loading = useAppSelector(state => state.laboratory.serviceRequest.loading);
 
@@ -67,8 +68,8 @@ export const ServiceRequest = () => {
     });
   };
 
-  const getTagColor = serviceRequestResponse => {
-    switch (ServiceRequestPriority[serviceRequestResponse.priority]) {
+  const getTagColor = priority => {
+    switch (ServiceRequestPriority[priority]) {
       case ServiceRequestPriority.HIGH:
         return 'error';
       case ServiceRequestPriority.MEDIUM:
@@ -84,6 +85,88 @@ export const ServiceRequest = () => {
     navigate('new');
   };
 
+  const columns: ColumnsType<IServiceRequestResponseLight> = [
+    {
+      title: '#',
+      dataIndex: '',
+      key: 'index',
+      render: (text, record, index) => (
+        <MUILink component={Link} to={`${record?.id}`}>
+          {String(index + 1).padStart(6, '0')}
+        </MUILink>
+      ),
+    },
+    {
+      title: 'Estado',
+      dataIndex: 'status',
+      key: 'status',
+      render: (text, record) => translate(`laboratoryApp.ServiceRequestStatus.${record.status}`),
+    },
+    {
+      title: 'Prioridad',
+      dataIndex: 'priority',
+      key: 'priority',
+      render: (text, record) => (
+        <Tag color={getTagColor(record.priority)}>
+          {translate(`laboratoryApp.laboratoryServiceRequest.create.priority.${record.priority}`)}
+        </Tag>
+      ),
+    },
+    {
+      title: 'Paciente',
+      dataIndex: 'subject',
+      key: 'subject',
+      render: (text, record) => record?.subject?.name?.text,
+    },
+    {
+      title: '# de reportes',
+      dataIndex: 'diagnosticReportsFormats',
+      key: 'diagnosticReportsFormats',
+      render: (text, record) => record?.diagnosticReportsFormats?.length,
+    },
+    {
+      title: 'Creado en',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      render: (text, record) => <TextFormat value={record.createdAt} type="date" format={APP_LOCAL_DATE_FORMAT} />,
+    },
+    {
+      title: 'Creado por',
+      dataIndex: 'createdBy',
+      key: 'createdBy',
+      render: (text, record) => `${record?.createdBy?.firstName} ${record?.createdBy?.lastName}`,
+    },
+    {
+      title: 'Actualizado en',
+      dataIndex: 'updatedAt',
+      key: 'updatedAt',
+      render: (text, record) => <TextFormat value={record.updatedAt} type="date" format={APP_LOCAL_DATE_FORMAT} />,
+    },
+    {
+      title: 'Actualizado por',
+      dataIndex: 'updatedBy',
+      key: 'updatedBy',
+      render: (text, record) => `${record?.updatedBy?.firstName} ${record?.updatedBy?.lastName}`,
+    },
+    {
+      title: 'Acción',
+      dataIndex: '',
+      key: 'x',
+      render: (t, record) => (
+        <>
+          <Space size="middle">
+            {isLabUser && record.status === ServiceRequestStatus.DRAFT && (
+              <FabButton Icon={Start} onClick={() => onStartRequest(record)} color={'info'} />
+            )}
+            {isMedUser && record.status === ServiceRequestStatus.DRAFT && (
+              <FabButton Icon={Block} onClick={() => handleOpenCancel(record?.id)} color={'error'} />
+            )}
+          </Space>
+        </>
+      ),
+    },
+  ];
+
   return (
     <>
       <PageHeader title={translate('laboratoryApp.laboratoryServiceRequest.home.title')} />
@@ -92,89 +175,19 @@ export const ServiceRequest = () => {
       <div className="table-responsive">
         {serviceRequestList && serviceRequestList.length > 0 ? (
           <>
-            <Table responsive>
-              <thead>
-                <tr>
-                  <th>
-                    <Translate contentKey="laboratoryApp.laboratoryServiceRequest.status">Status</Translate>
-                  </th>
-                  <th>
-                    <Translate contentKey="laboratoryApp.laboratoryServiceRequest.priority">Priority</Translate>
-                  </th>
-                  <th>
-                    <Translate contentKey="laboratoryApp.laboratoryPatient.detail.title">Subject</Translate>
-                  </th>
-                  <th>
-                    <Translate contentKey="laboratoryApp.laboratoryServiceRequest.diagnosticReportsIds"># of diagnostic reports</Translate>
-                  </th>
-                  <th>
-                    <Translate contentKey="laboratoryApp.laboratoryServiceRequest.createdAt">Created At</Translate>
-                  </th>
-                  <th>
-                    <Translate contentKey="laboratoryApp.laboratoryServiceRequest.createdBy">Created By</Translate>
-                  </th>
-                  <th>
-                    <Translate contentKey="laboratoryApp.laboratoryServiceRequest.updatedAt">Updated At</Translate>
-                  </th>
-                  <th>
-                    <Translate contentKey="laboratoryApp.laboratoryServiceRequest.updatedBy">Updated By</Translate>
-                  </th>
-                  <th>Acción</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[...serviceRequestList]
-                  .sort((actual: any, previous: any) => previous?.id?.localeCompare(actual?.id))
-                  .map((serviceRequest: any, i: number) => (
-                    <tr key={`entity-${i}`} data-cy="entityTable">
-                      <td>
-                        <Translate contentKey={`laboratoryApp.ServiceRequestStatus.${serviceRequest.status}`} />
-                      </td>
-                      <td>
-                        <Tag color={getTagColor(serviceRequest)}>
-                          {translate(`laboratoryApp.laboratoryServiceRequest.create.priority.${serviceRequest.priority}`)}
-                        </Tag>
-                      </td>
-                      <td>{serviceRequest.subject?.name?.text}</td>
-                      <td>{serviceRequest.diagnosticReportsFormats?.length}</td>
-                      <td>
-                        {serviceRequest.createdAt ? (
-                          <TextFormat type="date" value={serviceRequest.createdAt} format={APP_LOCAL_DATE_FORMAT} />
-                        ) : null}
-                      </td>
-                      <td>{`${serviceRequest.createdBy.firstName} ${serviceRequest.createdBy.lastName}`}</td>
-                      <td>
-                        {serviceRequest.updatedAt ? (
-                          <TextFormat type="date" value={serviceRequest.updatedAt} format={APP_LOCAL_DATE_FORMAT} />
-                        ) : null}
-                      </td>
-                      <td>{`${serviceRequest.updatedBy.firstName} ${serviceRequest.updatedBy.lastName}`}</td>
-                      <td className="text-end">
-                        <div className="btn-group flex-btn-group-container">
-                          <Button
-                            component={Link}
-                            to={`/laboratory/service-request/${serviceRequest.id}`}
-                            variant="contained"
-                            color={'info'}
-                          >
-                            Ver
-                          </Button>
-                          {isLabUser && serviceRequest.status === ServiceRequestStatus.DRAFT && (
-                            <Button onClick={() => onStartRequest(serviceRequest)} variant="contained" color={'primary'}>
-                              Iniciar solicitud
-                            </Button>
-                          )}
-                          {isMedUser && serviceRequest.status === ServiceRequestStatus.DRAFT && (
-                            <Button onClick={() => handleOpenCancel(serviceRequest)} variant="contained" color={'error'}>
-                              Cancelar
-                            </Button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </Table>
+            <Table
+              onRow={(record, rowIndex) => {
+                return {
+                  onClick(event) {
+                    navigate(`${record?.id}`);
+                  },
+                };
+              }}
+              dataSource={serviceRequestList}
+              columns={columns}
+              rowKey={'id'}
+              sortDirections={['descend', 'ascend']}
+            />
           </>
         ) : (
           !loading && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={'No hay solicitudes de servicios de diagnóstico'} />

@@ -52,7 +52,7 @@ export const ValueSet = () => {
       dataIndex: 'name',
       key: 'format',
       render: (text, record) => (
-        <MUILink component={Link} to={`${record?.id}`} color={'#00f'}>
+        <MUILink component={Link} to={`${record?.id}`}>
           {record?.name}
         </MUILink>
       ),

@@ -14,7 +14,7 @@ const DiagnosticReportRoutes = () => (
       <Route
         path="edit"
         element={
-          <PrivateRoute hasAnyAuthorities={[AUTHORITIES.LAB]}>
+          <PrivateRoute hasAnyAuthorities={[AUTHORITIES.LAB_USER]}>
             <DiagnosticReportUpdate />
           </PrivateRoute>
         }

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { TextFormat, translate } from 'react-jhipster';
 import type { ColumnsType } from 'antd/es/table';
 
@@ -10,13 +10,16 @@ import { getEntity } from './service-request.reducer';
 import { IServiceRequestResponse } from 'app/shared/model/laboratory/service-request.model';
 import { Descriptions, Space, Table, Tag } from 'antd';
 import { hasAnyAuthority } from 'app/shared/auth/private-route';
-import { IDiagnosticReport } from 'app/shared/model/laboratory/diagnostic-report.model';
+import { IDiagnosticReport, IDiagnosticReportLight } from 'app/shared/model/laboratory/diagnostic-report.model';
 import PageHeader from 'app/entities/laboratory/shared/page-header';
 import { LeftOutlined } from '@ant-design/icons';
 import { ServiceRequestStatus } from 'app/shared/model/enumerations/service-request-status.model';
 import { DiagnosticReportStatus } from 'app/shared/model/enumerations/diagnostic-report-status.model';
 import { ServiceRequestPriority } from 'app/shared/model/enumerations/service-request-priority.model';
-import { Button } from '@mui/material';
+import { Link as MUILink } from '@mui/material';
+
+import { FabButton } from 'app/entities/laboratory/shared/fab-button';
+import { Start } from '@mui/icons-material';
 
 const getTagColor = serviceRequestResponse => {
   switch (ServiceRequestPriority[serviceRequestResponse.priority]) {
@@ -32,8 +35,9 @@ const getTagColor = serviceRequestResponse => {
 };
 export const ServiceRequestDetail = () => {
   const dispatch = useAppDispatch();
-  const isLabUser = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.LAB]));
+  const isLabUser = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.LAB_USER]));
   const { id } = useParams<'id'>();
+  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(getEntity(id));
@@ -41,11 +45,22 @@ export const ServiceRequestDetail = () => {
 
   const serviceRequestEntity = useAppSelector(state => state.laboratory.serviceRequest.entity);
 
-  const columns: ColumnsType<IDiagnosticReport> = [
+  const columns: ColumnsType<IDiagnosticReportLight> = [
+    {
+      title: '#',
+      dataIndex: '',
+      key: 'index',
+      render: (text, record, index) => index + 1,
+    },
     {
       title: 'Nombre',
       dataIndex: 'format',
       key: 'format',
+      render: (text, record) => (
+        <MUILink component={Link} to={`diagnostic-report/${record.id}`}>
+          {record.format}
+        </MUILink>
+      ),
     },
     {
       title: 'Estado',
@@ -77,28 +92,29 @@ export const ServiceRequestDetail = () => {
       key: 'updatedBy',
       render: (text, record) => `${record?.updatedBy?.firstName} ${record?.updatedBy?.lastName}`,
     },
-    {
+  ];
+
+  if (isLabUser) {
+    columns.push({
       title: 'Acción',
       dataIndex: '',
       key: 'x',
       render: (text, record) => (
         <Space size="middle">
-          <Button component={Link} to={`diagnostic-report/${record.id}`} variant="contained" color={'info'}>
-            Ver
-          </Button>
-
           {isLabUser &&
-          serviceRequestEntity &&
-          ServiceRequestStatus[serviceRequestEntity.status] === ServiceRequestStatus.ACTIVE &&
-          DiagnosticReportStatus[record.status] !== DiagnosticReportStatus.FINAL ? (
-            <Button component={Link} to={`diagnostic-report/${record.id}/edit`} variant="contained" color={'primary'}>
-              Realizar diagnóstico
-            </Button>
-          ) : null}
+            serviceRequestEntity &&
+            ServiceRequestStatus[serviceRequestEntity.status] === ServiceRequestStatus.ACTIVE &&
+            DiagnosticReportStatus[record.status] !== DiagnosticReportStatus.FINAL && (
+              <FabButton Icon={Start} onClick={() => handleStartRequest(record.id)} color={'info'} />
+            )}
         </Space>
       ),
-    },
-  ];
+    });
+  }
+
+  const handleStartRequest = paramId => {
+    navigate(`diagnostic-report/${paramId}/edit`);
+  };
 
   const mapperToDescriptionItem = (serviceRequest: IServiceRequestResponse) => {
     const items = [

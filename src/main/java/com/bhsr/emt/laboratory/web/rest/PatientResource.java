@@ -5,7 +5,6 @@ import com.bhsr.emt.laboratory.domain.Identifier;
 import com.bhsr.emt.laboratory.domain.IdentifierType;
 import com.bhsr.emt.laboratory.domain.Patient;
 import com.bhsr.emt.laboratory.domain.enumeration.AdministrativeGender;
-import com.bhsr.emt.laboratory.repository.PatientRepository;
 import com.bhsr.emt.laboratory.security.oauth2.OAuthIdpTokenResponseDTO;
 import com.bhsr.emt.laboratory.service.dto.Patient.PatientField;
 import com.bhsr.emt.laboratory.service.dto.Patient.PatientServiceResponse;
@@ -26,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -46,6 +46,7 @@ public class PatientResource {
     private final Logger log = LoggerFactory.getLogger(PatientResource.class);
     private final WebClient webClient;
     private final PatientMapper patientMapper;
+    private ReactiveSecurityContextHolder securityContextHolder;
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
@@ -188,7 +189,7 @@ public class PatientResource {
                     .collectList()
                     .flatMap(responseTokenAsList ->
                         webClient
-                            .method(HttpMethod.GET)
+                            .post()
                             .uri(ehrUri + "/Pacient/GetByField")
                             .header("Authorization", "Bearer " + responseTokenAsList.get(0).getAccessToken())
                             .bodyValue(PatientField.builder().Name(name).Value(value).build())

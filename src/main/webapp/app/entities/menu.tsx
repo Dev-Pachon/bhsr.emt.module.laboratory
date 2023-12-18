@@ -12,8 +12,8 @@ import { Home, ListAlt, MedicalInformation, Summarize } from '@mui/icons-materia
 
 const EntitiesMenu = ({ closeMenu }) => {
   const lastChange = useAppSelector(state => state.locale.lastChange);
-  const isLabUser = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.LAB]));
-  const isMedUser = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.MED]));
+  const isLabUser = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.LAB_USER]));
+  const isMedUser = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.MEDICAL_USER]));
   const isAdminUser = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.ADMIN]));
   const dispatch = useAppDispatch();
   useEffect(() => {
@@ -50,7 +50,7 @@ const EntitiesMenu = ({ closeMenu }) => {
           <ListItemIcon>
             <Home />
           </ListItemIcon>
-          <ListItemText primary={translate('global.menu.entities.laboratoryDiagnosticReportFormat')} />
+          <ListItemText primary={translate('global.menu.entities.home')} />
         </ListItemButton>
         <ListItemButton component={Link} to="/laboratory/service-request" onClick={closeMenu}>
           <ListItemIcon>
@@ -67,7 +67,7 @@ const EntitiesMenu = ({ closeMenu }) => {
           <ListItemIcon>
             <Home />
           </ListItemIcon>
-          <ListItemText primary={translate('global.menu.entities.laboratoryDiagnosticReportFormat')} />
+          <ListItemText primary={translate('global.menu.entities.home')} />
         </ListItemButton>
         <ListItemButton component={Link} to="/laboratory/service-request" onClick={closeMenu}>
           <ListItemIcon>
