@@ -6,6 +6,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "app:start": "./gradlew",
+    "app:start-w": "gradlew",
     "backend:build-cache": "npm run backend:info && npm run backend:nohttp:test && npm run ci:e2e:package",
     "backend:doc:test": "./gradlew javadoc -x webapp -x webapp_test",
     "backend:info": "./gradlew -v",

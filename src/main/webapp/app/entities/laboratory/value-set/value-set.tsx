@@ -1,18 +1,17 @@
 import React, { useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Table } from 'reactstrap';
 import { Link as MUILink } from '@mui/material';
-import { translate, Translate } from 'react-jhipster';
+import { translate } from 'react-jhipster';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { IValueSet } from 'app/shared/model/laboratory/value-set.model';
 import { deleteEntity, getEntities } from './value-set.reducer';
-import { Empty } from 'antd';
+import { Empty, Space, Table } from 'antd';
 import PageHeader from 'app/entities/laboratory/shared/page-header';
-import { PlusOutlined } from '@ant-design/icons';
 import Swal from 'sweetalert2';
 import { FabButton } from 'app/entities/laboratory/shared/fab-button';
 import { Add, Delete, Edit } from '@mui/icons-material';
+import { ColumnsType } from 'antd/es/table';
 
 export const ValueSet = () => {
   const dispatch = useAppDispatch();
@@ -47,6 +46,48 @@ export const ValueSet = () => {
     });
   };
 
+  const columns: ColumnsType<IValueSet> = [
+    {
+      title: 'Nombre del formato',
+      dataIndex: 'name',
+      key: 'format',
+      render: (text, record) => (
+        <MUILink component={Link} to={`${record?.id}`} color={'#00f'}>
+          {record?.name}
+        </MUILink>
+      ),
+    },
+    {
+      title: 'Número de constantes',
+      dataIndex: 'constants',
+      key: 'constants',
+      render: (text, record) => record?.constants?.length,
+    },
+    {
+      title: 'Tipo de dato',
+      dataIndex: 'dataType',
+      key: 'dataType',
+      render: (text, record) => translate(`laboratoryApp.fieldFormatType.${record.dataType}`),
+    },
+    {
+      title: 'Descripción',
+      dataIndex: 'description',
+      key: 'description',
+    },
+    {
+      title: 'Acción',
+      dataIndex: '',
+      key: 'x',
+      render: (text, record) => (
+        <Space size="middle">
+          <FabButton Icon={Edit} onClick={() => handleEdit(record?.id)} color={'info'} />
+
+          <FabButton Icon={Delete} onClick={() => handleOpenDelete(record?.id)} color={'error'} />
+        </Space>
+      ),
+    },
+  ];
+
   const handleEdit = (id: string) => {
     navigate(id + '/edit');
   };
@@ -61,44 +102,9 @@ export const ValueSet = () => {
       <FabButton Icon={Add} onClick={handleAdd} color={'secondary'} sx={{ color: 'white' }} />
       <div className="table-responsive">
         {valueSetList && valueSetList.length > 0 ? (
-          <Table responsive>
-            <thead>
-              <tr>
-                <th>
-                  <Translate contentKey="laboratoryApp.laboratoryValueSet.name">Name</Translate>
-                </th>
-                <th>
-                  <Translate contentKey="laboratoryApp.laboratoryValueSet.numConstants">Number of Constants</Translate>
-                </th>
-                <th>
-                  <Translate contentKey="laboratoryApp.laboratoryValueSet.dataType">Datatype</Translate>
-                </th>
-                <th>
-                  <Translate contentKey="laboratoryApp.laboratoryValueSet.description">Description</Translate>
-                </th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {valueSetList.map((valueSet: IValueSet, i: number) => (
-                <tr key={`entity-${i}`} data-cy="entityTable">
-                  <MUILink component={Link} to={`${valueSet?.id}`} color={'#00f'}>
-                    {valueSet.name}
-                  </MUILink>
-                  <td>{valueSet.constants.length}</td>
-                  <td>{translate(`laboratoryApp.fieldFormatType.${valueSet.dataType}`)}</td>
-                  <td>{valueSet.description}</td>
-                  <td className="text-end">
-                    <div className="btn-group flex-btn-group-container">
-                      <FabButton Icon={Edit} onClick={() => handleEdit(valueSet?.id)} color={'info'} />
-
-                      <FabButton Icon={Delete} onClick={() => handleOpenDelete(valueSet?.id)} color={'error'} />
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+          <>
+            <Table columns={columns} dataSource={valueSetList} rowKey={r => r.id} />
+          </>
         ) : (
           !loading && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={'Sin conjuntos de constantes'} />
         )}

@@ -1,18 +1,19 @@
 import React, { useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Table } from 'reactstrap';
 import { TextFormat, translate } from 'react-jhipster';
 
-import { APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { APP_DATE_FORMAT } from 'app/config/constants';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { deleteEntity, getEntities } from './diagnostic-report-format.reducer';
-import { Empty, Typography } from 'antd';
+import { Empty, Space, Table, Typography } from 'antd';
 import PageHeader from 'app/entities/laboratory/shared/page-header';
 import { Link as MUILink } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import Swal from 'sweetalert2';
 import { Add, Delete, Edit } from '@mui/icons-material';
 import { FabButton } from 'app/entities/laboratory/shared/fab-button';
+import { IDiagnosticReportFormat } from 'app/shared/model/laboratory/diagnostic-report-format.model';
+import { ColumnsType } from 'antd/es/table';
 
 const { Title } = Typography;
 
@@ -52,63 +53,63 @@ export const DiagnosticReportFormat = () => {
     navigate(id + '/edit');
   };
 
+  const columns: ColumnsType<IDiagnosticReportFormat> = [
+    {
+      title: 'Nombre del formato',
+      dataIndex: 'name',
+      key: 'format',
+      render: (text, record) => (
+        <MUILink component={Link} to={`${record?.id}`} color={'#00f'}>
+          {record?.name}
+        </MUILink>
+      ),
+    },
+    {
+      title: 'Creado en',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      render: (text, record) => <TextFormat value={record.createdAt} type="date" format={APP_DATE_FORMAT} />,
+    },
+    {
+      title: 'Creado por',
+      dataIndex: 'createdBy',
+      key: 'createdBy',
+      render: (text, record) => `${record?.createdBy?.firstName} ${record?.createdBy?.lastName}`,
+    },
+    {
+      title: 'Actualizado en',
+      dataIndex: 'updatedAt',
+      key: 'updatedAt',
+      render: (text, record) => <TextFormat value={record.updatedAt} type="date" format={APP_DATE_FORMAT} />,
+    },
+    {
+      title: 'Actualizado por',
+      dataIndex: 'updatedBy',
+      key: 'updatedBy',
+      render: (text, record) => `${record?.updatedBy?.firstName} ${record?.updatedBy?.lastName}`,
+    },
+    {
+      title: 'Acción',
+      dataIndex: '',
+      key: 'x',
+      render: (text, record) => (
+        <Space size="middle">
+          <FabButton Icon={Edit} onClick={() => handleEdit(record?.id)} color={'info'} />
+
+          <FabButton Icon={Delete} onClick={() => handleOpenDelete(record?.id)} color={'error'} />
+        </Space>
+      ),
+    },
+  ];
+
   return (
     <>
       <CssBaseline />
-      <PageHeader
-        title={translate('laboratoryApp.laboratoryDiagnosticReportFormat.home.title')}
-        // rightAction={
-        //   <Link to={`new`}>
-        //     <PlusOutlined style={{ fontSize: '24px', color: 'white' }} rev={undefined} />
-        //   </Link>
-        // }
-      />
+      <PageHeader title={translate('laboratoryApp.laboratoryDiagnosticReportFormat.home.title')} />
       <FabButton Icon={Add} onClick={handleAdd} color={'secondary'} sx={{ color: 'white' }} />
       <div className="table-responsive">
         {diagnosticReportFormatList && diagnosticReportFormatList.length > 0 ? (
-          <Table responsive>
-            <thead>
-              <tr>
-                <th>Nombre del formato</th>
-                <th>Creado en</th>
-                <th>Creado por</th>
-                <th>Última actualización en</th>
-                <th>Última actualización por</th>
-
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {diagnosticReportFormatList.map((diagnosticReportFormat, i) => (
-                <tr key={`entity-${i}`} data-cy="entityTable">
-                  <td>
-                    <MUILink component={Link} to={`${diagnosticReportFormat?.id}`} color={'#00f'}>
-                      {diagnosticReportFormat?.name}
-                    </MUILink>
-                  </td>
-                  <td>
-                    {diagnosticReportFormat?.createdAt ? (
-                      <TextFormat type="date" value={diagnosticReportFormat?.createdAt} format={APP_LOCAL_DATE_FORMAT} />
-                    ) : null}
-                  </td>
-                  <td>{`${diagnosticReportFormat?.createdBy?.firstName} ${diagnosticReportFormat?.createdBy?.lastName}`}</td>
-                  <td>
-                    {diagnosticReportFormat?.updatedAt ? (
-                      <TextFormat type="date" value={diagnosticReportFormat?.updatedAt} format={APP_LOCAL_DATE_FORMAT} />
-                    ) : null}
-                  </td>
-                  <td>{`${diagnosticReportFormat?.updatedBy?.firstName} ${diagnosticReportFormat?.updatedBy?.lastName}`}</td>
-                  <td className="text-end">
-                    <div className="btn-group flex-btn-group-container">
-                      <FabButton Icon={Edit} onClick={() => handleEdit(diagnosticReportFormat?.id)} color={'info'} />
-
-                      <FabButton Icon={Delete} onClick={() => handleOpenDelete(diagnosticReportFormat?.id)} color={'error'} />
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+          <Table columns={columns} dataSource={diagnosticReportFormatList} rowKey={r => r.id} />
         ) : (
           !loading && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={'No hay formatos de reporte de diagnóstico...'} />
         )}
