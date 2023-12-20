@@ -175,19 +175,7 @@ export const ServiceRequest = () => {
       <div className="table-responsive">
         {serviceRequestList && serviceRequestList.length > 0 ? (
           <>
-            <Table
-              onRow={(record, rowIndex) => {
-                return {
-                  onClick(event) {
-                    navigate(`${record?.id}`);
-                  },
-                };
-              }}
-              dataSource={serviceRequestList}
-              columns={columns}
-              rowKey={'id'}
-              sortDirections={['descend', 'ascend']}
-            />
+            <Table dataSource={serviceRequestList} columns={columns} rowKey={'id'} sortDirections={['descend', 'ascend']} />
           </>
         ) : (
           !loading && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={'No hay solicitudes de servicios de diagnóstico'} />
