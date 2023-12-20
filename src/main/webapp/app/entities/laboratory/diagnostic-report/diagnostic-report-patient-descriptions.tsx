@@ -24,7 +24,7 @@ export const DiagnosticReportPatientDescriptions = ({ subject }) => {
       {
         key: 'gender',
         label: 'Gender',
-        children: translate(`laboratoryApp.AdministrativeGender.${subjectEl?.gender}`),
+        children: subjectEl?.gender && translate(`laboratoryApp.AdministrativeGender.${subjectEl?.gender}`),
       },
       {
         key: 'birthDate',
