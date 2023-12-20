@@ -239,7 +239,7 @@ public class PatientResource {
                                             case "gender":
                                                 patientResponse.gender(AdministrativeGender.valueOf(field.getValue()));
                                                 break;
-                                            case "Name":
+                                            case "firstName":
                                                 Name.set(field.getValue());
                                                 break;
                                             case "lastName":
