@@ -10,7 +10,7 @@ import { getEntity } from './service-request.reducer';
 import { IServiceRequestResponse } from 'app/shared/model/laboratory/service-request.model';
 import { Descriptions, Space, Table, Tag } from 'antd';
 import { hasAnyAuthority } from 'app/shared/auth/private-route';
-import { IDiagnosticReport, IDiagnosticReportLight } from 'app/shared/model/laboratory/diagnostic-report.model';
+import { IDiagnosticReportLight } from 'app/shared/model/laboratory/diagnostic-report.model';
 import PageHeader from 'app/entities/laboratory/shared/page-header';
 import { LeftOutlined } from '@ant-design/icons';
 import { ServiceRequestStatus } from 'app/shared/model/enumerations/service-request-status.model';
@@ -105,7 +105,7 @@ export const ServiceRequestDetail = () => {
             serviceRequestEntity &&
             ServiceRequestStatus[serviceRequestEntity.status] === ServiceRequestStatus.ACTIVE &&
             DiagnosticReportStatus[record.status] !== DiagnosticReportStatus.FINAL && (
-              <FabButton Icon={Start} onClick={() => handleStartRequest(record.id)} color={'info'} />
+              <FabButton Icon={Start} onClick={() => handleStartRequest(record.id)} color={'info'} tooltip={'Realizar diagnóstico'} />
             )}
         </Space>
       ),

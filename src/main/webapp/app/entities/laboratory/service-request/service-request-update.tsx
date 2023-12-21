@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button, Form, Input, Modal, Select, Transfer, Typography } from 'antd';
+import { Form, Input, Modal, Select, Transfer, Typography } from 'antd';
 import { translate } from 'react-jhipster';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { createEntity as createServiceRequest, reset as resetServiceRequest } from './service-request.reducer';
@@ -10,10 +10,10 @@ import { IPatient } from 'app/shared/model/laboratory/patient.model';
 import { IServiceRequest } from 'app/shared/model/laboratory/service-request.model';
 import { ServiceRequestPriority } from 'app/shared/model/enumerations/service-request-priority.model';
 import { IDiagnosticReportFormat } from 'app/shared/model/laboratory/diagnostic-report-format.model';
-import SignatureCanvas from 'react-signature-canvas';
 import '../shared/signatureComponent/signature.style.css';
 import { FabButton } from 'app/entities/laboratory/shared/fab-button';
-import { Start } from '@mui/icons-material';
+import { Cancel, Start } from '@mui/icons-material';
+import { Stack } from '@mui/material';
 
 const { Title } = Typography;
 
@@ -121,8 +121,6 @@ const ServiceRequestModal: React.FC<ServiceRequestModalProps> = ({ patient, ...p
 
   const defaultValues = { status: 'DRAFT', subject: patient.id, category: 'LABORATORY_PROCEDURE' };
 
-  console.log(defaultValues);
-
   const filterOption = (input: string, option?: { label: string; value: string }) =>
     (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
 
@@ -130,19 +128,17 @@ const ServiceRequestModal: React.FC<ServiceRequestModalProps> = ({ patient, ...p
     <>
       {!patient ? null : (
         <>
-          <FabButton Icon={Start} onClick={showModal} color={'info'} />
+          <FabButton Icon={Start} onClick={showModal} color={'info'} tooltip={'Solicitar servicio'} />
           <Modal
             title={translate('laboratoryApp.laboratoryServiceRequest.home.createLabel')}
             open={open}
             onOk={handleOk}
             onCancel={handleCancel}
             footer={[
-              <Button key="back" onClick={handleCancel}>
-                Cancel
-              </Button>,
-              <Button key="submit" type="primary" loading={confirmLoading} onClick={handleOk}>
-                Solicitar
-              </Button>,
+              <Stack key={'actions'} spacing={2} direction="row" sx={{ justifyContent: 'center' }}>
+                <FabButton key="back" Icon={Cancel} onClick={handleCancel} color={'error'} tooltip={'Cancelar'} />
+                <FabButton key="submit" Icon={Start} onClick={handleOk} color={'info'} tooltip={'Solicitar'} />
+              </Stack>,
             ]}
           >
             <Form form={form} initialValues={defaultValues} onFinish={saveEntity} layout={'vertical'} disabled={confirmLoading}>
@@ -181,7 +177,7 @@ const ServiceRequestModal: React.FC<ServiceRequestModalProps> = ({ patient, ...p
               <Form.Item<IServiceRequest>
                 name="priority"
                 label={translate('laboratoryApp.laboratoryServiceRequest.create.priority.label')}
-                rules={[{ required: true }]}
+                rules={[{ required: true, message: 'Por favor seleccione una prioridad' }]}
               >
                 <Select
                   showSearch
@@ -201,7 +197,7 @@ const ServiceRequestModal: React.FC<ServiceRequestModalProps> = ({ patient, ...p
                 name="diagnosticReportsFormats"
                 label={'Informes de diagnóstico'}
                 valuePropName={'targetKeys'}
-                rules={[{ required: true }]}
+                rules={[{ required: true, message: 'Por favor seleccione al menos un informe de diagnóstico' }]}
               >
                 <Transfer
                   titles={['Disponibles', 'Seleccionados']}

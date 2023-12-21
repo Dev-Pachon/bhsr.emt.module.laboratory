@@ -1,12 +1,14 @@
-import { Box, Fab } from '@mui/material';
+import { Box, Fab, Tooltip } from '@mui/material';
 import React from 'react';
 
-export const FabButton = ({ Icon, onClick, ...restProps }) => {
+export const FabButton = ({ Icon, onClick, tooltip = '', ...restProps }) => {
   return (
     <Box sx={{ textAlign: 'center', my: 2 }}>
-      <Fab size="medium" onClick={onClick} {...restProps}>
-        <Icon />
-      </Fab>
+      <Tooltip title={tooltip}>
+        <Fab size="medium" onClick={onClick} {...restProps}>
+          <Icon />
+        </Fab>
+      </Tooltip>
     </Box>
   );
 };

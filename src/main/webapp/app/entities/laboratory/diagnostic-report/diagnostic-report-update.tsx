@@ -96,7 +96,7 @@ export const DiagnosticReportUpdate = () => {
               <DiagnosticReportUpdateField key={index} el={el} index={index} form={form} />
             ))}
 
-            <FabButton Icon={Save} onClick={e => e} color={'info'} component={'button'} type={'submit'} />
+            <FabButton Icon={Save} onClick={e => e} color={'info'} component={'button'} type={'submit'} tooltip={'Guardar'} />
           </Form>
         </Space>
       )}

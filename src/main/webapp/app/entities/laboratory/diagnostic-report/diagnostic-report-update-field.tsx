@@ -30,17 +30,17 @@ export const DiagnosticReportUpdateField = ({ el, index, form }) => {
       {valueSetEntities?.find(e => e.id === valueSet)?.constants ? (
         <>
           <Radio.Group onChange={handleModeChange} value={custom} style={{ marginBottom: 8 }}>
-            <Radio.Button value={true}>Custom</Radio.Button>
-            <Radio.Button value={false}>Select from constants</Radio.Button>
+            <Radio.Button value={true}>Manual</Radio.Button>
+            <Radio.Button value={false}>Conjunto de constantes</Radio.Button>
           </Radio.Group>
 
           {custom ? (
             <FormItemCustom form={form} name={el?.name} label={el?.name} dataType={el.dataType} />
           ) : (
-            <Form.Item name={el?.name} label={el?.name} rules={[{ required: el?.isRequired }]}>
+            <Form.Item name={el?.name} label={el?.name} rules={[{ required: el?.isRequired, message: '¡Este campo es requerido!' }]}>
               <Select
                 showSearch
-                placeholder="Select a data type "
+                placeholder="Seleccionar constante"
                 optionFilterProp="children"
                 filterOption={filterOption}
                 options={valueSetEntities

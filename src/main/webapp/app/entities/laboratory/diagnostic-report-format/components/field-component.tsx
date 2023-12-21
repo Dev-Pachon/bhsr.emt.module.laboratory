@@ -32,18 +32,18 @@ export const DiagnosticReportFormatField = ({ idx, onDelete, valueSet }) => {
         <Form.Item<IDiagnosticReportFormat>
           name={['fieldFormats', idx, 'name']}
           label={translate('laboratoryApp.laboratoryDiagnosticReportFormat.fields.name')}
-          rules={[{ required: true, message: 'Please fill this field!' }]}
+          rules={[{ required: true, message: '¡Este campo es requerido!' }]}
         >
           <Input placeholder={translate('laboratoryApp.laboratoryDiagnosticReportFormat.fields.name')} />
         </Form.Item>
         <Form.Item<IDiagnosticReportFormat>
           name={['fieldFormats', idx, 'dataType']}
           label={translate('laboratoryApp.laboratoryDiagnosticReportFormat.fields.dataType')}
-          rules={[{ required: true, message: 'Please fill this field!' }]}
+          rules={[{ required: true, message: '¡Este campo es requerido!' }]}
         >
           <Select
             showSearch
-            placeholder="Select a data type "
+            placeholder="Seleccione un tipo de dato"
             optionFilterProp="children"
             filterOption={filterOption}
             options={Object.keys(DataType).map((key: string) => {
@@ -68,7 +68,7 @@ export const DiagnosticReportFormatField = ({ idx, onDelete, valueSet }) => {
           <Select
             showSearch
             allowClear
-            placeholder="Select a dataset"
+            placeholder="Seleccione un conjunto de valores"
             optionFilterProp="children"
             filterOption={filterOption}
             options={valueSet

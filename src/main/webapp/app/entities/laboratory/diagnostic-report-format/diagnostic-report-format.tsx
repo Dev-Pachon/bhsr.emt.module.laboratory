@@ -39,6 +39,7 @@ export const DiagnosticReportFormat = () => {
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
       confirmButtonText: '¡Si, quiero eliminarlo!',
+      cancelButtonText: 'Cancelar',
     }).then(result => {
       if (result.isConfirmed) {
         dispatch(deleteEntity(id));
@@ -94,9 +95,9 @@ export const DiagnosticReportFormat = () => {
       key: 'x',
       render: (text, record) => (
         <Space size="middle">
-          <FabButton Icon={Edit} onClick={() => handleEdit(record?.id)} color={'info'} />
+          <FabButton Icon={Edit} onClick={() => handleEdit(record?.id)} color={'info'} tooltip={'Editar formato'} />
 
-          <FabButton Icon={Delete} onClick={() => handleOpenDelete(record?.id)} color={'error'} />
+          <FabButton Icon={Delete} onClick={() => handleOpenDelete(record?.id)} color={'error'} tooltip={'Eliminar formato'} />
         </Space>
       ),
     },
@@ -106,7 +107,7 @@ export const DiagnosticReportFormat = () => {
     <>
       <CssBaseline />
       <PageHeader title={translate('laboratoryApp.laboratoryDiagnosticReportFormat.home.title')} />
-      <FabButton Icon={Add} onClick={handleAdd} color={'secondary'} sx={{ color: 'white' }} />
+      <FabButton Icon={Add} onClick={handleAdd} color={'secondary'} sx={{ color: 'white' }} tooltip={'Crear formato'} />
       <div className="table-responsive">
         {diagnosticReportFormatList && diagnosticReportFormatList.length > 0 ? (
           <Table

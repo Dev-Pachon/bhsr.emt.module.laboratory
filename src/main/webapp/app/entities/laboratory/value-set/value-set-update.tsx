@@ -82,6 +82,7 @@ export const ValueSetUpdate = () => {
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
       confirmButtonText: '¡Si, quiero guardarlo!',
+      cancelButtonText: 'Cancelar',
     }).then(result => {
       if (result.isConfirmed) {
         saveEntity(values);
@@ -120,13 +121,7 @@ export const ValueSetUpdate = () => {
           ) : (
             <Form form={form} initialValues={defaultValues()} onFinish={handleOpenSave}>
               {!isNew ? (
-                <Form.Item<IValueSet>
-                  name="id"
-                  hidden
-                  label={translate('laboratoryApp.laboratoryValueSet.id')}
-                  rules={[{ required: true }]}
-                  style={{ width: '100%' }}
-                >
+                <Form.Item<IValueSet> name="id" hidden label={translate('laboratoryApp.laboratoryValueSet.id')} style={{ width: '100%' }}>
                   <Input readOnly hidden />
                 </Form.Item>
               ) : null}
@@ -134,7 +129,7 @@ export const ValueSetUpdate = () => {
                 <Form.Item<IValueSet>
                   name="name"
                   label={translate('laboratoryApp.laboratoryValueSet.create.name')}
-                  rules={[{ required: true, message: 'Please fill this field.' }]}
+                  rules={[{ required: true, message: '¡Este campo es requerido!' }]}
                   style={{ width: '100%' }}
                 >
                   <Input placeholder={translate('laboratoryApp.laboratoryValueSet.create.name')} />
@@ -142,7 +137,7 @@ export const ValueSetUpdate = () => {
                 <Form.Item<IValueSet>
                   name="description"
                   label={translate('laboratoryApp.laboratoryValueSet.create.description')}
-                  rules={[{ required: true }]}
+                  rules={[{ required: true, message: '¡Este campo es requerido!' }]}
                   style={{ width: '100%' }}
                 >
                   <Input placeholder={translate('laboratoryApp.laboratoryValueSet.create.description')} />
@@ -150,7 +145,7 @@ export const ValueSetUpdate = () => {
                 <Form.Item<IValueSet>
                   name="dataType"
                   label={translate('laboratoryApp.laboratoryValueSet.create.dataType')}
-                  rules={[{ required: true }]}
+                  rules={[{ required: true, message: '¡Este campo es requerido!' }]}
                   style={{ width: '100%' }}
                 >
                   <Select
@@ -189,7 +184,7 @@ export const ValueSetUpdate = () => {
                             name={[name, 'name']}
                             fieldKey={[key, 'name']}
                             label={translate('laboratoryApp.laboratoryValueSet.create.values.name')}
-                            rules={[{ required: true, message: 'Please fill this field!' }]}
+                            rules={[{ required: true, message: '¡Este campo es requerido!' }]}
                           >
                             <Input placeholder={translate('laboratoryApp.laboratoryValueSet.create.values.name')} />
                           </Form.Item>
@@ -198,7 +193,7 @@ export const ValueSetUpdate = () => {
                             name={[name, 'description']}
                             fieldKey={[key, 'description']}
                             label={translate('laboratoryApp.laboratoryValueSet.create.values.description')}
-                            rules={[{ required: true, message: 'Please fill this field!' }]}
+                            rules={[{ required: true, message: '¡Este campo es requerido!' }]}
                           >
                             <Input placeholder={translate('laboratoryApp.laboratoryValueSet.create.values.description')} />
                           </Form.Item>
@@ -226,7 +221,7 @@ export const ValueSetUpdate = () => {
                   </div>
                 )}
               </Form.List>
-              <FabButton Icon={Save} onClick={e => e} color={'info'} component={'button'} type={'submit'} />
+              <FabButton Icon={Save} onClick={e => e} color={'info'} component={'button'} type={'submit'} tooltip={'Guardar'} />
             </Form>
           )}
         </Col>

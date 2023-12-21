@@ -39,6 +39,7 @@ export const ValueSet = () => {
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
       confirmButtonText: '¡Si, quiero eliminarlo!',
+      cancelButtonText: 'Cancelar',
     }).then(result => {
       if (result.isConfirmed) {
         dispatch(deleteEntity(id));
@@ -80,9 +81,9 @@ export const ValueSet = () => {
       key: 'x',
       render: (text, record) => (
         <Space size="middle">
-          <FabButton Icon={Edit} onClick={() => handleEdit(record?.id)} color={'info'} />
+          <FabButton Icon={Edit} onClick={() => handleEdit(record?.id)} color={'info'} tooltip={'Editar'} />
 
-          <FabButton Icon={Delete} onClick={() => handleOpenDelete(record?.id)} color={'error'} />
+          <FabButton Icon={Delete} onClick={() => handleOpenDelete(record?.id)} color={'error'} tooltip={'Eliminar'} />
         </Space>
       ),
     },
@@ -99,7 +100,7 @@ export const ValueSet = () => {
   return (
     <div>
       <PageHeader title={translate('laboratoryApp.laboratoryValueSet.home.title')} />
-      <FabButton Icon={Add} onClick={handleAdd} color={'secondary'} sx={{ color: 'white' }} />
+      <FabButton Icon={Add} onClick={handleAdd} color={'secondary'} sx={{ color: 'white' }} tooltip={'Crear conjunto'} />
       <div className="table-responsive">
         {valueSetList && valueSetList.length > 0 ? (
           <>

@@ -8,27 +8,27 @@ export const DiagnosticReportPatientDescriptions = ({ subject }) => {
     return [
       {
         key: 'name',
-        label: 'Name',
+        label: 'Nombre',
         children: subjectEl?.name?.text,
       },
       {
         key: 'identifierType',
-        label: 'Id Type',
+        label: 'Tipo de Identificación',
         children: subjectEl?.identifier?.type?.name,
       },
       {
         key: 'identifier',
-        label: 'Id',
+        label: 'Número de Identificación',
         children: subjectEl?.identifier?.value,
       },
       {
         key: 'gender',
-        label: 'Gender',
+        label: 'Género',
         children: subjectEl?.gender && translate(`laboratoryApp.AdministrativeGender.${subjectEl?.gender}`),
       },
       {
         key: 'birthDate',
-        label: 'Birth Date',
+        label: 'Fecha de Nacimiento',
         children: subjectEl?.birthDate,
       },
       {
@@ -39,7 +39,7 @@ export const DiagnosticReportPatientDescriptions = ({ subject }) => {
     ];
   };
 
-  return <Descriptions title={'Patient'} bordered size={'small'} items={getPatientItems(subject)} />;
+  return <Descriptions title={'Paciente'} bordered size={'small'} items={getPatientItems(subject)} />;
 };
 
 export default DiagnosticReportPatientDescriptions;

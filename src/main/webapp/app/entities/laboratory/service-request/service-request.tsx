@@ -42,6 +42,23 @@ export const ServiceRequest = () => {
     });
   };
 
+  const handleOpenStartRequest = serviceRequest => {
+    Swal.fire({
+      title: '¿Deseas continuar?',
+      text: '¡No podrás deshacer esta acción!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: '¡Si, quiero iniciarla!',
+      cancelButtonText: 'Cancelar',
+    }).then(result => {
+      if (result.isConfirmed) {
+        onStartRequest(serviceRequest);
+      }
+    });
+  };
+
   const onStartRequest = serviceRequest => {
     const newServiceRequest = {
       id: serviceRequest.id,
@@ -60,7 +77,8 @@ export const ServiceRequest = () => {
       showCancelButton: true,
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
-      confirmButtonText: '¡Si, quiero eliminarlo!',
+      confirmButtonText: '¡Si, quiero revocarla!',
+      cancelButtonText: 'Cancelar',
     }).then(result => {
       if (result.isConfirmed) {
         onCancel(serviceRequest);
@@ -87,12 +105,12 @@ export const ServiceRequest = () => {
 
   const columns: ColumnsType<IServiceRequestResponseLight> = [
     {
-      title: '#',
-      dataIndex: '',
-      key: 'index',
+      title: 'ID',
+      dataIndex: 'id',
+      key: 'id',
       render: (text, record, index) => (
         <MUILink component={Link} to={`${record?.id}`}>
-          {String(index + 1).padStart(6, '0')}
+          {record?.id}
         </MUILink>
       ),
     },
@@ -156,10 +174,10 @@ export const ServiceRequest = () => {
         <>
           <Space size="middle">
             {isLabUser && record.status === ServiceRequestStatus.DRAFT && (
-              <FabButton Icon={Start} onClick={() => onStartRequest(record)} color={'info'} />
+              <FabButton Icon={Start} onClick={() => handleOpenStartRequest(record)} color={'info'} tooltip={'Iniciar servicio'} />
             )}
             {isMedUser && record.status === ServiceRequestStatus.DRAFT && (
-              <FabButton Icon={Block} onClick={() => handleOpenCancel(record?.id)} color={'error'} />
+              <FabButton Icon={Block} onClick={() => handleOpenCancel(record)} color={'error'} tooltip={'Revocar solicitud'} />
             )}
           </Space>
         </>
@@ -170,12 +188,19 @@ export const ServiceRequest = () => {
   return (
     <>
       <PageHeader title={translate('laboratoryApp.laboratoryServiceRequest.home.title')} />
-      {isMedUser && <FabButton Icon={Add} onClick={handleAdd} color={'secondary'} sx={{ color: 'white' }} />}
+      {isMedUser && (
+        <FabButton Icon={Add} onClick={handleAdd} color={'secondary'} sx={{ color: 'white' }} tooltip={'Crear solicitud de servicio'} />
+      )}
       {!serviceRequestList && loading && <p>Loading...</p>}
       <div className="table-responsive">
         {serviceRequestList && serviceRequestList.length > 0 ? (
           <>
-            <Table dataSource={serviceRequestList} columns={columns} rowKey={'id'} sortDirections={['descend', 'ascend']} />
+            <Table
+              dataSource={[...serviceRequestList].sort((a: any, b: any) => a?.id?.localeCompare(b?.id))}
+              columns={columns}
+              rowKey={'id'}
+              sortDirections={['descend', 'ascend']}
+            />
           </>
         ) : (
           !loading && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={'No hay solicitudes de servicios de diagnóstico'} />

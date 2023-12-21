@@ -153,7 +153,7 @@ export const DiagnosticReportFormatUpdate = () => {
             <Form.Item<IDiagnosticReportFormat>
               name="name"
               label={translate('laboratoryApp.laboratoryDiagnosticReportFormat.name')}
-              rules={[{ required: true, message: 'Please fill this field!' }]}
+              rules={[{ required: true, message: '¡Este campo es requerido!' }]}
               labelCol={{ span: 8 }}
               wrapperCol={{ span: 8 }}
             >
@@ -169,7 +169,7 @@ export const DiagnosticReportFormatUpdate = () => {
             <Button type="dashed" onClick={addField} block icon={<PlusOutlined rev={undefined} />} className={'mb-3'}>
               Agregar campo
             </Button>
-            <FabButton Icon={Save} onClick={e => e} color={'info'} component={'button'} type={'submit'} />
+            <FabButton Icon={Save} onClick={e => e} color={'info'} component={'button'} type={'submit'} tooltip={'Guardar'} />
           </Form>
         )}
       </Row>
