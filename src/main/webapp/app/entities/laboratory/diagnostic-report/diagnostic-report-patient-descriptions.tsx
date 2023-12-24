@@ -31,11 +31,6 @@ export const DiagnosticReportPatientDescriptions = ({ subject }) => {
         label: 'Fecha de Nacimiento',
         children: subjectEl?.birthDate,
       },
-      {
-        key: 'address',
-        label: 'Address',
-        children: subjectEl?.address?.text,
-      },
     ];
   };
 
