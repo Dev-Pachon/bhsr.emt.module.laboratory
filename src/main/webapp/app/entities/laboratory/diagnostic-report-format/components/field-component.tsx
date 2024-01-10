@@ -62,6 +62,12 @@ export const DiagnosticReportFormatField = ({ idx, onDelete, valueSet }) => {
           <Input placeholder={translate('laboratoryApp.laboratoryDiagnosticReportFormat.fields.defaultValue')} />
         </Form.Item>
         <Form.Item<IDiagnosticReportFormat>
+          name={['fieldFormats', idx, 'referenceValue']}
+          label={translate('laboratoryApp.laboratoryDiagnosticReportFormat.fields.referenceValue')}
+        >
+          <Input placeholder={translate('laboratoryApp.laboratoryDiagnosticReportFormat.fields.referenceValue')} />
+        </Form.Item>
+        <Form.Item<IDiagnosticReportFormat>
           name={['fieldFormats', idx, 'valueSet']}
           label={translate('laboratoryApp.laboratoryDiagnosticReportFormat.fields.valueSet')}
         >
@@ -96,7 +102,7 @@ export const DiagnosticReportFormatField = ({ idx, onDelete, valueSet }) => {
         </Form.Item>
       </Card.Grid>
       <Form.Item<IDiagnosticReportFormat> name={['fieldFormats', idx, 'order']} hidden>
-        <Input type="hidden" value={idx} />
+        <Input value={idx} />
       </Form.Item>
     </Card>
   );

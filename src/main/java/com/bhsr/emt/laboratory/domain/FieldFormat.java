@@ -22,6 +22,8 @@ public class FieldFormat {
 
     private String defaultValue;
 
+    private String referenceValue;
+
     private String valueSet;
 
     private Integer order;

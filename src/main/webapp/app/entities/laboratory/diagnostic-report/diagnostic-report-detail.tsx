@@ -24,23 +24,14 @@ export const DiagnosticReportDetail = () => {
   const getItems = (diagnosticReport: IDiagnosticReport) => {
     const { format } = diagnosticReport;
 
-    if (diagnosticReport.fields) {
-      return diagnosticReport?.fields?.map((el, index) => {
-        return {
-          key: index,
-          label: el?.key,
-          children: `${el?.value || ''}`,
-        };
-      });
-    } else {
-      return format?.fieldFormats?.map((el, index) => {
-        return {
-          key: index,
-          label: el.name,
-          children: ``,
-        };
-      });
-    }
+    return format?.fieldFormats?.map((el, index) => {
+      const field = diagnosticReport.fields?.find(e => e.key === el?.name);
+      return {
+        key: index,
+        label: el?.name + (el?.referenceValue ? ` | Valor de referencia: ${el?.referenceValue}` : ''),
+        children: `${field?.value || ''}`,
+      };
+    });
   };
 
   return (

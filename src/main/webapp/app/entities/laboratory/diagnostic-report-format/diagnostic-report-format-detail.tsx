@@ -48,6 +48,11 @@ export const DiagnosticReportFormatDetail = () => {
               {/*<Typography>{`${translate('laboratoryApp.laboratoryDiagnosticReportFormat.fields.defaultValue')}: ${*/}
               {/*  e.defaultValue*/}
               {/*}`}</Typography>*/}
+              {e.referenceValue ? (
+                <Typography>{`${translate('laboratoryApp.laboratoryDiagnosticReportFormat.fields.referenceValue')}: ${
+                  e.referenceValue
+                }`}</Typography>
+              ) : null}
               <Typography>{`${translate('laboratoryApp.laboratoryDiagnosticReportFormat.fields.isRequired')}: ${
                 e.isRequired ? translate('global.true') : translate('global.false')
               }`}</Typography>

@@ -35,6 +35,7 @@
         "isRequired": "Required",
         "isSearchable": "Searchable",
         "defaultValue": "Default value",
+        "referenceValue": "Reference value",
         "valueSet": "Value set",
         "order": "Order",
         "hasValueSet": "Has value set"

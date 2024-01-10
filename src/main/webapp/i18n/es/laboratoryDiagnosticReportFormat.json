@@ -2,25 +2,25 @@
   "laboratoryApp": {
     "laboratoryDiagnosticReportFormat": {
       "home": {
-        "title": "Formatos de Informe de Diagnóstico",
+        "title": "Formatos de Exámenes de Laboratorio",
         "refreshListLabel": "Actualizar lista",
-        "createLabel": "Crear un nuevo Formato de Informe de Diagnóstico",
-        "createOrEditLabel": "Crear o editar un Formato de Informe de Diagnóstico",
-        "editLabel": "Editar un Formato de Informe de Diagnóstico",
-        "notFound": "No se encontraron Formatos de Informe de Diagnóstico"
+        "createLabel": "Crear un nuevo Formato de Examen de Laboratorio",
+        "createOrEditLabel": "Crear o editar un Formato de Examen de Laboratorio",
+        "editLabel": "Editar un Formato de Examen de Laboratorio",
+        "notFound": "No se encontraron Formatos de Exámenes de Laboratorio"
       },
-      "created": "Se ha creado un nuevo Formato de Informe de Diagnóstico con el identificador {{ param }}",
-      "updated": "Se ha actualizado un Formato de Informe de Diagnóstico con el identificador {{ param }}",
-      "deleted": "Se ha eliminado un Formato de Informe de Diagnóstico con el identificador {{ param }}",
+      "created": "Se ha creado un nuevo Formato de Examen de Laboratorio con el identificador {{ param }}",
+      "updated": "Se ha actualizado un Formato de Examen de Laboratorio con el identificador {{ param }}",
+      "deleted": "Se ha eliminado un Formato de Examen de Laboratorio con el identificador {{ param }}",
       "delete": {
-        "question": "¿Estás seguro de que deseas eliminar el Formato de Informe de Diagnóstico {{ id }}?"
+        "question": "¿Estás seguro de que deseas eliminar el Formato de Examen de Laboratorio {{ id }}?"
       },
       "update": {
         "createField": "Crear nuevo Campo",
         "field": "Campo"
       },
       "detail": {
-        "title": "Formato de Informe de Diagnóstico"
+        "title": "Formato de Examen de Laboratorio"
       },
       "id": "Id",
       "name": "Nombre",
@@ -35,6 +35,7 @@
         "isRequired": "Requerido",
         "isSearchable": "Búsqueda habilitada",
         "defaultValue": "Valor por defecto",
+        "referenceValue": "Valor de Referencia",
         "valueSet": "Conjunto de Valores",
         "hasValueSet": "Tiene Conjunto de Valores",
         "order": "Orden"

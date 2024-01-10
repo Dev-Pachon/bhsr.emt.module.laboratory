@@ -16,7 +16,6 @@ import { useForm } from 'antd/es/form/Form';
 import PageHeader from 'app/entities/laboratory/shared/page-header';
 import Swal from 'sweetalert2';
 import { Save } from '@mui/icons-material';
-import { Box, Fab } from '@mui/material';
 import { FabButton } from 'app/entities/laboratory/shared/fab-button';
 
 export const DiagnosticReportFormatUpdate = () => {
@@ -77,6 +76,7 @@ export const DiagnosticReportFormatUpdate = () => {
   };
 
   const handleOpenSave = (values: IDiagnosticReportFormat) => {
+    console.log(values);
     Swal.fire({
       title: 'Guardar formato de reporte',
       text: '¿Deseas guardar el formato?',

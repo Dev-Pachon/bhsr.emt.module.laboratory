@@ -5,6 +5,7 @@ export interface IFieldFormat {
   isRequired?: boolean;
   isSearchable?: boolean;
   defaultValue?: string;
+  referenceValue?: string;
   valueSet?: string;
   order?: number;
 }

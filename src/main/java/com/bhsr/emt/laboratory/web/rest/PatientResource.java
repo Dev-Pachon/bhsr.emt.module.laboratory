@@ -20,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -152,10 +151,15 @@ public class PatientResource {
                                     )
                             )
                             .bodyToFlux(PatientServiceResponse.class)
+                            .onErrorResume(BadRequestAlertException.class, ex -> Mono.empty())
                             .collectList()
                             .flatMap(patientServiceResponse -> {
                                 if (patientServiceResponse == null || patientServiceResponse.isEmpty()) {
-                                    return Mono.error(new BadRequestAlertException("Not found patient", ENTITY_NAME, "patientidinvalid"));
+                                    return Mono.just(Patient.builder().build());
+                                    //                                             return Mono.error(
+                                    //                                                 new BadRequestAlertException("Not found patient", ENTITY_NAME,
+                                    //                                                                              "patientidinvalid"
+                                    //                                                 ));
                                 }
 
                                 return Mono.just(patientMapper.PatientServiceToPatient(patientServiceResponse.get(0)));
@@ -206,9 +210,11 @@ public class PatientResource {
                                     )
                             )
                             .bodyToFlux(PatientServiceResponse.class)
+                            .onErrorResume(BadRequestAlertException.class, ex -> Mono.empty())
                             .flatMap(patientServiceResponse -> {
                                 if (patientServiceResponse == null) {
-                                    return Mono.error(new BadRequestAlertException("Not found patient", ENTITY_NAME, "patientidinvalid"));
+                                    return Mono.just(Patient.builder().build());
+                                    //                                    return Mono.error(new BadRequestAlertException("Not found patient", ENTITY_NAME, "patientidinvalid"));
                                 }
 
                                 Patient.PatientBuilder patientResponse = Patient.builder();
@@ -313,9 +319,14 @@ public class PatientResource {
                                     )
                             )
                             .bodyToFlux(PatientServiceResponse.class)
+                            .onErrorResume(BadRequestAlertException.class, ex -> Mono.empty())
                             .flatMap(patientServiceResponse -> {
                                 if (patientServiceResponse == null) {
-                                    return Mono.error(new BadRequestAlertException("Not found patient", ENTITY_NAME, "patientidinvalid"));
+                                    return Mono.just(Patient.builder().build());
+                                    //                                             return Mono.error(
+                                    //                                                 new BadRequestAlertException("Not found patient", ENTITY_NAME,
+                                    //                                                                              "patientidinvalid"
+                                    //                                                 ));
                                 }
                                 Patient.PatientBuilder patientResponse = Patient.builder();
                                 HumanName.HumanNameBuilder humanName = HumanName.builder();
