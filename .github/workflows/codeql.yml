@@ -82,3 +82,13 @@ jobs:
       uses: github/codeql-action/analyze@v3
       with:
         category: "/language:${{matrix.language}}"
+
+    
+    - name: install dependencies
+      run: npm ci
+    - uses: oke-py/npm-audit-action@v2
+      with:
+        audit_level: moderate
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        issue_labels: vulnerability,security
+        dedupe_issues: true
