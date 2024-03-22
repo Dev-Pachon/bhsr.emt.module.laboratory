@@ -33,3 +33,4 @@ jobs:
           audit_level: moderate
           github_token: ${{ secrets.GITHUB_TOKEN }}
           issue_labels: vulnerability,security
+          dedupe_issues: true
