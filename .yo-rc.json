@@ -38,7 +38,7 @@
     "prodDatabaseType": "mongodb",
     "reactive": true,
     "searchEngine": false,
-    "serverPort": "8081",
+    "serverPort": "8082",
     "serviceDiscoveryType": "consul",
     "skipCheckLengthOfIdentifier": false,
     "skipClient": false,

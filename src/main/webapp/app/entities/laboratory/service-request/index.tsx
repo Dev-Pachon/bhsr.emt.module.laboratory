@@ -5,19 +5,31 @@ import ErrorBoundaryRoutes from 'app/shared/error/error-boundary-routes';
 
 import ServiceRequest from './service-request';
 import ServiceRequestDetail from './service-request-detail';
-import ServiceRequestUpdate from './service-request-update';
-import ServiceRequestDeleteDialog from './service-request-delete-dialog';
+import DiagnosticReport from 'app/entities/laboratory/diagnostic-report';
+import PatientListToRequestService from 'app/entities/laboratory/service-request/patient-list-to-request-service';
+import PrivateRoute from 'app/shared/auth/private-route';
+import { AUTHORITIES } from 'app/config/constants';
 
-const ServiceRequestRoutes = () => (
-  <ErrorBoundaryRoutes>
-    <Route index element={<ServiceRequest />} />
-    <Route path="new" element={<ServiceRequestUpdate />} />
-    <Route path=":id">
-      <Route index element={<ServiceRequestDetail />} />
-      <Route path="edit" element={<ServiceRequestUpdate />} />
-      <Route path="delete" element={<ServiceRequestDeleteDialog />} />
-    </Route>
-  </ErrorBoundaryRoutes>
-);
+const ServiceRequestRoutes = () => {
+  return (
+    <ErrorBoundaryRoutes>
+      <Route index element={<ServiceRequest />} />
+
+      <Route
+        path="new"
+        element={
+          <PrivateRoute hasAnyAuthorities={[AUTHORITIES.MEDICAL_USER]}>
+            <PatientListToRequestService />
+          </PrivateRoute>
+        }
+      />
+
+      <Route path=":id">
+        <Route index element={<ServiceRequestDetail />} />
+        <Route path="diagnostic-report/*" element={<DiagnosticReport />} />
+      </Route>
+    </ErrorBoundaryRoutes>
+  );
+};
 
 export default ServiceRequestRoutes;

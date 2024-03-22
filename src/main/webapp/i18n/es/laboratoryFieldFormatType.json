@@ -1,0 +1,16 @@
+{
+  "laboratoryApp": {
+    "fieldFormatType": {
+      "STRING": "Texto corto",
+      "LONG_STRING": "Texto largo",
+      "INTEGER": "Número entero",
+      "BOOLEAN": "Booleano",
+      "FLOAT": "Número decimal",
+      "FILE": "Archivo",
+      "IMAGE": "Imagen",
+      "DATE": "Fecha",
+      "TIME_RANGE": "Rango de tiempo",
+      "HOUR_RANGE": "Rango de horas"
+    }
+  }
+}

@@ -98,8 +98,6 @@ export default () => next => action => {
     } else {
       toast.error(error.message || 'Unknown error!');
     }
-  } else if (error) {
-    toast.error(error.message || 'Unknown error!');
   }
 
   return next(action);

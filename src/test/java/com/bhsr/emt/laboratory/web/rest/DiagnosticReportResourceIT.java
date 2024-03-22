@@ -7,6 +7,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 
 import com.bhsr.emt.laboratory.IntegrationTest;
 import com.bhsr.emt.laboratory.domain.DiagnosticReport;
+import com.bhsr.emt.laboratory.domain.User;
 import com.bhsr.emt.laboratory.domain.enumeration.DiagnosticReportStatus;
 import com.bhsr.emt.laboratory.repository.DiagnosticReportRepository;
 import java.time.Duration;
@@ -36,14 +37,14 @@ class DiagnosticReportResourceIT {
     private static final LocalDate DEFAULT_CREATED_AT = LocalDate.ofEpochDay(0L);
     private static final LocalDate UPDATED_CREATED_AT = LocalDate.now(ZoneId.systemDefault());
 
-    private static final String DEFAULT_CREATED_BY = "AAAAAAAAAA";
-    private static final String UPDATED_CREATED_BY = "BBBBBBBBBB";
+    private static final User DEFAULT_CREATED_BY = User.builder().firstName("AAAAAAAAAA").build();
+    private static final User UPDATED_CREATED_BY = User.builder().firstName("BBBBBBBBBB").build();
 
     private static final LocalDate DEFAULT_UPDATED_AT = LocalDate.ofEpochDay(0L);
     private static final LocalDate UPDATED_UPDATED_AT = LocalDate.now(ZoneId.systemDefault());
 
-    private static final String DEFAULT_UPDATED_BY = "AAAAAAAAAA";
-    private static final String UPDATED_UPDATED_BY = "BBBBBBBBBB";
+    private static final User DEFAULT_UPDATED_BY = User.builder().firstName("AAAAAAAAAAA").build();
+    private static final User UPDATED_UPDATED_BY = User.builder().firstName("BBBBBBBBBB").build();
 
     private static final LocalDate DEFAULT_DELETED_AT = LocalDate.ofEpochDay(0L);
     private static final LocalDate UPDATED_DELETED_AT = LocalDate.now(ZoneId.systemDefault());
@@ -66,13 +67,12 @@ class DiagnosticReportResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static DiagnosticReport createEntity() {
-        DiagnosticReport diagnosticReport = new DiagnosticReport()
-            .status(DEFAULT_STATUS)
-            .createdAt(DEFAULT_CREATED_AT)
-            .createdBy(DEFAULT_CREATED_BY)
-            .updatedAt(DEFAULT_UPDATED_AT)
-            .updatedBy(DEFAULT_UPDATED_BY)
-            .deletedAt(DEFAULT_DELETED_AT);
+        DiagnosticReport diagnosticReport = new DiagnosticReport();
+        diagnosticReport.setCreatedAt(DEFAULT_CREATED_AT);
+        diagnosticReport.setCreatedBy(DEFAULT_CREATED_BY);
+        diagnosticReport.setUpdatedAt(DEFAULT_UPDATED_AT);
+        diagnosticReport.setUpdatedBy(DEFAULT_UPDATED_BY);
+        diagnosticReport.setDeletedAt(DEFAULT_DELETED_AT);
         return diagnosticReport;
     }
 
@@ -83,13 +83,12 @@ class DiagnosticReportResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static DiagnosticReport createUpdatedEntity() {
-        DiagnosticReport diagnosticReport = new DiagnosticReport()
-            .status(UPDATED_STATUS)
-            .createdAt(UPDATED_CREATED_AT)
-            .createdBy(UPDATED_CREATED_BY)
-            .updatedAt(UPDATED_UPDATED_AT)
-            .updatedBy(UPDATED_UPDATED_BY)
-            .deletedAt(UPDATED_DELETED_AT);
+        DiagnosticReport diagnosticReport = new DiagnosticReport();
+        diagnosticReport.setCreatedAt(UPDATED_CREATED_AT);
+        diagnosticReport.setCreatedBy(UPDATED_CREATED_BY);
+        diagnosticReport.setUpdatedAt(UPDATED_UPDATED_AT);
+        diagnosticReport.setUpdatedBy(UPDATED_UPDATED_BY);
+        diagnosticReport.setDeletedAt(UPDATED_DELETED_AT);
         return diagnosticReport;
     }
 
@@ -376,13 +375,11 @@ class DiagnosticReportResourceIT {
 
         // Update the diagnosticReport
         DiagnosticReport updatedDiagnosticReport = diagnosticReportRepository.findById(diagnosticReport.getId()).block();
-        updatedDiagnosticReport
-            .status(UPDATED_STATUS)
-            .createdAt(UPDATED_CREATED_AT)
-            .createdBy(UPDATED_CREATED_BY)
-            .updatedAt(UPDATED_UPDATED_AT)
-            .updatedBy(UPDATED_UPDATED_BY)
-            .deletedAt(UPDATED_DELETED_AT);
+        updatedDiagnosticReport.setCreatedAt(UPDATED_CREATED_AT);
+        updatedDiagnosticReport.setCreatedBy(UPDATED_CREATED_BY);
+        updatedDiagnosticReport.setUpdatedAt(UPDATED_UPDATED_AT);
+        updatedDiagnosticReport.setUpdatedBy(UPDATED_UPDATED_BY);
+        updatedDiagnosticReport.setDeletedAt(UPDATED_DELETED_AT);
 
         webTestClient
             .put()
@@ -477,11 +474,11 @@ class DiagnosticReportResourceIT {
         DiagnosticReport partialUpdatedDiagnosticReport = new DiagnosticReport();
         partialUpdatedDiagnosticReport.setId(diagnosticReport.getId());
 
-        partialUpdatedDiagnosticReport
-            .status(UPDATED_STATUS)
-            .createdBy(UPDATED_CREATED_BY)
-            .updatedAt(UPDATED_UPDATED_AT)
-            .deletedAt(UPDATED_DELETED_AT);
+        partialUpdatedDiagnosticReport.setCreatedAt(UPDATED_CREATED_AT);
+        partialUpdatedDiagnosticReport.setCreatedBy(UPDATED_CREATED_BY);
+        partialUpdatedDiagnosticReport.setUpdatedAt(UPDATED_UPDATED_AT);
+        partialUpdatedDiagnosticReport.setUpdatedBy(UPDATED_UPDATED_BY);
+        partialUpdatedDiagnosticReport.setDeletedAt(UPDATED_DELETED_AT);
 
         webTestClient
             .patch()
@@ -516,13 +513,11 @@ class DiagnosticReportResourceIT {
         DiagnosticReport partialUpdatedDiagnosticReport = new DiagnosticReport();
         partialUpdatedDiagnosticReport.setId(diagnosticReport.getId());
 
-        partialUpdatedDiagnosticReport
-            .status(UPDATED_STATUS)
-            .createdAt(UPDATED_CREATED_AT)
-            .createdBy(UPDATED_CREATED_BY)
-            .updatedAt(UPDATED_UPDATED_AT)
-            .updatedBy(UPDATED_UPDATED_BY)
-            .deletedAt(UPDATED_DELETED_AT);
+        partialUpdatedDiagnosticReport.setCreatedAt(UPDATED_CREATED_AT);
+        partialUpdatedDiagnosticReport.setCreatedBy(UPDATED_CREATED_BY);
+        partialUpdatedDiagnosticReport.setUpdatedAt(UPDATED_UPDATED_AT);
+        partialUpdatedDiagnosticReport.setUpdatedBy(UPDATED_UPDATED_BY);
+        partialUpdatedDiagnosticReport.setDeletedAt(UPDATED_DELETED_AT);
 
         webTestClient
             .patch()

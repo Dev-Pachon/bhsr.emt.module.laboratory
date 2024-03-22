@@ -5,9 +5,22 @@
         "title": "Value Sets",
         "refreshListLabel": "Refresh list",
         "createLabel": "Create a new Value Set",
-        "createOrEditLabel": "Create or edit a Value Set",
+        "editLabel": "Edit a Value Set",
         "notFound": "No Value Sets found"
       },
+      "create": {
+        "name": "Name",
+        "description": "Description",
+        "dataType": "Data Type",
+        "values": {
+          "name": "Name",
+          "description": "Description",
+          "value": "Value"
+        }
+      },
+      "description": "Description",
+      "dataType": "Data Type",
+      "numConstants": "Number of Constants",
       "created": "A new Value Set is created with identifier {{ param }}",
       "updated": "A Value Set is updated with identifier {{ param }}",
       "deleted": "A Value Set is deleted with identifier {{ param }}",

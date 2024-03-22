@@ -32,6 +32,15 @@ export const getEntity = createAsyncThunk(
   { serializeError: serializeAxiosError }
 );
 
+// export const cancelRequest = createAsyncThunk(
+//   'serviceRequest/fetch_entity',
+//   async (id: string | number) => {
+//     const requestUrl = `${apiUrl}/${id}`;
+//     return axios.patch<IServiceRequest>(requestUrl);
+//   },
+//   { serializeError: serializeAxiosError }
+// );
+
 export const createEntity = createAsyncThunk(
   'serviceRequest/create_entity',
   async (entity: IServiceRequest, thunkAPI) => {

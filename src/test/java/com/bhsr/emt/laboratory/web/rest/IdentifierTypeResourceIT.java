@@ -48,7 +48,8 @@ class IdentifierTypeResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static IdentifierType createEntity() {
-        IdentifierType identifierType = new IdentifierType().name(DEFAULT_NAME);
+        IdentifierType identifierType = new IdentifierType();
+        identifierType.setName(DEFAULT_NAME);
         return identifierType;
     }
 
@@ -59,7 +60,8 @@ class IdentifierTypeResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static IdentifierType createUpdatedEntity() {
-        IdentifierType identifierType = new IdentifierType().name(UPDATED_NAME);
+        IdentifierType identifierType = new IdentifierType();
+        identifierType.setName(UPDATED_NAME);
         return identifierType;
     }
 
@@ -232,7 +234,7 @@ class IdentifierTypeResourceIT {
 
         // Update the identifierType
         IdentifierType updatedIdentifierType = identifierTypeRepository.findById(identifierType.getId()).block();
-        updatedIdentifierType.name(UPDATED_NAME);
+        updatedIdentifierType.setName(UPDATED_NAME);
 
         webTestClient
             .put()
@@ -322,7 +324,7 @@ class IdentifierTypeResourceIT {
         IdentifierType partialUpdatedIdentifierType = new IdentifierType();
         partialUpdatedIdentifierType.setId(identifierType.getId());
 
-        partialUpdatedIdentifierType.name(UPDATED_NAME);
+        partialUpdatedIdentifierType.setName(UPDATED_NAME);
 
         webTestClient
             .patch()
@@ -352,7 +354,7 @@ class IdentifierTypeResourceIT {
         IdentifierType partialUpdatedIdentifierType = new IdentifierType();
         partialUpdatedIdentifierType.setId(identifierType.getId());
 
-        partialUpdatedIdentifierType.name(UPDATED_NAME);
+        partialUpdatedIdentifierType.setName(UPDATED_NAME);
 
         webTestClient
             .patch()

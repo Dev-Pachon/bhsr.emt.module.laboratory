@@ -1,14 +1,26 @@
+import { Button, Result } from 'antd';
 import React from 'react';
-import { Translate } from 'react-jhipster';
-import { Alert } from 'reactstrap';
+import { useNavigate } from 'react-router-dom';
 
 const PageNotFound = () => {
+  const navigate = useNavigate();
+  const handleGoHome = () => {
+    navigate('/');
+  };
+
   return (
-    <div>
-      <Alert color="danger">
-        <Translate contentKey="error.http.404">The page does not exist.</Translate>
-      </Alert>
-    </div>
+    <>
+      <Result
+        status="404"
+        title="404"
+        subTitle="Sorry, the page you visited does not exist."
+        extra={
+          <Button type="primary" onClick={handleGoHome}>
+            Back Home
+          </Button>
+        }
+      />
+    </>
   );
 };
 

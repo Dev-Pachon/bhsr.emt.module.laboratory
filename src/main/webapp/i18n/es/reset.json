@@ -1,0 +1,26 @@
+{
+  "reset": {
+    "request": {
+      "title": "Restablecer tu contraseña",
+      "form": {
+        "button": "Restablecer contraseña"
+      },
+      "messages": {
+        "info": "Ingresa la dirección de correo electrónico que utilizaste para registrarte",
+        "success": "Revisa tus correos electrónicos para obtener detalles sobre cómo restablecer tu contraseña."
+      }
+    },
+    "finish": {
+      "title": "Restablecer contraseña",
+      "form": {
+        "button": "Validar nueva contraseña"
+      },
+      "messages": {
+        "info": "Elige una nueva contraseña",
+        "success": "<strong>Tu contraseña ha sido restablecida.</strong> Por favor, ",
+        "keymissing": "Falta la clave de restablecimiento.",
+        "error": "No se pudo restablecer tu contraseña. Recuerda que una solicitud de contraseña solo es válida durante 24 horas."
+      }
+    }
+  }
+}

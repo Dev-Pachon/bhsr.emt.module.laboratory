@@ -1,13 +1,32 @@
 import React, { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Button, Row, Col } from 'reactstrap';
-import { Translate } from 'react-jhipster';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { getEntity } from './value-set.reducer';
+import { Space, Table, Typography } from 'antd';
+import PageHeader from 'app/entities/laboratory/shared/page-header';
+import { translate } from 'react-jhipster';
+import { LeftOutlined } from '@ant-design/icons';
+
+const { Title } = Typography;
+
+const columns = [
+  {
+    title: 'Nombre',
+    dataIndex: 'name',
+    key: 'name',
+  },
+  {
+    title: 'Descripción',
+    dataIndex: 'description',
+    key: 'description',
+  },
+  {
+    title: 'Valor',
+    dataIndex: 'value',
+    key: 'value',
+  },
+];
 
 export const ValueSetDetail = () => {
   const dispatch = useAppDispatch();
@@ -20,40 +39,21 @@ export const ValueSetDetail = () => {
 
   const valueSetEntity = useAppSelector(state => state.laboratory.valueSet.entity);
   return (
-    <Row>
-      <Col md="8">
-        <h2 data-cy="valueSetDetailsHeading">
-          <Translate contentKey="laboratoryApp.laboratoryValueSet.detail.title">ValueSet</Translate>
-        </h2>
-        <dl className="jh-entity-details">
-          <dt>
-            <span id="id">
-              <Translate contentKey="laboratoryApp.laboratoryValueSet.id">Id</Translate>
-            </span>
-          </dt>
-          <dd>{valueSetEntity.id}</dd>
-          <dt>
-            <span id="name">
-              <Translate contentKey="laboratoryApp.laboratoryValueSet.name">Name</Translate>
-            </span>
-          </dt>
-          <dd>{valueSetEntity.name}</dd>
-        </dl>
-        <Button tag={Link} to="/laboratory/value-set" replace color="info" data-cy="entityDetailsBackButton">
-          <FontAwesomeIcon icon="arrow-left" />{' '}
-          <span className="d-none d-md-inline">
-            <Translate contentKey="entity.action.back">Back</Translate>
-          </span>
-        </Button>
-        &nbsp;
-        <Button tag={Link} to={`/laboratory/value-set/${valueSetEntity.id}/edit`} replace color="primary">
-          <FontAwesomeIcon icon="pencil-alt" />{' '}
-          <span className="d-none d-md-inline">
-            <Translate contentKey="entity.action.edit">Edit</Translate>
-          </span>
-        </Button>
-      </Col>
-    </Row>
+    <>
+      <PageHeader
+        title={translate('laboratoryApp.laboratoryValueSet.detail.title')}
+        leftAction={
+          <Link to={`/laboratory/value-set`} style={{ placeSelf: 'end' }}>
+            <LeftOutlined style={{ fontSize: '24px', color: 'white' }} rev={undefined} />
+          </Link>
+        }
+      />
+      <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
+        <Title level={3}>{valueSetEntity.name}</Title>
+        <Typography>{valueSetEntity.description}</Typography>
+        <Table columns={columns} dataSource={valueSetEntity.constants}></Table>
+      </Space>
+    </>
   );
 };
 

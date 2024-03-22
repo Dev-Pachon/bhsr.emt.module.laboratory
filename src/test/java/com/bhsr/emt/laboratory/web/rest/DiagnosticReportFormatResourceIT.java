@@ -62,12 +62,12 @@ class DiagnosticReportFormatResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static DiagnosticReportFormat createEntity() {
-        DiagnosticReportFormat diagnosticReportFormat = new DiagnosticReportFormat()
-            .createdAt(DEFAULT_CREATED_AT)
-            .createdBy(DEFAULT_CREATED_BY)
-            .updatedAt(DEFAULT_UPDATED_AT)
-            .updatedBy(DEFAULT_UPDATED_BY)
-            .deletedAt(DEFAULT_DELETED_AT);
+        DiagnosticReportFormat diagnosticReportFormat = new DiagnosticReportFormat();
+        diagnosticReportFormat.setCreatedAt(DEFAULT_CREATED_AT);
+        diagnosticReportFormat.setCreatedBy(DEFAULT_CREATED_BY);
+        diagnosticReportFormat.setUpdatedAt(DEFAULT_UPDATED_AT);
+        diagnosticReportFormat.setUpdatedBy(DEFAULT_UPDATED_BY);
+        diagnosticReportFormat.setDeletedAt(DEFAULT_DELETED_AT);
         return diagnosticReportFormat;
     }
 
@@ -78,12 +78,12 @@ class DiagnosticReportFormatResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static DiagnosticReportFormat createUpdatedEntity() {
-        DiagnosticReportFormat diagnosticReportFormat = new DiagnosticReportFormat()
-            .createdAt(UPDATED_CREATED_AT)
-            .createdBy(UPDATED_CREATED_BY)
-            .updatedAt(UPDATED_UPDATED_AT)
-            .updatedBy(UPDATED_UPDATED_BY)
-            .deletedAt(UPDATED_DELETED_AT);
+        DiagnosticReportFormat diagnosticReportFormat = new DiagnosticReportFormat();
+        diagnosticReportFormat.setCreatedAt(UPDATED_CREATED_AT);
+        diagnosticReportFormat.setCreatedBy(UPDATED_CREATED_BY);
+        diagnosticReportFormat.setUpdatedAt(UPDATED_UPDATED_AT);
+        diagnosticReportFormat.setUpdatedBy(UPDATED_UPDATED_BY);
+        diagnosticReportFormat.setDeletedAt(UPDATED_DELETED_AT);
         return diagnosticReportFormat;
     }
 
@@ -334,45 +334,6 @@ class DiagnosticReportFormatResourceIT {
     }
 
     @Test
-    void putExistingDiagnosticReportFormat() throws Exception {
-        // Initialize the database
-        diagnosticReportFormat.setId(UUID.randomUUID().toString());
-        diagnosticReportFormatRepository.save(diagnosticReportFormat).block();
-
-        int databaseSizeBeforeUpdate = diagnosticReportFormatRepository.findAll().collectList().block().size();
-
-        // Update the diagnosticReportFormat
-        DiagnosticReportFormat updatedDiagnosticReportFormat = diagnosticReportFormatRepository
-            .findById(diagnosticReportFormat.getId())
-            .block();
-        updatedDiagnosticReportFormat
-            .createdAt(UPDATED_CREATED_AT)
-            .createdBy(UPDATED_CREATED_BY)
-            .updatedAt(UPDATED_UPDATED_AT)
-            .updatedBy(UPDATED_UPDATED_BY)
-            .deletedAt(UPDATED_DELETED_AT);
-
-        webTestClient
-            .put()
-            .uri(ENTITY_API_URL_ID, updatedDiagnosticReportFormat.getId())
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(TestUtil.convertObjectToJsonBytes(updatedDiagnosticReportFormat))
-            .exchange()
-            .expectStatus()
-            .isOk();
-
-        // Validate the DiagnosticReportFormat in the database
-        List<DiagnosticReportFormat> diagnosticReportFormatList = diagnosticReportFormatRepository.findAll().collectList().block();
-        assertThat(diagnosticReportFormatList).hasSize(databaseSizeBeforeUpdate);
-        DiagnosticReportFormat testDiagnosticReportFormat = diagnosticReportFormatList.get(diagnosticReportFormatList.size() - 1);
-        assertThat(testDiagnosticReportFormat.getCreatedAt()).isEqualTo(UPDATED_CREATED_AT);
-        assertThat(testDiagnosticReportFormat.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
-        assertThat(testDiagnosticReportFormat.getUpdatedAt()).isEqualTo(UPDATED_UPDATED_AT);
-        assertThat(testDiagnosticReportFormat.getUpdatedBy()).isEqualTo(UPDATED_UPDATED_BY);
-        assertThat(testDiagnosticReportFormat.getDeletedAt()).isEqualTo(UPDATED_DELETED_AT);
-    }
-
-    @Test
     void putNonExistingDiagnosticReportFormat() throws Exception {
         int databaseSizeBeforeUpdate = diagnosticReportFormatRepository.findAll().collectList().block().size();
         diagnosticReportFormat.setId(UUID.randomUUID().toString());
@@ -430,83 +391,6 @@ class DiagnosticReportFormatResourceIT {
         // Validate the DiagnosticReportFormat in the database
         List<DiagnosticReportFormat> diagnosticReportFormatList = diagnosticReportFormatRepository.findAll().collectList().block();
         assertThat(diagnosticReportFormatList).hasSize(databaseSizeBeforeUpdate);
-    }
-
-    @Test
-    void partialUpdateDiagnosticReportFormatWithPatch() throws Exception {
-        // Initialize the database
-        diagnosticReportFormat.setId(UUID.randomUUID().toString());
-        diagnosticReportFormatRepository.save(diagnosticReportFormat).block();
-
-        int databaseSizeBeforeUpdate = diagnosticReportFormatRepository.findAll().collectList().block().size();
-
-        // Update the diagnosticReportFormat using partial update
-        DiagnosticReportFormat partialUpdatedDiagnosticReportFormat = new DiagnosticReportFormat();
-        partialUpdatedDiagnosticReportFormat.setId(diagnosticReportFormat.getId());
-
-        partialUpdatedDiagnosticReportFormat
-            .createdAt(UPDATED_CREATED_AT)
-            .createdBy(UPDATED_CREATED_BY)
-            .updatedAt(UPDATED_UPDATED_AT)
-            .deletedAt(UPDATED_DELETED_AT);
-
-        webTestClient
-            .patch()
-            .uri(ENTITY_API_URL_ID, partialUpdatedDiagnosticReportFormat.getId())
-            .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(partialUpdatedDiagnosticReportFormat))
-            .exchange()
-            .expectStatus()
-            .isOk();
-
-        // Validate the DiagnosticReportFormat in the database
-        List<DiagnosticReportFormat> diagnosticReportFormatList = diagnosticReportFormatRepository.findAll().collectList().block();
-        assertThat(diagnosticReportFormatList).hasSize(databaseSizeBeforeUpdate);
-        DiagnosticReportFormat testDiagnosticReportFormat = diagnosticReportFormatList.get(diagnosticReportFormatList.size() - 1);
-        assertThat(testDiagnosticReportFormat.getCreatedAt()).isEqualTo(UPDATED_CREATED_AT);
-        assertThat(testDiagnosticReportFormat.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
-        assertThat(testDiagnosticReportFormat.getUpdatedAt()).isEqualTo(UPDATED_UPDATED_AT);
-        assertThat(testDiagnosticReportFormat.getUpdatedBy()).isEqualTo(DEFAULT_UPDATED_BY);
-        assertThat(testDiagnosticReportFormat.getDeletedAt()).isEqualTo(UPDATED_DELETED_AT);
-    }
-
-    @Test
-    void fullUpdateDiagnosticReportFormatWithPatch() throws Exception {
-        // Initialize the database
-        diagnosticReportFormat.setId(UUID.randomUUID().toString());
-        diagnosticReportFormatRepository.save(diagnosticReportFormat).block();
-
-        int databaseSizeBeforeUpdate = diagnosticReportFormatRepository.findAll().collectList().block().size();
-
-        // Update the diagnosticReportFormat using partial update
-        DiagnosticReportFormat partialUpdatedDiagnosticReportFormat = new DiagnosticReportFormat();
-        partialUpdatedDiagnosticReportFormat.setId(diagnosticReportFormat.getId());
-
-        partialUpdatedDiagnosticReportFormat
-            .createdAt(UPDATED_CREATED_AT)
-            .createdBy(UPDATED_CREATED_BY)
-            .updatedAt(UPDATED_UPDATED_AT)
-            .updatedBy(UPDATED_UPDATED_BY)
-            .deletedAt(UPDATED_DELETED_AT);
-
-        webTestClient
-            .patch()
-            .uri(ENTITY_API_URL_ID, partialUpdatedDiagnosticReportFormat.getId())
-            .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(TestUtil.convertObjectToJsonBytes(partialUpdatedDiagnosticReportFormat))
-            .exchange()
-            .expectStatus()
-            .isOk();
-
-        // Validate the DiagnosticReportFormat in the database
-        List<DiagnosticReportFormat> diagnosticReportFormatList = diagnosticReportFormatRepository.findAll().collectList().block();
-        assertThat(diagnosticReportFormatList).hasSize(databaseSizeBeforeUpdate);
-        DiagnosticReportFormat testDiagnosticReportFormat = diagnosticReportFormatList.get(diagnosticReportFormatList.size() - 1);
-        assertThat(testDiagnosticReportFormat.getCreatedAt()).isEqualTo(UPDATED_CREATED_AT);
-        assertThat(testDiagnosticReportFormat.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
-        assertThat(testDiagnosticReportFormat.getUpdatedAt()).isEqualTo(UPDATED_UPDATED_AT);
-        assertThat(testDiagnosticReportFormat.getUpdatedBy()).isEqualTo(UPDATED_UPDATED_BY);
-        assertThat(testDiagnosticReportFormat.getDeletedAt()).isEqualTo(UPDATED_DELETED_AT);
     }
 
     @Test

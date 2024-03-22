@@ -15,6 +15,7 @@ import reducer, {
 } from './diagnostic-report-format.reducer';
 import { EntityState } from 'app/shared/reducers/reducer.utils';
 import { IDiagnosticReportFormat, defaultValue } from 'app/shared/model/laboratory/diagnostic-report-format.model';
+import { IFieldFormat, defaultValue as defaultValueFieldFormat } from 'app/shared/model/laboratory/field-format.model';
 
 describe('Entities reducer tests', () => {
   function isEmpty(element): boolean {

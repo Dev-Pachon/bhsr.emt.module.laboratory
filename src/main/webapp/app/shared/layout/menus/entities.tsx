@@ -12,8 +12,6 @@ export const EntitiesMenu = () => (
     data-cy="entity"
     style={{ maxHeight: '80vh', overflow: 'auto' }}
   >
-    <Suspense fallback={<div>loading...</div>}>
-      <EntitiesMenuItems />
-    </Suspense>
+    <Suspense fallback={<div>loading...</div>}></Suspense>
   </NavDropdown>
 );

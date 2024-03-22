@@ -48,7 +48,8 @@ class ValueSetResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static ValueSet createEntity() {
-        ValueSet valueSet = new ValueSet().name(DEFAULT_NAME);
+        ValueSet valueSet = new ValueSet();
+        valueSet.setName(DEFAULT_NAME);
         return valueSet;
     }
 
@@ -59,7 +60,8 @@ class ValueSetResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static ValueSet createUpdatedEntity() {
-        ValueSet valueSet = new ValueSet().name(UPDATED_NAME);
+        ValueSet valueSet = new ValueSet();
+        valueSet.setName(UPDATED_NAME);
         return valueSet;
     }
 
@@ -232,7 +234,7 @@ class ValueSetResourceIT {
 
         // Update the valueSet
         ValueSet updatedValueSet = valueSetRepository.findById(valueSet.getId()).block();
-        updatedValueSet.name(UPDATED_NAME);
+        updatedValueSet.setName(UPDATED_NAME);
 
         webTestClient
             .put()
@@ -322,7 +324,7 @@ class ValueSetResourceIT {
         ValueSet partialUpdatedValueSet = new ValueSet();
         partialUpdatedValueSet.setId(valueSet.getId());
 
-        partialUpdatedValueSet.name(UPDATED_NAME);
+        partialUpdatedValueSet.setName(UPDATED_NAME);
 
         webTestClient
             .patch()
@@ -352,7 +354,7 @@ class ValueSetResourceIT {
         ValueSet partialUpdatedValueSet = new ValueSet();
         partialUpdatedValueSet.setId(valueSet.getId());
 
-        partialUpdatedValueSet.name(UPDATED_NAME);
+        partialUpdatedValueSet.setName(UPDATED_NAME);
 
         webTestClient
             .patch()

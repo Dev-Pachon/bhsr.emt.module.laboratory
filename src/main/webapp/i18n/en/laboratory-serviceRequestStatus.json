@@ -2,13 +2,13 @@
   "laboratoryApp": {
     "ServiceRequestStatus": {
       "null": "",
-      "DRAFT": "DRAFT",
-      "ACTIVE": "ACTIVE",
-      "ON_HOLD": "ON_HOLD",
-      "REVOKED": "REVOKED",
-      "COMPLETED": "COMPLETED",
-      "ENTERED_IN_ERROR": "ENTERED_IN_ERROR",
-      "UNKNOWN": "UNKNOWN"
+      "DRAFT": "Draft",
+      "ACTIVE": "Active",
+      "ON_HOLD": "On hold",
+      "REVOKED": "Revoked",
+      "COMPLETED": "Completed",
+      "ENTERED_IN_ERROR": "Entered in error",
+      "UNKNOWN": "Unknown"
     }
   }
 }

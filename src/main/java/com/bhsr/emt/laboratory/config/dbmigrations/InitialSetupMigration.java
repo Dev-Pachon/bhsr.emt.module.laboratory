@@ -7,7 +7,6 @@ import com.bhsr.emt.laboratory.security.AuthoritiesConstants;
 import io.mongock.api.annotations.ChangeUnit;
 import io.mongock.api.annotations.Execution;
 import io.mongock.api.annotations.RollbackExecution;
-import java.time.Instant;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 /**
