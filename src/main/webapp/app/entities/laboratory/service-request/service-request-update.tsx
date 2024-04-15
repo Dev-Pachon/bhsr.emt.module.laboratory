@@ -1,18 +1,38 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Button, Row, Col, FormText } from 'reactstrap';
-import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
-import { mapIdList } from 'app/shared/util/entity-utils';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Form, Input, Modal, Select, Transfer, Typography } from 'antd';
+import { translate } from 'react-jhipster';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
-
+import { createEntity as createServiceRequest, reset as resetServiceRequest } from './service-request.reducer';
+import { getEntities as getFormats } from '../diagnostic-report-format/diagnostic-report-format.reducer';
+import { useForm } from 'antd/es/form/Form';
+import { IPatient } from 'app/shared/model/laboratory/patient.model';
 import { IServiceRequest } from 'app/shared/model/laboratory/service-request.model';
-import { ServiceRequestStatus } from 'app/shared/model/enumerations/service-request-status.model';
-import { getEntity, updateEntity, createEntity, reset } from './service-request.reducer';
+import { ServiceRequestPriority } from 'app/shared/model/enumerations/service-request-priority.model';
+import { IDiagnosticReportFormat } from 'app/shared/model/laboratory/diagnostic-report-format.model';
+import '../shared/signatureComponent/signature.style.css';
+import { FabButton } from 'app/entities/laboratory/shared/fab-button';
+import { Cancel, Start } from '@mui/icons-material';
+import { Stack } from '@mui/material';
 
-export const ServiceRequestUpdate = () => {
+const { Title } = Typography;
+
+interface TransferItem {
+  key: string;
+  title: string;
+  description?: string;
+  disabled?: boolean;
+}
+
+interface ServiceRequestModalProps {
+  patient: IPatient;
+}
+
+const ServiceRequestModal: React.FC<ServiceRequestModalProps> = ({ patient, ...props }) => {
+  const [open, setOpen] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [form] = useForm<IServiceRequest>();
+  const [diagnosticReportFormatOptions, setDiagnosticReportFormatOptions] = useState<TransferItem[]>([]);
   const dispatch = useAppDispatch();
 
   const navigate = useNavigate();
@@ -21,205 +41,188 @@ export const ServiceRequestUpdate = () => {
   const isNew = id === undefined;
 
   const serviceRequestEntity = useAppSelector(state => state.laboratory.serviceRequest.entity);
-  const loading = useAppSelector(state => state.laboratory.serviceRequest.loading);
-  const updating = useAppSelector(state => state.laboratory.serviceRequest.updating);
-  const updateSuccess = useAppSelector(state => state.laboratory.serviceRequest.updateSuccess);
-  const serviceRequestStatusValues = Object.keys(ServiceRequestStatus);
+  const diagnosticReportFormatEntity = useAppSelector(state => state.laboratory.diagnosticReportFormat.entities);
+  const loadingFormats = useAppSelector(state => state.laboratory.diagnosticReportFormat.loading);
 
-  const handleClose = () => {
-    navigate('/laboratory/service-request');
-  };
+  const updateSuccess = useAppSelector(state => state.laboratory.serviceRequest.updateSuccess);
 
   useEffect(() => {
-    if (isNew) {
-      dispatch(reset());
-    } else {
-      dispatch(getEntity(id));
-    }
+    dispatch(resetServiceRequest());
+    dispatch(getFormats({}));
   }, []);
 
   useEffect(() => {
+    if (diagnosticReportFormatEntity && diagnosticReportFormatEntity.length > 0) {
+      setDiagnosticReportFormatOptions(
+        diagnosticReportFormatEntity.map((item: IDiagnosticReportFormat, idx) => {
+          return { key: idx, title: item.name };
+        })
+      );
+    }
+  }, [diagnosticReportFormatEntity]);
+
+  useEffect(() => {
     if (updateSuccess) {
-      handleClose();
+      setConfirmLoading(false);
+      handleCancel();
+      navigate('/laboratory/service-request');
+    } else if (!confirmLoading) {
+      console.log('error');
     }
   }, [updateSuccess]);
 
-  const saveEntity = values => {
+  const saveEntity = (values: IServiceRequest) => {
+    console.log(values);
     const entity = {
       ...serviceRequestEntity,
       ...values,
     };
 
     if (isNew) {
-      dispatch(createEntity(entity));
-    } else {
-      dispatch(updateEntity(entity));
+      dispatch(createServiceRequest(entity));
     }
   };
 
-  const defaultValues = () =>
-    isNew
-      ? {}
-      : {
-          status: 'DRAFT',
-          ...serviceRequestEntity,
-        };
+  const showModal = () => {
+    setOpen(true);
+  };
+
+  const handleOk = () => {
+    setConfirmLoading(true);
+    console.log(form.getFieldsValue());
+    form
+      .validateFields()
+      .then(values => {
+        console.log(values);
+        form.resetFields();
+
+        const valuesToSave = { ...values };
+
+        valuesToSave.diagnosticReportsFormats = values.diagnosticReportsFormats.map(item => diagnosticReportFormatEntity[item]);
+
+        console.log(valuesToSave);
+
+        saveEntity(valuesToSave);
+        setOpen(false);
+        setConfirmLoading(false);
+        dispatch(resetServiceRequest());
+        form.resetFields();
+      })
+      .catch(info => {
+        console.log('Validate Failed:', info);
+        setConfirmLoading(false);
+      });
+  };
+
+  const handleCancel = () => {
+    setOpen(false);
+    form.resetFields();
+  };
+
+  const defaultValues = { status: 'DRAFT', subject: patient.id, category: 'LABORATORY_PROCEDURE' };
+
+  const filterOption = (input: string, option?: { label: string; value: string }) =>
+    (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
 
   return (
-    <div>
-      <Row className="justify-content-center">
-        <Col md="8">
-          <h2 id="laboratoryApp.laboratoryServiceRequest.home.createOrEditLabel" data-cy="ServiceRequestCreateUpdateHeading">
-            <Translate contentKey="laboratoryApp.laboratoryServiceRequest.home.createOrEditLabel">
-              Create or edit a ServiceRequest
-            </Translate>
-          </h2>
-        </Col>
-      </Row>
-      <Row className="justify-content-center">
-        <Col md="8">
-          {loading ? (
-            <p>Loading...</p>
-          ) : (
-            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
-              {!isNew ? (
-                <ValidatedField
-                  name="id"
-                  required
-                  readOnly
-                  id="service-request-id"
-                  label={translate('laboratoryApp.laboratoryServiceRequest.id')}
-                  validate={{ required: true }}
-                />
-              ) : null}
-              <ValidatedField
+    <>
+      {!patient ? null : (
+        <>
+          <FabButton Icon={Start} onClick={showModal} color={'info'} tooltip={'Solicitar servicio'} />
+          <Modal
+            title={translate('laboratoryApp.laboratoryServiceRequest.home.createLabel')}
+            open={open}
+            onOk={handleOk}
+            onCancel={handleCancel}
+            footer={[
+              <Stack key={'actions'} spacing={2} direction="row" sx={{ justifyContent: 'center' }}>
+                <FabButton key="back" Icon={Cancel} onClick={handleCancel} color={'error'} tooltip={'Cancelar'} />
+                <FabButton key="submit" Icon={Start} onClick={handleOk} color={'info'} tooltip={'Solicitar'} />
+              </Stack>,
+            ]}
+          >
+            <Form form={form} initialValues={defaultValues} onFinish={saveEntity} layout={'vertical'} disabled={confirmLoading}>
+              <Title level={4}>Paciente: {patient.name.text}</Title>
+
+              <Form.Item<IServiceRequest>
+                label={translate('laboratoryApp.laboratoryServiceRequest.patient')}
+                id="service-request-patient"
+                name="subject"
+                data-cy="patient"
+                hidden
+              >
+                <Input readOnly />
+              </Form.Item>
+
+              <Form.Item<IServiceRequest>
                 label={translate('laboratoryApp.laboratoryServiceRequest.status')}
                 id="service-request-status"
                 name="status"
                 data-cy="status"
-                type="select"
+                hidden
               >
-                {serviceRequestStatusValues.map(serviceRequestStatus => (
-                  <option value={serviceRequestStatus} key={serviceRequestStatus}>
-                    {translate('laboratoryApp.ServiceRequestStatus.' + serviceRequestStatus)}
-                  </option>
-                ))}
-              </ValidatedField>
-              <ValidatedField
+                <Input readOnly hidden />
+              </Form.Item>
+
+              <Form.Item<IServiceRequest>
                 label={translate('laboratoryApp.laboratoryServiceRequest.category')}
                 id="service-request-category"
                 name="category"
                 data-cy="category"
-                type="text"
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                }}
-              />
-              <ValidatedField
-                label={translate('laboratoryApp.laboratoryServiceRequest.priority')}
-                id="service-request-priority"
+                hidden
+              >
+                <Input readOnly />
+              </Form.Item>
+
+              <Form.Item<IServiceRequest>
                 name="priority"
-                data-cy="priority"
-                type="text"
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                }}
-              />
-              <ValidatedField
-                label={translate('laboratoryApp.laboratoryServiceRequest.code')}
-                id="service-request-code"
-                name="code"
-                data-cy="code"
-                type="text"
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                }}
-              />
-              <ValidatedField
-                label={translate('laboratoryApp.laboratoryServiceRequest.doNotPerform')}
-                id="service-request-doNotPerform"
-                name="doNotPerform"
-                data-cy="doNotPerform"
-                check
-                type="checkbox"
-              />
-              <ValidatedField
-                label={translate('laboratoryApp.laboratoryServiceRequest.serviceId')}
-                id="service-request-serviceId"
-                name="serviceId"
-                data-cy="serviceId"
-                type="text"
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                  validate: v => isNumber(v) || translate('entity.validation.number'),
-                }}
-              />
-              <ValidatedField
-                label={translate('laboratoryApp.laboratoryServiceRequest.createdAt')}
-                id="service-request-createdAt"
-                name="createdAt"
-                data-cy="createdAt"
-                type="date"
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                }}
-              />
-              <ValidatedField
-                label={translate('laboratoryApp.laboratoryServiceRequest.createdBy')}
-                id="service-request-createdBy"
-                name="createdBy"
-                data-cy="createdBy"
-                type="text"
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                }}
-              />
-              <ValidatedField
-                label={translate('laboratoryApp.laboratoryServiceRequest.updatedAt')}
-                id="service-request-updatedAt"
-                name="updatedAt"
-                data-cy="updatedAt"
-                type="date"
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                }}
-              />
-              <ValidatedField
-                label={translate('laboratoryApp.laboratoryServiceRequest.updatedBy')}
-                id="service-request-updatedBy"
-                name="updatedBy"
-                data-cy="updatedBy"
-                type="text"
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                }}
-              />
-              <ValidatedField
-                label={translate('laboratoryApp.laboratoryServiceRequest.deletedAt')}
-                id="service-request-deletedAt"
-                name="deletedAt"
-                data-cy="deletedAt"
-                type="date"
-              />
-              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/laboratory/service-request" replace color="info">
-                <FontAwesomeIcon icon="arrow-left" />
-                &nbsp;
-                <span className="d-none d-md-inline">
-                  <Translate contentKey="entity.action.back">Back</Translate>
-                </span>
-              </Button>
-              &nbsp;
-              <Button color="primary" id="save-entity" data-cy="entityCreateSaveButton" type="submit" disabled={updating}>
-                <FontAwesomeIcon icon="save" />
-                &nbsp;
-                <Translate contentKey="entity.action.save">Save</Translate>
-              </Button>
-            </ValidatedForm>
-          )}
-        </Col>
-      </Row>
-    </div>
+                label={translate('laboratoryApp.laboratoryServiceRequest.create.priority.label')}
+                rules={[{ required: true, message: 'Por favor seleccione una prioridad' }]}
+              >
+                <Select
+                  showSearch
+                  placeholder="Seleccione una prioridad"
+                  optionFilterProp="children"
+                  filterOption={filterOption}
+                  options={Object.keys(ServiceRequestPriority).map((key: string) => {
+                    return {
+                      value: key,
+                      label: translate(`laboratoryApp.laboratoryServiceRequest.create.priority.${key}`),
+                    };
+                  })}
+                />
+              </Form.Item>
+
+              <Form.Item<IServiceRequest>
+                name="diagnosticReportsFormats"
+                label={'Informes de diagnóstico'}
+                valuePropName={'targetKeys'}
+                rules={[{ required: true, message: 'Por favor seleccione al menos un informe de diagnóstico' }]}
+              >
+                <Transfer
+                  titles={['Disponibles', 'Seleccionados']}
+                  dataSource={diagnosticReportFormatOptions}
+                  listStyle={{
+                    width: '100%',
+                  }}
+                  showSearch
+                  oneWay
+                  render={item => item.title}
+                  locale={{
+                    itemUnit: 'Elemento',
+                    itemsUnit: 'Elementos',
+                    notFoundContent: 'Sin elementos',
+                    searchPlaceholder: 'Buscar informe',
+                  }}
+                />
+              </Form.Item>
+              {/*<SignatureCanvas penColor="black" canvasProps={{ className: 'signatureCanvas', width: 2, height: 1 }} />*/}
+            </Form>
+          </Modal>
+        </>
+      )}
+    </>
   );
 };
 
-export default ServiceRequestUpdate;
+export default ServiceRequestModal;

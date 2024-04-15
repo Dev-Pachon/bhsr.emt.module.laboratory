@@ -1,7 +1,13 @@
 package com.bhsr.emt.laboratory.domain;
 
+import com.bhsr.emt.laboratory.domain.enumeration.DataType;
 import java.io.Serializable;
+import java.util.Set;
 import javax.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -10,12 +16,14 @@ import org.springframework.data.mongodb.core.mapping.Field;
  * A ValueSet.
  */
 @Document(collection = "value_set")
-@SuppressWarnings("common-java:DuplicatedBlocks")
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ValueSet implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "must not be null")
     @Id
     private String id;
 
@@ -23,59 +31,15 @@ public class ValueSet implements Serializable {
     @Field("name")
     private String name;
 
-    // jhipster-needle-entity-add-field - JHipster will add fields here
+    @NotNull(message = "must not be null")
+    @Field("description")
+    private String description;
 
-    public String getId() {
-        return this.id;
-    }
+    @NotNull(message = "must not be null")
+    @Field("dataType")
+    private DataType dataType;
 
-    public ValueSet id(String id) {
-        this.setId(id);
-        return this;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public ValueSet name(String name) {
-        this.setName(name);
-        return this;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof ValueSet)) {
-            return false;
-        }
-        return id != null && id.equals(((ValueSet) o).id);
-    }
-
-    @Override
-    public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
-        return getClass().hashCode();
-    }
-
-    // prettier-ignore
-    @Override
-    public String toString() {
-        return "ValueSet{" +
-            "id=" + getId() +
-            ", name='" + getName() + "'" +
-            "}";
-    }
+    @NotNull(message = "must not be null")
+    @Field("constants")
+    private Set<Constant> constants;
 }

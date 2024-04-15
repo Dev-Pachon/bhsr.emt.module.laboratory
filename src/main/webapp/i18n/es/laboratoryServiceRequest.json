@@ -1,0 +1,44 @@
+{
+  "laboratoryApp": {
+    "laboratoryServiceRequest": {
+      "home": {
+        "title": "Solicitudes de Servicio",
+        "refreshListLabel": "Actualizar lista",
+        "createLabel": "Crear una nueva Solicitud de Servicio",
+        "createOrEditLabel": "Crear o editar una Solicitud de Servicio",
+        "notFound": "No se encontraron Solicitudes de Servicio"
+      },
+      "created": "Se ha creado una nueva Solicitud de Servicio con el identificador {{ param }}",
+      "updated": "Se ha actualizado una Solicitud de Servicio con el identificador {{ param }}",
+      "deleted": "Se ha eliminado una Solicitud de Servicio con el identificador {{ param }}",
+      "delete": {
+        "question": "¿Estás seguro de que deseas eliminar la Solicitud de Servicio {{ id }}?"
+      },
+      "detail": {
+        "title": "Solicitud de Servicio"
+      },
+      "create": {
+        "title": "Nueva Solicitud de Servicio",
+        "priority": {
+          "label": "Prioridad",
+          "LOW": "Baja",
+          "MEDIUM": "Media",
+          "HIGH": "Alta"
+        },
+        "diagnosticReportIds": "# Informes de Diagnóstico Solicitados"
+      },
+      "id": "Id",
+      "status": "Estado",
+      "category": "Categoría",
+      "priority": "Prioridad",
+      "diagnosticReportsIds": "Informes de Diagnóstico Solicitados",
+      "doNotPerform": "No Realizar",
+      "serviceId": "Id de Servicio",
+      "createdAt": "Creado en",
+      "createdBy": "Creado por",
+      "updatedAt": "Actualizado en",
+      "updatedBy": "Actualizado por",
+      "deletedAt": "Eliminado en"
+    }
+  }
+}

@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { IDiagnosticReport } from 'app/shared/model/laboratory/diagnostic-report.model';
 import { getEntities } from './diagnostic-report.reducer';
+import { Empty } from 'antd';
 
 export const DiagnosticReport = () => {
   const dispatch = useAppDispatch();
@@ -28,7 +29,7 @@ export const DiagnosticReport = () => {
   };
 
   return (
-    <div>
+    <>
       <h2 id="diagnostic-report-heading" data-cy="DiagnosticReportHeading">
         <Translate contentKey="laboratoryApp.laboratoryDiagnosticReport.home.title">Diagnostic Reports</Translate>
         <div className="d-flex justify-content-end">
@@ -180,14 +181,10 @@ export const DiagnosticReport = () => {
             </tbody>
           </Table>
         ) : (
-          !loading && (
-            <div className="alert alert-warning">
-              <Translate contentKey="laboratoryApp.laboratoryDiagnosticReport.home.notFound">No Diagnostic Reports found</Translate>
-            </div>
-          )
+          !loading && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
         )}
       </div>
-    </div>
+    </>
   );
 };
 

@@ -6,6 +6,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "app:start": "./gradlew",
+    "app:start-w": "gradlew",
     "backend:build-cache": "npm run backend:info && npm run backend:nohttp:test && npm run ci:e2e:package",
     "backend:doc:test": "./gradlew javadoc -x webapp -x webapp_test",
     "backend:info": "./gradlew -v",
@@ -87,10 +88,16 @@
     "packaging": "jar"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
     "@fortawesome/fontawesome-svg-core": "6.2.0",
     "@fortawesome/free-solid-svg-icons": "6.2.0",
     "@fortawesome/react-fontawesome": "0.2.0",
+    "@mui/icons-material": "^5.14.19",
+    "@mui/material": "^5.14.20",
     "@reduxjs/toolkit": "1.8.5",
+    "@syncfusion/ej2-react-inputs": "^23.2.4",
+    "antd": "^5.10.2",
     "axios": "0.27.2",
     "bootstrap": "5.2.0",
     "dayjs": "1.11.5",
@@ -104,11 +111,13 @@
     "react-redux": "8.0.2",
     "react-redux-loading-bar": "5.0.4",
     "react-router-dom": "6.3.0",
+    "react-signature-canvas": "^1.0.6",
     "react-toastify": "9.0.8",
     "react-transition-group": "4.4.5",
     "reactstrap": "9.1.4",
     "redux": "4.2.0",
     "redux-thunk": "2.4.1",
+    "sweetalert2": "^11.10.1",
     "tslib": "2.4.0",
     "uuid": "8.3.2"
   },

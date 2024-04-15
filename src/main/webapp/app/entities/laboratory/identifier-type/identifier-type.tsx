@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { IIdentifierType } from 'app/shared/model/laboratory/identifier-type.model';
 import { getEntities } from './identifier-type.reducer';
+import { Empty } from 'antd';
 
 export const IdentifierType = () => {
   const dispatch = useAppDispatch();
@@ -116,11 +117,7 @@ export const IdentifierType = () => {
             </tbody>
           </Table>
         ) : (
-          !loading && (
-            <div className="alert alert-warning">
-              <Translate contentKey="laboratoryApp.laboratoryIdentifierType.home.notFound">No Identifier Types found</Translate>
-            </div>
-          )
+          !loading && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
         )}
       </div>
     </div>

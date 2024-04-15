@@ -1,14 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Button, Table } from 'reactstrap';
-import { Translate, TextFormat } from 'react-jhipster';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { TextFormat, translate } from 'react-jhipster';
 
-import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { APP_DATE_FORMAT } from 'app/config/constants';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
-
+import { deleteEntity, getEntities } from './diagnostic-report-format.reducer';
+import { Empty, Space, Table, Typography } from 'antd';
+import PageHeader from 'app/entities/laboratory/shared/page-header';
+import { Link as MUILink } from '@mui/material';
+import CssBaseline from '@mui/material/CssBaseline';
+import Swal from 'sweetalert2';
+import { Add, Delete, Edit } from '@mui/icons-material';
+import { FabButton } from 'app/entities/laboratory/shared/fab-button';
 import { IDiagnosticReportFormat } from 'app/shared/model/laboratory/diagnostic-report-format.model';
-import { getEntities } from './diagnostic-report-format.reducer';
+import { ColumnsType } from 'antd/es/table';
+
+const { Title } = Typography;
 
 export const DiagnosticReportFormat = () => {
   const dispatch = useAppDispatch();
@@ -23,139 +30,96 @@ export const DiagnosticReportFormat = () => {
     dispatch(getEntities({}));
   }, []);
 
-  const handleSyncList = () => {
-    dispatch(getEntities({}));
+  const handleOpenDelete = (id: string) => {
+    Swal.fire({
+      title: '¿Deseas continuar?',
+      text: '¡No podrás deshacer esta acción!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: '¡Si, quiero eliminarlo!',
+      cancelButtonText: 'Cancelar',
+    }).then(result => {
+      if (result.isConfirmed) {
+        dispatch(deleteEntity(id));
+      }
+    });
   };
 
+  const handleAdd = () => {
+    navigate('new');
+  };
+  const handleEdit = (id: string) => {
+    navigate(id + '/edit');
+  };
+
+  const columns: ColumnsType<IDiagnosticReportFormat> = [
+    {
+      title: 'Nombre del formato',
+      dataIndex: 'name',
+      key: 'format',
+      render: (text, record) => (
+        <MUILink component={Link} to={`${record?.id}`}>
+          {record?.name}
+        </MUILink>
+      ),
+    },
+    {
+      title: 'Creado en',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      render: (text, record) => <TextFormat value={record.createdAt} type="date" format={APP_DATE_FORMAT} />,
+    },
+    {
+      title: 'Creado por',
+      dataIndex: 'createdBy',
+      key: 'createdBy',
+      render: (text, record) => `${record?.createdBy?.firstName} ${record?.createdBy?.lastName}`,
+    },
+    {
+      title: 'Actualizado en',
+      dataIndex: 'updatedAt',
+      key: 'updatedAt',
+      render: (text, record) => <TextFormat value={record.updatedAt} type="date" format={APP_DATE_FORMAT} />,
+    },
+    {
+      title: 'Actualizado por',
+      dataIndex: 'updatedBy',
+      key: 'updatedBy',
+      render: (text, record) => `${record?.updatedBy?.firstName} ${record?.updatedBy?.lastName}`,
+    },
+    {
+      title: 'Acción',
+      dataIndex: '',
+      key: 'x',
+      render: (text, record) => (
+        <Space size="middle">
+          <FabButton Icon={Edit} onClick={() => handleEdit(record?.id)} color={'info'} tooltip={'Editar formato'} />
+
+          <FabButton Icon={Delete} onClick={() => handleOpenDelete(record?.id)} color={'error'} tooltip={'Eliminar formato'} />
+        </Space>
+      ),
+    },
+  ];
+
   return (
-    <div>
-      <h2 id="diagnostic-report-format-heading" data-cy="DiagnosticReportFormatHeading">
-        <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.home.title">Diagnostic Report Formats</Translate>
-        <div className="d-flex justify-content-end">
-          <Button className="me-2" color="info" onClick={handleSyncList} disabled={loading}>
-            <FontAwesomeIcon icon="sync" spin={loading} />{' '}
-            <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.home.refreshListLabel">Refresh List</Translate>
-          </Button>
-          <Link
-            to="/laboratory/diagnostic-report-format/new"
-            className="btn btn-primary jh-create-entity"
-            id="jh-create-entity"
-            data-cy="entityCreateButton"
-          >
-            <FontAwesomeIcon icon="plus" />
-            &nbsp;
-            <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.home.createLabel">
-              Create new Diagnostic Report Format
-            </Translate>
-          </Link>
-        </div>
-      </h2>
+    <>
+      <CssBaseline />
+      <PageHeader title={translate('laboratoryApp.laboratoryDiagnosticReportFormat.home.title')} />
+      <FabButton Icon={Add} onClick={handleAdd} color={'secondary'} sx={{ color: 'white' }} tooltip={'Crear formato'} />
       <div className="table-responsive">
         {diagnosticReportFormatList && diagnosticReportFormatList.length > 0 ? (
-          <Table responsive>
-            <thead>
-              <tr>
-                <th>
-                  <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.id">Id</Translate>
-                </th>
-                <th>
-                  <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.createdAt">Created At</Translate>
-                </th>
-                <th>
-                  <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.createdBy">Created By</Translate>
-                </th>
-                <th>
-                  <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.updatedAt">Updated At</Translate>
-                </th>
-                <th>
-                  <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.updatedBy">Updated By</Translate>
-                </th>
-                <th>
-                  <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.deletedAt">Deleted At</Translate>
-                </th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {diagnosticReportFormatList.map((diagnosticReportFormat, i) => (
-                <tr key={`entity-${i}`} data-cy="entityTable">
-                  <td>
-                    <Button tag={Link} to={`/laboratory/diagnostic-report-format/${diagnosticReportFormat.id}`} color="link" size="sm">
-                      {diagnosticReportFormat.id}
-                    </Button>
-                  </td>
-                  <td>
-                    {diagnosticReportFormat.createdAt ? (
-                      <TextFormat type="date" value={diagnosticReportFormat.createdAt} format={APP_LOCAL_DATE_FORMAT} />
-                    ) : null}
-                  </td>
-                  <td>{diagnosticReportFormat.createdBy}</td>
-                  <td>
-                    {diagnosticReportFormat.updatedAt ? (
-                      <TextFormat type="date" value={diagnosticReportFormat.updatedAt} format={APP_LOCAL_DATE_FORMAT} />
-                    ) : null}
-                  </td>
-                  <td>{diagnosticReportFormat.updatedBy}</td>
-                  <td>
-                    {diagnosticReportFormat.deletedAt ? (
-                      <TextFormat type="date" value={diagnosticReportFormat.deletedAt} format={APP_LOCAL_DATE_FORMAT} />
-                    ) : null}
-                  </td>
-                  <td className="text-end">
-                    <div className="btn-group flex-btn-group-container">
-                      <Button
-                        tag={Link}
-                        to={`/laboratory/diagnostic-report-format/${diagnosticReportFormat.id}`}
-                        color="info"
-                        size="sm"
-                        data-cy="entityDetailsButton"
-                      >
-                        <FontAwesomeIcon icon="eye" />{' '}
-                        <span className="d-none d-md-inline">
-                          <Translate contentKey="entity.action.view">View</Translate>
-                        </span>
-                      </Button>
-                      <Button
-                        tag={Link}
-                        to={`/laboratory/diagnostic-report-format/${diagnosticReportFormat.id}/edit`}
-                        color="primary"
-                        size="sm"
-                        data-cy="entityEditButton"
-                      >
-                        <FontAwesomeIcon icon="pencil-alt" />{' '}
-                        <span className="d-none d-md-inline">
-                          <Translate contentKey="entity.action.edit">Edit</Translate>
-                        </span>
-                      </Button>
-                      <Button
-                        tag={Link}
-                        to={`/laboratory/diagnostic-report-format/${diagnosticReportFormat.id}/delete`}
-                        color="danger"
-                        size="sm"
-                        data-cy="entityDeleteButton"
-                      >
-                        <FontAwesomeIcon icon="trash" />{' '}
-                        <span className="d-none d-md-inline">
-                          <Translate contentKey="entity.action.delete">Delete</Translate>
-                        </span>
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+          <Table
+            columns={columns}
+            dataSource={[...diagnosticReportFormatList].sort((a, b) => a?.id?.localeCompare(b?.id))}
+            rowKey={r => r.id}
+          />
         ) : (
-          !loading && (
-            <div className="alert alert-warning">
-              <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.home.notFound">
-                No Diagnostic Report Formats found
-              </Translate>
-            </div>
-          )
+          !loading && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={'No hay formatos de reporte de diagnóstico...'} />
         )}
       </div>
-    </div>
+    </>
   );
 };
 

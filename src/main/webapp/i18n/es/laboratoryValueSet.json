@@ -1,0 +1,37 @@
+{
+  "laboratoryApp": {
+    "laboratoryValueSet": {
+      "home": {
+        "title": "Conjuntos de Valores",
+        "refreshListLabel": "Actualizar lista",
+        "createLabel": "Crear un nuevo Conjunto de Valores",
+        "editLabel": "Editar un Conjunto de Valores",
+        "notFound": "No se encontraron Conjuntos de Valores"
+      },
+      "create": {
+        "name": "Nombre",
+        "description": "Descripción",
+        "dataType": "Tipo de Dato",
+        "values": {
+          "name": "Nombre",
+          "description": "Descripción",
+          "value": "Valor"
+        }
+      },
+      "description": "Descripción",
+      "dataType": "Tipo de Dato",
+      "numConstants": "Número de Constantes",
+      "created": "Se ha creado un nuevo Conjunto de Valores con el identificador {{ param }}",
+      "updated": "Se ha actualizado un Conjunto de Valores con el identificador {{ param }}",
+      "deleted": "Se ha eliminado un Conjunto de Valores con el identificador {{ param }}",
+      "delete": {
+        "question": "¿Estás seguro de que deseas eliminar el Conjunto de Valores {{ id }}?"
+      },
+      "detail": {
+        "title": "Conjunto de Valores"
+      },
+      "id": "Id",
+      "name": "Nombre"
+    }
+  }
+}

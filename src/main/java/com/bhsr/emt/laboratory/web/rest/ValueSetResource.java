@@ -1,13 +1,18 @@
 package com.bhsr.emt.laboratory.web.rest;
 
+import com.bhsr.emt.laboratory.domain.Constant;
 import com.bhsr.emt.laboratory.domain.ValueSet;
 import com.bhsr.emt.laboratory.repository.ValueSetRepository;
+import com.bhsr.emt.laboratory.service.dto.Constant.ConstantResponseDTO;
+import com.bhsr.emt.laboratory.service.dto.ValueSet.ValueSetRequestDTO;
+import com.bhsr.emt.laboratory.service.dto.ValueSet.ValueSetResponseDTO;
 import com.bhsr.emt.laboratory.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
@@ -46,24 +51,69 @@ public class ValueSetResource {
     /**
      * {@code POST  /value-sets} : Create a new valueSet.
      *
-     * @param valueSet the valueSet to create.
+     * @param valueSetRequestDTO the valueSet to create.
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new valueSet, or with status {@code 400 (Bad Request)} if the valueSet has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/value-sets")
-    public Mono<ResponseEntity<ValueSet>> createValueSet(@Valid @RequestBody ValueSet valueSet) throws URISyntaxException {
-        log.debug("REST request to save ValueSet : {}", valueSet);
-        if (valueSet.getId() != null) {
+    public Mono<ResponseEntity<ValueSetResponseDTO>> createValueSet(@Valid @RequestBody ValueSetRequestDTO valueSetRequestDTO)
+        throws URISyntaxException {
+        log.debug("REST request to save ValueSet : {}", valueSetRequestDTO);
+        if (valueSetRequestDTO.getId() != null) {
             throw new BadRequestAlertException("A new valueSet cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
+        ValueSet valueSet = ValueSet
+            .builder()
+            .name(valueSetRequestDTO.getName())
+            .description(valueSetRequestDTO.getDescription())
+            .dataType(valueSetRequestDTO.getDataType())
+            .constants(
+                valueSetRequestDTO
+                    .getConstants()
+                    .stream()
+                    .map(constantRequestDTO ->
+                        Constant
+                            .builder()
+                            .name(constantRequestDTO.getName())
+                            .value(constantRequestDTO.getValue())
+                            .description(constantRequestDTO.getDescription())
+                            .build()
+                    )
+                    .collect(Collectors.toSet())
+            )
+            .build();
+
         return valueSetRepository
             .save(valueSet)
             .map(result -> {
                 try {
+                    ValueSetResponseDTO valueSetResponseDTO = ValueSetResponseDTO
+                        .builder()
+                        .id(result.getId())
+                        .name(result.getName())
+                        .description(result.getDescription())
+                        .dataType(result.getDataType())
+                        .constants(
+                            result
+                                .getConstants()
+                                .stream()
+                                .map(constant ->
+                                    ConstantResponseDTO
+                                        .builder()
+                                        .name(constant.getName())
+                                        .value(constant.getValue())
+                                        .description(constant.getDescription())
+                                        .build()
+                                )
+                                .collect(Collectors.toSet())
+                        )
+                        .build();
+
                     return ResponseEntity
-                        .created(new URI("/api/value-sets/" + result.getId()))
-                        .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId()))
-                        .body(result);
+                        .created(new URI("/api/value-sets/" + valueSetResponseDTO.getId()))
+                        .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, valueSetResponseDTO.getId()))
+                        .body(valueSetResponseDTO);
                 } catch (URISyntaxException e) {
                     throw new RuntimeException(e);
                 }
@@ -73,7 +123,7 @@ public class ValueSetResource {
     /**
      * {@code PUT  /value-sets/:id} : Updates an existing valueSet.
      *
-     * @param id the id of the valueSet to save.
+     * @param id       the id of the valueSet to save.
      * @param valueSet the valueSet to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated valueSet,
      * or with status {@code 400 (Bad Request)} if the valueSet is not valid,
@@ -115,7 +165,7 @@ public class ValueSetResource {
     /**
      * {@code PATCH  /value-sets/:id} : Partial updates given fields of an existing valueSet, field will ignore if it is null
      *
-     * @param id the id of the valueSet to save.
+     * @param id       the id of the valueSet to save.
      * @param valueSet the valueSet to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated valueSet,
      * or with status {@code 400 (Bad Request)} if the valueSet is not valid,
@@ -171,13 +221,44 @@ public class ValueSetResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of valueSets in body.
      */
     @GetMapping("/value-sets")
-    public Mono<List<ValueSet>> getAllValueSets() {
+    public Mono<List<ValueSetResponseDTO>> getAllValueSets() {
         log.debug("REST request to get all ValueSets");
-        return valueSetRepository.findAll().collectList();
+        return valueSetRepository
+            .findAll()
+            .collectList()
+            .map(valueSets ->
+                valueSets
+                    .stream()
+                    .map(valueSet ->
+                        ValueSetResponseDTO
+                            .builder()
+                            .id(valueSet.getId())
+                            .name(valueSet.getName())
+                            .description(valueSet.getDescription())
+                            .dataType(valueSet.getDataType())
+                            .constants(
+                                valueSet
+                                    .getConstants()
+                                    .stream()
+                                    .map(constant ->
+                                        ConstantResponseDTO
+                                            .builder()
+                                            .name(constant.getName())
+                                            .value(constant.getValue())
+                                            .description(constant.getDescription())
+                                            .build()
+                                    )
+                                    .collect(Collectors.toSet())
+                            )
+                            .build()
+                    )
+                    .collect(Collectors.toList())
+            );
     }
 
     /**
      * {@code GET  /value-sets} : get all the valueSets as a stream.
+     *
      * @return the {@link Flux} of valueSets.
      */
     @GetMapping(value = "/value-sets", produces = MediaType.APPLICATION_NDJSON_VALUE)
@@ -193,10 +274,35 @@ public class ValueSetResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the valueSet, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/value-sets/{id}")
-    public Mono<ResponseEntity<ValueSet>> getValueSet(@PathVariable String id) {
+    public Mono<ResponseEntity<ValueSetResponseDTO>> getValueSet(@PathVariable String id) {
         log.debug("REST request to get ValueSet : {}", id);
-        Mono<ValueSet> valueSet = valueSetRepository.findById(id);
-        return ResponseUtil.wrapOrNotFound(valueSet);
+        return valueSetRepository
+            .findById(id)
+            .flatMap(result -> {
+                ValueSetResponseDTO valueSetResponseDTO = ValueSetResponseDTO
+                    .builder()
+                    .id(result.getId())
+                    .name(result.getName())
+                    .description(result.getDescription())
+                    .dataType(result.getDataType())
+                    .constants(
+                        result
+                            .getConstants()
+                            .stream()
+                            .map(constant ->
+                                ConstantResponseDTO
+                                    .builder()
+                                    .name(constant.getName())
+                                    .value(constant.getValue())
+                                    .description(constant.getDescription())
+                                    .build()
+                            )
+                            .collect(Collectors.toSet())
+                    )
+                    .build();
+
+                return ResponseUtil.wrapOrNotFound(Mono.just(valueSetResponseDTO));
+            });
     }
 
     /**

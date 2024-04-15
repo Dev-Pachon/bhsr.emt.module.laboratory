@@ -1,15 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Button, Row, Col, FormText } from 'reactstrap';
-import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { translate } from 'react-jhipster';
+import { Button, Form, Input, Row } from 'antd';
+import { LeftOutlined, PlusOutlined } from '@ant-design/icons';
 
-import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
-import { mapIdList } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { IDiagnosticReportFormat } from 'app/shared/model/laboratory/diagnostic-report-format.model';
-import { getEntity, updateEntity, createEntity, reset } from './diagnostic-report-format.reducer';
+import { createEntity, getEntity, reset, updateEntity } from './diagnostic-report-format.reducer';
+import { IFieldFormat } from 'app/shared/model/laboratory/field-format.model';
+import { DataType } from 'app/shared/model/enumerations/data-type.model';
+import { DiagnosticReportFormatField } from 'app/entities/laboratory/diagnostic-report-format/components/field-component';
+import { getEntities as getValueSetEntities } from 'app/entities/laboratory/value-set/value-set.reducer';
+import { useForm } from 'antd/es/form/Form';
+import PageHeader from 'app/entities/laboratory/shared/page-header';
+import Swal from 'sweetalert2';
+import { Save } from '@mui/icons-material';
+import { FabButton } from 'app/entities/laboratory/shared/fab-button';
 
 export const DiagnosticReportFormatUpdate = () => {
   const dispatch = useAppDispatch();
@@ -20,15 +27,20 @@ export const DiagnosticReportFormatUpdate = () => {
   const isNew = id === undefined;
 
   const diagnosticReportFormatEntity = useAppSelector(state => state.laboratory.diagnosticReportFormat.entity);
+  const valueSetList = useAppSelector(state => state.laboratory.valueSet.entities);
+
   const loading = useAppSelector(state => state.laboratory.diagnosticReportFormat.loading);
   const updating = useAppSelector(state => state.laboratory.diagnosticReportFormat.updating);
   const updateSuccess = useAppSelector(state => state.laboratory.diagnosticReportFormat.updateSuccess);
+  const [form] = useForm<IDiagnosticReportFormat>();
 
+  const [fields, setFields] = useState<IFieldFormat[]>([]);
   const handleClose = () => {
     navigate('/laboratory/diagnostic-report-format');
   };
 
   useEffect(() => {
+    dispatch(getValueSetEntities({}));
     if (isNew) {
       dispatch(reset());
     } else {
@@ -37,12 +49,20 @@ export const DiagnosticReportFormatUpdate = () => {
   }, []);
 
   useEffect(() => {
+    if (isNew) {
+      addField();
+    } else {
+      setFields([...diagnosticReportFormatEntity.fieldFormats]);
+    }
+  }, [diagnosticReportFormatEntity]);
+
+  useEffect(() => {
     if (updateSuccess) {
       handleClose();
     }
   }, [updateSuccess]);
 
-  const saveEntity = values => {
+  const saveEntity = (values: IDiagnosticReportFormat) => {
     const entity = {
       ...diagnosticReportFormatEntity,
       ...values,
@@ -55,115 +75,105 @@ export const DiagnosticReportFormatUpdate = () => {
     }
   };
 
-  const defaultValues = () =>
-    isNew
+  const handleOpenSave = (values: IDiagnosticReportFormat) => {
+    console.log(values);
+    Swal.fire({
+      title: 'Guardar formato de reporte',
+      text: '¿Deseas guardar el formato?',
+      icon: 'info',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: '¡Si, quiero guardarlo!',
+      cancelButtonText: 'Cancelar',
+    }).then(result => {
+      if (result.isConfirmed) {
+        saveEntity(values);
+      }
+    });
+  };
+
+  const addField = () => {
+    const newField: IFieldFormat = {
+      name: '',
+      dataType: DataType.STRING,
+      defaultValue: 's',
+      isRequired: false,
+      isSearchable: false,
+      order: fields.length + 1,
+    };
+    setFields([...fields, newField]);
+  };
+
+  const removeField = (idx: number) => {
+    const newFields = [...fields];
+    newFields.splice(idx, 1);
+    setFields(newFields);
+  };
+
+  const defaultValues = () => {
+    return isNew
       ? {}
       : {
           ...diagnosticReportFormatEntity,
         };
+  };
 
   return (
-    <div>
+    <>
+      <PageHeader
+        title={
+          isNew
+            ? translate('laboratoryApp.laboratoryDiagnosticReportFormat.home.createLabel')
+            : translate('laboratoryApp.laboratoryDiagnosticReportFormat.home.editLabel')
+        }
+        leftAction={
+          <Link to={`/laboratory/diagnostic-report-format`} style={{ placeSelf: 'end' }}>
+            <LeftOutlined style={{ fontSize: '24px', color: 'white' }} rev={undefined} />
+          </Link>
+        }
+      />
       <Row className="justify-content-center">
-        <Col md="8">
-          <h2
-            id="laboratoryApp.laboratoryDiagnosticReportFormat.home.createOrEditLabel"
-            data-cy="DiagnosticReportFormatCreateUpdateHeading"
+        {loading || diagnosticReportFormatEntity.length === 0 || fields.length === 0 ? (
+          <p>Loading...</p>
+        ) : (
+          <Form
+            form={form}
+            layout="horizontal"
+            initialValues={defaultValues()}
+            onFinish={handleOpenSave}
+            scrollToFirstError
+            style={{ width: '100%' }}
           >
-            <Translate contentKey="laboratoryApp.laboratoryDiagnosticReportFormat.home.createOrEditLabel">
-              Create or edit a DiagnosticReportFormat
-            </Translate>
-          </h2>
-        </Col>
+            {!isNew ? (
+              <Form.Item<IDiagnosticReportFormat> name="id" hidden label={translate('laboratoryApp.laboratoryDiagnosticReportFormat.id')}>
+                <Input />
+              </Form.Item>
+            ) : null}
+            <Form.Item<IDiagnosticReportFormat>
+              name="name"
+              label={translate('laboratoryApp.laboratoryDiagnosticReportFormat.name')}
+              rules={[{ required: true, message: '¡Este campo es requerido!' }]}
+              labelCol={{ span: 8 }}
+              wrapperCol={{ span: 8 }}
+            >
+              <Input placeholder={translate('laboratoryApp.laboratoryDiagnosticReportFormat.name')} />
+            </Form.Item>
+            {fields &&
+              fields.length > 0 &&
+              fields
+                .sort((fieldA, fieldB) => fieldA.order - fieldB.order)
+                .map((field: IFieldFormat, i: number) => (
+                  <DiagnosticReportFormatField key={i} idx={i} onDelete={removeField} valueSet={valueSetList} />
+                ))}
+            <Button type="dashed" onClick={addField} block icon={<PlusOutlined rev={undefined} />} className={'mb-3'}>
+              Agregar campo
+            </Button>
+            <FabButton Icon={Save} onClick={e => e} color={'info'} component={'button'} type={'submit'} tooltip={'Guardar'} />
+          </Form>
+        )}
       </Row>
-      <Row className="justify-content-center">
-        <Col md="8">
-          {loading ? (
-            <p>Loading...</p>
-          ) : (
-            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
-              {!isNew ? (
-                <ValidatedField
-                  name="id"
-                  required
-                  readOnly
-                  id="diagnostic-report-format-id"
-                  label={translate('laboratoryApp.laboratoryDiagnosticReportFormat.id')}
-                  validate={{ required: true }}
-                />
-              ) : null}
-              <ValidatedField
-                label={translate('laboratoryApp.laboratoryDiagnosticReportFormat.createdAt')}
-                id="diagnostic-report-format-createdAt"
-                name="createdAt"
-                data-cy="createdAt"
-                type="date"
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                }}
-              />
-              <ValidatedField
-                label={translate('laboratoryApp.laboratoryDiagnosticReportFormat.createdBy')}
-                id="diagnostic-report-format-createdBy"
-                name="createdBy"
-                data-cy="createdBy"
-                type="text"
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                }}
-              />
-              <ValidatedField
-                label={translate('laboratoryApp.laboratoryDiagnosticReportFormat.updatedAt')}
-                id="diagnostic-report-format-updatedAt"
-                name="updatedAt"
-                data-cy="updatedAt"
-                type="date"
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                }}
-              />
-              <ValidatedField
-                label={translate('laboratoryApp.laboratoryDiagnosticReportFormat.updatedBy')}
-                id="diagnostic-report-format-updatedBy"
-                name="updatedBy"
-                data-cy="updatedBy"
-                type="text"
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                }}
-              />
-              <ValidatedField
-                label={translate('laboratoryApp.laboratoryDiagnosticReportFormat.deletedAt')}
-                id="diagnostic-report-format-deletedAt"
-                name="deletedAt"
-                data-cy="deletedAt"
-                type="date"
-              />
-              <Button
-                tag={Link}
-                id="cancel-save"
-                data-cy="entityCreateCancelButton"
-                to="/laboratory/diagnostic-report-format"
-                replace
-                color="info"
-              >
-                <FontAwesomeIcon icon="arrow-left" />
-                &nbsp;
-                <span className="d-none d-md-inline">
-                  <Translate contentKey="entity.action.back">Back</Translate>
-                </span>
-              </Button>
-              &nbsp;
-              <Button color="primary" id="save-entity" data-cy="entityCreateSaveButton" type="submit" disabled={updating}>
-                <FontAwesomeIcon icon="save" />
-                &nbsp;
-                <Translate contentKey="entity.action.save">Save</Translate>
-              </Button>
-            </ValidatedForm>
-          )}
-        </Col>
-      </Row>
-    </div>
+    </>
   );
 };
 

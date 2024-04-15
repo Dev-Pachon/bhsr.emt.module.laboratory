@@ -1,41 +1,82 @@
-import React, { useEffect, useState } from 'react';
-import { Translate } from 'react-jhipster';
-
-import MenuItem from 'app/shared/layout/menus/menu-item';
+import React, { useEffect } from 'react';
+import { translate } from 'react-jhipster';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
 import { addTranslationSourcePrefix } from 'app/shared/reducers/locale';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
+import { hasAnyAuthority } from 'app/shared/auth/private-route';
+import { AUTHORITIES } from 'app/config/constants';
+import { Link } from 'react-router-dom';
+import { ListItemIcon } from '@mui/material';
+import { Home, ListAlt, MedicalInformation, Summarize } from '@mui/icons-material';
 
-const EntitiesMenu = () => {
+const EntitiesMenu = ({ closeMenu }) => {
   const lastChange = useAppSelector(state => state.locale.lastChange);
+  const isLabUser = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.LAB_USER]));
+  const isMedUser = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.MEDICAL_USER]));
+  const isAdminUser = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.ADMIN]));
   const dispatch = useAppDispatch();
   useEffect(() => {
     dispatch(addTranslationSourcePrefix('services/laboratory/'));
   }, [lastChange]);
 
-  return (
-    <>
-      {/* prettier-ignore */}
-      <MenuItem icon="asterisk" to="/laboratory/patient">
-        <Translate contentKey="global.menu.entities.laboratoryPatient" />
-      </MenuItem>
-      <MenuItem icon="asterisk" to="/laboratory/identifier-type">
-        <Translate contentKey="global.menu.entities.laboratoryIdentifierType" />
-      </MenuItem>
-      <MenuItem icon="asterisk" to="/laboratory/diagnostic-report">
-        <Translate contentKey="global.menu.entities.laboratoryDiagnosticReport" />
-      </MenuItem>
-      <MenuItem icon="asterisk" to="/laboratory/diagnostic-report-format">
-        <Translate contentKey="global.menu.entities.laboratoryDiagnosticReportFormat" />
-      </MenuItem>
-      <MenuItem icon="asterisk" to="/laboratory/service-request">
-        <Translate contentKey="global.menu.entities.laboratoryServiceRequest" />
-      </MenuItem>
-      <MenuItem icon="asterisk" to="/laboratory/value-set">
-        <Translate contentKey="global.menu.entities.laboratoryValueSet" />
-      </MenuItem>
-      {/* jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here */}
-    </>
-  );
+  if (isAdminUser)
+    return (
+      <>
+        <ListItemButton component={Link} to="/" onClick={closeMenu}>
+          <ListItemIcon>
+            <Home />
+          </ListItemIcon>
+          <ListItemText primary={translate('global.menu.entities.home')} />
+        </ListItemButton>
+        <ListItemButton component={Link} to="/laboratory/diagnostic-report-format" onClick={closeMenu}>
+          <ListItemIcon>
+            <Summarize />
+          </ListItemIcon>
+          <ListItemText primary={translate('global.menu.entities.laboratoryDiagnosticReportFormat')} />
+        </ListItemButton>
+        <ListItemButton component={Link} to="/laboratory/value-set" onClick={closeMenu}>
+          <ListItemIcon>
+            <ListAlt />
+          </ListItemIcon>
+          <ListItemText primary={translate('global.menu.entities.laboratoryValueSet')} />
+        </ListItemButton>
+      </>
+    );
+  if (isMedUser)
+    return (
+      <>
+        <ListItemButton component={Link} to="/" onClick={closeMenu}>
+          <ListItemIcon>
+            <Home />
+          </ListItemIcon>
+          <ListItemText primary={translate('global.menu.entities.home')} />
+        </ListItemButton>
+        <ListItemButton component={Link} to="/laboratory/service-request" onClick={closeMenu}>
+          <ListItemIcon>
+            <MedicalInformation />
+          </ListItemIcon>
+          <ListItemText primary={translate('global.menu.entities.laboratoryServiceRequest')} />
+        </ListItemButton>
+      </>
+    );
+  if (isLabUser)
+    return (
+      <>
+        <ListItemButton component={Link} to="/" onClick={closeMenu}>
+          <ListItemIcon>
+            <Home />
+          </ListItemIcon>
+          <ListItemText primary={translate('global.menu.entities.home')} />
+        </ListItemButton>
+        <ListItemButton component={Link} to="/laboratory/service-request" onClick={closeMenu}>
+          <ListItemIcon>
+            <MedicalInformation />
+          </ListItemIcon>
+          <ListItemText primary={translate('global.menu.entities.laboratoryServiceRequest')} />
+        </ListItemButton>
+      </>
+    );
 };
 
 export default EntitiesMenu;

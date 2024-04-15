@@ -81,18 +81,18 @@ class ServiceRequestResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static ServiceRequest createEntity() {
-        ServiceRequest serviceRequest = new ServiceRequest()
-            .status(DEFAULT_STATUS)
-            .category(DEFAULT_CATEGORY)
-            .priority(DEFAULT_PRIORITY)
-            .code(DEFAULT_CODE)
-            .doNotPerform(DEFAULT_DO_NOT_PERFORM)
-            .serviceId(DEFAULT_SERVICE_ID)
-            .createdAt(DEFAULT_CREATED_AT)
-            .createdBy(DEFAULT_CREATED_BY)
-            .updatedAt(DEFAULT_UPDATED_AT)
-            .updatedBy(DEFAULT_UPDATED_BY)
-            .deletedAt(DEFAULT_DELETED_AT);
+        ServiceRequest serviceRequest = new ServiceRequest();
+        serviceRequest.setServiceId(DEFAULT_SERVICE_ID);
+        serviceRequest.setCreatedAt(DEFAULT_CREATED_AT);
+        serviceRequest.setCreatedBy(DEFAULT_CREATED_BY);
+        serviceRequest.setUpdatedAt(DEFAULT_UPDATED_AT);
+        serviceRequest.setUpdatedBy(DEFAULT_UPDATED_BY);
+        serviceRequest.setDeletedAt(DEFAULT_DELETED_AT);
+        serviceRequest.setStatus(DEFAULT_STATUS);
+        serviceRequest.setCategory(DEFAULT_CATEGORY);
+        serviceRequest.setPriority(DEFAULT_PRIORITY);
+        serviceRequest.setCode(DEFAULT_CODE);
+        serviceRequest.setDoNotPerform(DEFAULT_DO_NOT_PERFORM);
         return serviceRequest;
     }
 
@@ -103,18 +103,18 @@ class ServiceRequestResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static ServiceRequest createUpdatedEntity() {
-        ServiceRequest serviceRequest = new ServiceRequest()
-            .status(UPDATED_STATUS)
-            .category(UPDATED_CATEGORY)
-            .priority(UPDATED_PRIORITY)
-            .code(UPDATED_CODE)
-            .doNotPerform(UPDATED_DO_NOT_PERFORM)
-            .serviceId(UPDATED_SERVICE_ID)
-            .createdAt(UPDATED_CREATED_AT)
-            .createdBy(UPDATED_CREATED_BY)
-            .updatedAt(UPDATED_UPDATED_AT)
-            .updatedBy(UPDATED_UPDATED_BY)
-            .deletedAt(UPDATED_DELETED_AT);
+        ServiceRequest serviceRequest = new ServiceRequest();
+        serviceRequest.setServiceId(DEFAULT_SERVICE_ID);
+        serviceRequest.setCreatedAt(DEFAULT_CREATED_AT);
+        serviceRequest.setCreatedBy(DEFAULT_CREATED_BY);
+        serviceRequest.setUpdatedAt(DEFAULT_UPDATED_AT);
+        serviceRequest.setUpdatedBy(DEFAULT_UPDATED_BY);
+        serviceRequest.setDeletedAt(DEFAULT_DELETED_AT);
+        serviceRequest.setStatus(DEFAULT_STATUS);
+        serviceRequest.setCategory(DEFAULT_CATEGORY);
+        serviceRequest.setPriority(DEFAULT_PRIORITY);
+        serviceRequest.setCode(DEFAULT_CODE);
+        serviceRequest.setDoNotPerform(DEFAULT_DO_NOT_PERFORM);
         return serviceRequest;
     }
 
@@ -515,18 +515,17 @@ class ServiceRequestResourceIT {
 
         // Update the serviceRequest
         ServiceRequest updatedServiceRequest = serviceRequestRepository.findById(serviceRequest.getId()).block();
-        updatedServiceRequest
-            .status(UPDATED_STATUS)
-            .category(UPDATED_CATEGORY)
-            .priority(UPDATED_PRIORITY)
-            .code(UPDATED_CODE)
-            .doNotPerform(UPDATED_DO_NOT_PERFORM)
-            .serviceId(UPDATED_SERVICE_ID)
-            .createdAt(UPDATED_CREATED_AT)
-            .createdBy(UPDATED_CREATED_BY)
-            .updatedAt(UPDATED_UPDATED_AT)
-            .updatedBy(UPDATED_UPDATED_BY)
-            .deletedAt(UPDATED_DELETED_AT);
+        updatedServiceRequest.setServiceId(DEFAULT_SERVICE_ID);
+        updatedServiceRequest.setCreatedAt(DEFAULT_CREATED_AT);
+        updatedServiceRequest.setCreatedBy(DEFAULT_CREATED_BY);
+        updatedServiceRequest.setUpdatedAt(DEFAULT_UPDATED_AT);
+        updatedServiceRequest.setUpdatedBy(DEFAULT_UPDATED_BY);
+        updatedServiceRequest.setDeletedAt(DEFAULT_DELETED_AT);
+        updatedServiceRequest.setStatus(DEFAULT_STATUS);
+        updatedServiceRequest.setCategory(DEFAULT_CATEGORY);
+        updatedServiceRequest.setPriority(DEFAULT_PRIORITY);
+        updatedServiceRequest.setCode(DEFAULT_CODE);
+        updatedServiceRequest.setDoNotPerform(DEFAULT_DO_NOT_PERFORM);
 
         webTestClient
             .put()
@@ -625,12 +624,10 @@ class ServiceRequestResourceIT {
         // Update the serviceRequest using partial update
         ServiceRequest partialUpdatedServiceRequest = new ServiceRequest();
         partialUpdatedServiceRequest.setId(serviceRequest.getId());
-
-        partialUpdatedServiceRequest
-            .serviceId(UPDATED_SERVICE_ID)
-            .createdAt(UPDATED_CREATED_AT)
-            .createdBy(UPDATED_CREATED_BY)
-            .updatedAt(UPDATED_UPDATED_AT);
+        partialUpdatedServiceRequest.setServiceId(UPDATED_SERVICE_ID);
+        partialUpdatedServiceRequest.setCreatedAt(UPDATED_CREATED_AT);
+        partialUpdatedServiceRequest.setCreatedBy(UPDATED_CREATED_BY);
+        partialUpdatedServiceRequest.setUpdatedAt(UPDATED_UPDATED_AT);
 
         webTestClient
             .patch()
@@ -669,19 +666,17 @@ class ServiceRequestResourceIT {
         // Update the serviceRequest using partial update
         ServiceRequest partialUpdatedServiceRequest = new ServiceRequest();
         partialUpdatedServiceRequest.setId(serviceRequest.getId());
-
-        partialUpdatedServiceRequest
-            .status(UPDATED_STATUS)
-            .category(UPDATED_CATEGORY)
-            .priority(UPDATED_PRIORITY)
-            .code(UPDATED_CODE)
-            .doNotPerform(UPDATED_DO_NOT_PERFORM)
-            .serviceId(UPDATED_SERVICE_ID)
-            .createdAt(UPDATED_CREATED_AT)
-            .createdBy(UPDATED_CREATED_BY)
-            .updatedAt(UPDATED_UPDATED_AT)
-            .updatedBy(UPDATED_UPDATED_BY)
-            .deletedAt(UPDATED_DELETED_AT);
+        partialUpdatedServiceRequest.setUpdatedBy(UPDATED_UPDATED_BY);
+        partialUpdatedServiceRequest.setDeletedAt(UPDATED_DELETED_AT);
+        partialUpdatedServiceRequest.setStatus(UPDATED_STATUS);
+        partialUpdatedServiceRequest.setCategory(UPDATED_CATEGORY);
+        partialUpdatedServiceRequest.setPriority(UPDATED_PRIORITY);
+        partialUpdatedServiceRequest.setCode(UPDATED_CODE);
+        partialUpdatedServiceRequest.setDoNotPerform(UPDATED_DO_NOT_PERFORM);
+        partialUpdatedServiceRequest.setServiceId(UPDATED_SERVICE_ID);
+        partialUpdatedServiceRequest.setCreatedAt(UPDATED_CREATED_AT);
+        partialUpdatedServiceRequest.setCreatedBy(UPDATED_CREATED_BY);
+        partialUpdatedServiceRequest.setUpdatedAt(UPDATED_UPDATED_AT);
 
         webTestClient
             .patch()

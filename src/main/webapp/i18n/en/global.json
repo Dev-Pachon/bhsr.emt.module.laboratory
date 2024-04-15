@@ -1,5 +1,8 @@
 {
   "global": {
+    "true": "Yes",
+    "false": "No",
+    "create": "Create {{entity}}",
     "title": "Laboratory",
     "browsehappy": "You are using an <strong>outdated</strong> browser. Please <a href=\"http://browsehappy.com/?locale=en\">upgrade your browser</a> to improve your experience.",
     "menu": {
@@ -10,9 +13,9 @@
         "laboratoryPatient": "Patient",
         "laboratoryIdentifierType": "Identifier Type",
         "laboratoryDiagnosticReport": "Diagnostic Report",
-        "laboratoryDiagnosticReportFormat": "Diagnostic Report Format",
-        "laboratoryServiceRequest": "Service Request",
-        "laboratoryValueSet": "Value Set",
+        "laboratoryDiagnosticReportFormat": "Diagnostic Report Formats",
+        "laboratoryServiceRequest": "Laboratory Requests",
+        "laboratoryValueSet": "Value Sets",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
       },
       "account": {
@@ -98,13 +101,15 @@
       "addblob": "Add blob",
       "addimage": "Add image",
       "back": "Back",
-      "cancel": "Cancel",
+      "cancel": "Cancel {{entity}}",
       "delete": "Delete",
       "edit": "Edit",
       "open": "Open",
       "save": "Save",
       "view": "View",
-      "show": "Show {{otherEntity}}"
+      "show": "Show {{otherEntity}}",
+      "start": "Start {{entity}}",
+      "complete": "Complete"
     },
     "detail": {
       "field": "Field",

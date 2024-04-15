@@ -3,7 +3,6 @@ import { Route } from 'react-router-dom';
 import Loadable from 'react-loadable';
 
 import LoginRedirect from 'app/modules/login/login-redirect';
-import Logout from 'app/modules/login/logout';
 import Home from 'app/modules/home/home';
 import EntitiesRoutes from 'app/entities/routes';
 import PrivateRoute from 'app/shared/auth/private-route';
@@ -23,7 +22,7 @@ const AppRoutes = () => {
     <div className="view-routes">
       <ErrorBoundaryRoutes>
         <Route index element={<Home />} />
-        <Route path="logout" element={<Logout />} />
+        <Route path="*" element={<PageNotFound />} />
         <Route
           path="admin/*"
           element={
@@ -36,12 +35,11 @@ const AppRoutes = () => {
         <Route
           path="laboratory/*"
           element={
-            <PrivateRoute hasAnyAuthorities={[AUTHORITIES.USER]}>
+            <PrivateRoute hasAnyAuthorities={[AUTHORITIES.MEDICAL_USER, AUTHORITIES.LAB_USER, AUTHORITIES.ADMIN]}>
               <EntitiesRoutes />
             </PrivateRoute>
           }
         />
-        <Route path="*" element={<PageNotFound />} />
       </ErrorBoundaryRoutes>
     </div>
   );
